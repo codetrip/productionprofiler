@@ -1,8 +1,8 @@
 ﻿using System.Web;
 
-namespace ProductionProfiler.Profiling
+namespace ProductionProfiler.Interfaces
 {
-    public interface IRequestProfilingManager
+    public interface IRequestProfilingCoordinator
     {
         void BeginRequest(HttpContext context);
         void EndRequest(HttpContext context);

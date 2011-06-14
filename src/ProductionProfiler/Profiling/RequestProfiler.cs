@@ -14,8 +14,8 @@ namespace ProductionProfiler.Profiling
 {
     public class RequestProfiler : IRequestProfiler
     {
-        private ProfiledRequestInfo _profileData;
-        private ProfiledMethodInfo _currentMethod;
+        private ProfiledRequestData _profileData;
+        private ProfiledMethodData _currentMethod;
         private Stopwatch _watch;
         private readonly ProfilerConfiguration _configuration;
 
@@ -46,16 +46,16 @@ namespace ProductionProfiler.Profiling
                     _configuration.ProfilingAppender.AppendLoggingEvent += ProfilingAppenderAppendLoggingEvent;
                 }
 
-                _profileData = new ProfiledRequestInfo
+                _profileData = new ProfiledRequestData
                 {
                     Url = request.RawUrl.ToLowerInvariant(),
                     CapturedOnUtc = DateTime.UtcNow,
-                    Methods = new List<ProfiledMethodInfo>(),
+                    Methods = new List<ProfiledMethodData>(),
                     Server = Environment.MachineName,
                     ClientIpAddress = request.ClientIpAddress(),
                     UserAgent = request.UserAgent,
                     Ajax = request.IsAjaxRequest(),
-                    RequestId = RequestId
+                    Id = RequestId
                 };
 
                 _watch = Stopwatch.StartNew();
@@ -68,7 +68,7 @@ namespace ProductionProfiler.Profiling
                 _currentMethod.LogMessages.Add(e.LoggingEvent.ToLogMessage(_currentMethod.Elapsed()));
         }
 
-        public ProfiledRequestInfo StopProfiling()
+        public ProfiledRequestData StopProfiling()
         {
             _watch.Stop();
             _profileData.ElapsedMilliseconds = _watch.ElapsedMilliseconds;
@@ -84,7 +84,7 @@ namespace ProductionProfiler.Profiling
 
         public void MethodEntry(IInvocation invocation)
         {
-            ProfiledMethodInfo method = new ProfiledMethodInfo
+            ProfiledMethodData method = new ProfiledMethodData
             {
                 MethodName = string.Format("{0}.{1}", invocation.TargetType.FullName, invocation.Method.Name)
             };

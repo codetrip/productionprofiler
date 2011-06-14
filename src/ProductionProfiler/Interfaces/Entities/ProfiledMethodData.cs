@@ -5,27 +5,27 @@ using System.Diagnostics;
 namespace ProductionProfiler.Interfaces.Entities
 {
     [Serializable]
-    public class ProfiledMethodInfo
+    public class ProfiledMethodData
     {
         [NonSerialized]
-        private ProfiledMethodInfo _parentMethod;
+        private ProfiledMethodData _parentMethod;
         [NonSerialized]
         private Stopwatch _watch;
 
         public List<LogMessage> LogMessages { get; set; }
-        public List<ProfiledMethodInfo> InnerMethods { get; set; }
+        public List<ProfiledMethodData> InnerMethods { get; set; }
         public long ElapsedMilliseconds { get; set; }
         public long StartedAtMilliseconds { get; set; }
         public long StoppedAtMilliseconds { get; set; }
         public string MethodName { get; set; }
         public bool ErrorInMethod { get; set; }
 
-        public ProfiledMethodInfo GetParentMethod()
+        public ProfiledMethodData GetParentMethod()
         {
             return _parentMethod;
         }
 
-        public void SetParentMethod(ProfiledMethodInfo parentMethod)
+        public void SetParentMethod(ProfiledMethodData parentMethod)
         {
             _parentMethod = parentMethod;
         }
@@ -46,9 +46,9 @@ namespace ProductionProfiler.Interfaces.Entities
             return _watch.ElapsedMilliseconds;
         }
 
-        public ProfiledMethodInfo()
+        public ProfiledMethodData()
         {
-            InnerMethods = new List<ProfiledMethodInfo>();
+            InnerMethods = new List<ProfiledMethodData>();
             LogMessages = new List<LogMessage>();
         }
     }

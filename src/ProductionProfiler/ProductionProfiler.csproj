@@ -46,9 +46,13 @@
     <Reference Include="log4net">
       <HintPath>..\..\lib\Log4net\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Norm">
+      <HintPath>..\..\lib\NoRM\Norm.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -56,30 +60,58 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\Configure.cs" />
     <Compile Include="Configuration\ProfilerConfiguration.cs" />
+    <Compile Include="DataAccess\ProfiledRequestDataMongoRepository.cs" />
+    <Compile Include="DataAccess\ProfiledRequestMongoRepository.cs" />
+    <Compile Include="Extensions\ExceptionExtensions.cs" />
+    <Compile Include="Extensions\QueryableExtensions.cs" />
+    <Compile Include="Handlers\ErrorRequestHandler.cs" />
+    <Compile Include="Handlers\ProfiledRequestResultsRequestHandler.cs" />
+    <Compile Include="Handlers\ProfiledRequestsRequestHandler.cs" />
+    <Compile Include="Handlers\ProfilerAdministrationHandler.cs" />
+    <Compile Include="Handlers\RequestHandlerBase.cs" />
+    <Compile Include="Handlers\RequestHandlerFactory.cs" />
+    <Compile Include="Handlers\RequestInfoParser.cs" />
+    <Compile Include="Handlers\ResourceRequestHandler.cs" />
+    <Compile Include="Interfaces\Entities\ProfiledRequestPreview.cs" />
+    <Compile Include="Interfaces\Entities\RequestInfo.cs" />
+    <Compile Include="Interfaces\ICustomDataProvider.cs" />
+    <Compile Include="Interfaces\IProfiledRequestDataRepository.cs" />
+    <Compile Include="Interfaces\Entities\Page.cs" />
+    <Compile Include="Interfaces\Entities\Pagination.cs" />
+    <Compile Include="Interfaces\Entities\PagingInfo.cs" />
+    <Compile Include="Interfaces\Entities\ProfiledRequest.cs" />
     <Compile Include="Interfaces\Entities\RequestProfilerContext.cs" />
     <Compile Include="Extensions\HttpRequestExtensions.cs" />
     <Compile Include="Extensions\LoggingEventExtensions.cs" />
     <Compile Include="Interfaces\Entities\LogMessage.cs" />
-    <Compile Include="Interfaces\Entities\ProfiledMethodInfo.cs" />
-    <Compile Include="Interfaces\Entities\ProfiledRequestInfo.cs" />
+    <Compile Include="Interfaces\Entities\ProfiledMethodData.cs" />
+    <Compile Include="Interfaces\Entities\ProfiledRequestData.cs" />
     <Compile Include="Interfaces\Exceptions\RequestProfilerConfigurationException.cs" />
+    <Compile Include="Interfaces\IProfiledRequestRepository.cs" />
+    <Compile Include="Interfaces\IRepository.cs" />
+    <Compile Include="Interfaces\IRequestHandler.cs" />
     <Compile Include="Interfaces\IRequestProfiler.cs" />
     <Compile Include="Interfaces\IWantToBeProfiled.cs" />
     <Compile Include="Interfaces\Resources\Constants.cs" />
     <Compile Include="Log4Net\AppendLoggingEventEventArgs.cs" />
     <Compile Include="Log4Net\Log4NetProfilingAppender.cs" />
-    <Compile Include="Profiling\IRequestProfilingManager.cs" />
+    <Compile Include="Interfaces\IRequestProfilingCoordinator.cs" />
+    <Compile Include="Mongo\MongoConfiguration.cs" />
+    <Compile Include="Mongo\MongoSession.cs" />
     <Compile Include="Profiling\RequestProfiler.cs" />
     <Compile Include="IoC\ProfilingInterceptorSelector.cs" />
     <Compile Include="IoC\RequestProfilingInterceptor.cs" />
     <Compile Include="Modules\RequestProfilingModule.cs" />
-    <Compile Include="Profiling\RequestProfilingManager.cs" />
+    <Compile Include="Profiling\RequestProfilingCoordinator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="DataAccess\" />
-    <Folder Include="Handlers\" />
+    <EmbeddedResource Include="Resources.Css.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.Client.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

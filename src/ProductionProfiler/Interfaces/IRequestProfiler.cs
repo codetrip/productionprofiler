@@ -13,6 +13,6 @@ namespace ProductionProfiler.Interfaces
         void MethodEntry(IInvocation invocation);
         void MethodExit();
         void StartProfiling(HttpRequest request);
-        ProfiledRequestInfo StopProfiling();
+        ProfiledRequestData StopProfiling();
     }
 }

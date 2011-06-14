@@ -1,0 +1,15 @@
+﻿
+using System.Web;
+using ProductionProfiler.Interfaces;
+using ProductionProfiler.Interfaces.Entities;
+
+namespace ProductionProfiler.Handlers
+{
+    public class ErrorRequestHandler : IRequestHandler
+    {
+        public void HandleRequest(HttpContext context, RequestInfo requestInfo)
+        {
+            context.Response.Write("<html><body><h1>Invalid request, no suitable handler found to process your request</h1></body></html>");
+        }
+    }
+}

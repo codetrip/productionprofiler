@@ -5,7 +5,7 @@ using log4net.Core;
 
 namespace ProductionProfiler.Log4Net
 {
-    public class Log4NetProfilingAppender : TraceAppender
+    public class Log4NetProfilingAppender : AppenderSkeleton
     {
         private readonly object _eventlock = new object();
         private event EventHandler<AppendLoggingEventEventArgs> _appendLoggingEvent;
@@ -41,14 +41,6 @@ namespace ProductionProfiler.Log4Net
         protected override void Append(LoggingEvent loggingEvent)
         {
             OnAppendLoggingEvent(new AppendLoggingEventEventArgs(loggingEvent));
-        }
-
-        protected override void Append(LoggingEvent[] loggingEvents)
-        {
-            foreach (var loggingEvent in loggingEvents)
-            {
-                OnAppendLoggingEvent(new AppendLoggingEventEventArgs(loggingEvent));
-            }
         }
     }
 }

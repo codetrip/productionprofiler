@@ -9,6 +9,8 @@ using System.Web.Routing;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using log4net.Config;
+using ProductionProfiler.Configuration;
+using ProductionProfiler.Web.Models;
 
 namespace ProductionProfiler.Web
 {
@@ -26,6 +28,7 @@ namespace ProductionProfiler.Web
         public static void RegisterRoutes(RouteCollection routes)
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
+            routes.IgnoreRoute("{folder}/{*pathInfo}", new { folder = "profiler" });
 
             routes.MapRoute(
                 "Default", // Route name
@@ -55,6 +58,16 @@ namespace ProductionProfiler.Web
                 else
                     throw;
             }
+
+            //set up request profiler
+            Configure.With(Container)
+                .GetThreshold(2500)
+                .PostThreshold(3500)
+                .Log4Net("Profiler")
+                .Mongo("127.0.0.1", 27017)
+                .RequestFilter(req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty)
+                .InterceptTypes(new []{typeof(IWorkflow)})
+                .Initialise();
         }
 
         public IWindsorContainer Container
