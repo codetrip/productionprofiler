@@ -1,0 +1,32 @@
+# Ignore file for Visual Studio
+
+# use glob syntax
+syntax: glob
+
+*.min.css
+*.min.js
+*.bak
+*.obj
+*.user
+*.aps
+*.suo
+*.cache
+*.log
+*.lib
+*.scc
+*.dev.config
+*.gen.sql
+*.orig
+[Bb]in
+[Dd]ebug*/
+obj/
+bin/
+obj
+bin
+[Rr]elease*/
+[Tt]est[Rr]esult*
+[Bb]uild[Ll]og.*
+*.vshost.*
+*.[Pp]ublish.xml
+_[Rr]e[Ss]harper*
+glob:.fsLockFile
