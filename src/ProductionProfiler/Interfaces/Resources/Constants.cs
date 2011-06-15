@@ -26,11 +26,11 @@ namespace ProductionProfiler.Interfaces.Resources
 
         public static class Querystring
         {
-            public const string Handler = "h";
-            public const string Resource = "r";
-            public const string ContentType = "ct";
-            public const string Action = "a";
-            public const string Url = "u";
+            public const string Handler = "handler";
+            public const string Resource = "resource";
+            public const string ContentType = "contenttype";
+            public const string Action = "action";
+            public const string Url = "url";
             public const string Id = "id";
             public const string PageNumber = "pgno";
             public const string PageSize = "pgsz";
@@ -42,6 +42,14 @@ namespace ProductionProfiler.Interfaces.Resources
             public const string Results = "results";
             public const string ResultDetails = "resultsdetail";
             public const string ViewProfiledRequests = "viewprofiledrequests";
+            public const string Add = "add";
+            public const string Update = "update";
+        }
+
+        public static class Handlers
+        {
+            public const string Results = "results";
+            public const string ProfiledRequests = "profiledrequests";
         }
     }
 }

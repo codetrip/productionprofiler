@@ -165,12 +165,12 @@ namespace ProductionProfiler.Configuration
 
             _container.Register(Component.For<IRequestHandler>()
                 .LifeStyle.Transient
-                .Named("profiledrequests")
+                .Named(Constants.Handlers.ProfiledRequests)
                 .ImplementedBy<ProfiledRequestsRequestHandler>());
 
             _container.Register(Component.For<IRequestHandler>()
                 .LifeStyle.Transient
-                .Named("results")
+                .Named(Constants.Handlers.Results)
                 .ImplementedBy<ProfiledRequestResultsRequestHandler>());
 
             _container.Kernel.ProxyFactory.AddInterceptorSelector(new ProfilingInterceptorSelector(_typesToIntercept));

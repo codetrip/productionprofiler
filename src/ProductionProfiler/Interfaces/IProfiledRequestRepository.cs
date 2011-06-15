@@ -8,5 +8,6 @@ namespace ProductionProfiler.Interfaces
     {
         Page<ProfiledRequest> GetProfiledRequests(PagingInfo pagingInfo);
         IList<ProfiledRequest> GetRequestsToProfile(string serverName);
+        void Update(ProfiledRequest profiledRequest);
     }
 }

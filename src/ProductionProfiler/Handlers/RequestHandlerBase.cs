@@ -10,23 +10,34 @@ namespace ProductionProfiler.Handlers
     {
         public void HandleRequest(HttpContext context, RequestInfo requestInfo)
         {
-            string json = new JavaScriptSerializer().Serialize(GetResponseData(requestInfo));
+            var jsonResponse = GetResponseData(requestInfo);
 
+            if(!string.IsNullOrEmpty(jsonResponse.Redirect))
+            {
+                context.Response.Redirect(jsonResponse.Redirect);
+                context.Response.End();
+                return;
+            }
+
+            string json = new JavaScriptSerializer().Serialize(jsonResponse);
             string path = VirtualPathUtility.ToAbsolute("~/", context.Request.ApplicationPath);
 
             StringBuilder response = new StringBuilder();
-            response.AppendFormat("<html><head></head><body>");
+            response.AppendFormat("<html><head>");
+            response.AppendFormat("<link href=\"/Content/Resources.Css.css\" rel=\"stylesheet\" type=\"text/css\" />");
+            response.AppendFormat("</head><body><span id='title'></span>");
             response.AppendFormat("<script type='text/javascript'>var profileData = {0}, profilePath = '{1}', profileAction = '{2}';</script>", json, path, Action(requestInfo));
-            response.AppendFormat("<link href=\"profiler?r=Css.css&ct={0}\" rel=\"stylesheet\" type=\"text/css\" />", HttpUtility.UrlEncode("text/css"));
-            response.AppendFormat("<script type='text/javascript' src='profiler?r=Client.js&ct={0}'></script>", HttpUtility.UrlEncode("application/javascript"));
-            response.AppendFormat("<div id=\"profiler\" class=\"profiler\"></div></body></html>");
+            response.AppendFormat("<script type='text/javascript' src='/Content/Resources.Client.js'></script>");
+            //response.AppendFormat("<link href=\"profiler?r=Css.css&ct={0}\" rel=\"stylesheet\" type=\"text/css\" />", HttpUtility.UrlEncode("text/css"));
+            //response.AppendFormat("<script type='text/javascript' src='profiler?r=Client.js&ct={0}'></script>", HttpUtility.UrlEncode("application/javascript"));
+            response.AppendFormat("<div id=\"profiler\" class=\"container\"></div></body></html>");
 
             context.Response.Write(response.ToString());
             context.Response.AddHeader("Content-Type", "text/html");
             context.Response.Cache.SetCacheability(HttpCacheability.Private);
         }
 
-        protected abstract object GetResponseData(RequestInfo requestInfo);
+        protected abstract JsonResponse GetResponseData(RequestInfo requestInfo);
         protected abstract string Action(RequestInfo requestInfo);
     }
 }

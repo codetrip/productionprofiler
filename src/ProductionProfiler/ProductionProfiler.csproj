@@ -60,6 +60,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Binders\AddProfiledRequestModelBinder.cs" />
+    <Compile Include="Binders\UpdateProfiledRequestModelBinder.cs" />
     <Compile Include="Configuration\Configure.cs" />
     <Compile Include="Configuration\ProfilerConfiguration.cs" />
     <Compile Include="DataAccess\ProfiledRequestDataMongoRepository.cs" />
@@ -74,9 +76,12 @@
     <Compile Include="Handlers\RequestHandlerFactory.cs" />
     <Compile Include="Handlers\RequestInfoParser.cs" />
     <Compile Include="Handlers\ResourceRequestHandler.cs" />
+    <Compile Include="Interfaces\Entities\JsonResponse.cs" />
     <Compile Include="Interfaces\Entities\ProfiledRequestPreview.cs" />
+    <Compile Include="Interfaces\Entities\ProfiledRequestUpdate.cs" />
     <Compile Include="Interfaces\Entities\RequestInfo.cs" />
     <Compile Include="Interfaces\ICustomDataProvider.cs" />
+    <Compile Include="Interfaces\IModelBinder.cs" />
     <Compile Include="Interfaces\IProfiledRequestDataRepository.cs" />
     <Compile Include="Interfaces\Entities\Page.cs" />
     <Compile Include="Interfaces\Entities\Pagination.cs" />

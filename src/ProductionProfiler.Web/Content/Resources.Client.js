@@ -43,22 +43,51 @@ if (window.jQueryProfiler) {
         $.extend($.profiler, {
             update: function () {
 
+            },
+            formatDate: function (jsonDate) {
+                return jsonDate == null ? '' : new Date(parseInt(jsonDate.substr(6))).toUTCString();
+            },
+            emptyIfNull: function (val) {
+                return val === null || val === 0 ? '' : val;
             }
         });
 
         $.extend($.viewengine, {
             container: null,
+            title: null,
             init: function (data) {
                 this.container = $('#profiler');
+                this.title = $('#title');
             },
             renderProfiledRequests: function (data) {
-                this.container.append('<form action="/profiler?add" method="post">');
-                this.container.append('<table width="700">');
-                this.container.append('<tr><th>Url (Supports Regular Expressions)</th><th>Profile Count</th><th></th></tr>');
-                this.container.append('<tr><td><input id="Url" name="Url" style="width:500px" type="text" value="" /></td><td><input name="ProfilingCount" style="width:50px" type="text" value="" /></td><td><input type="submit" value="Add" class="btn" /></td></tr>');
-                this.container.append('</table></form>');
-                this.container.append('');
-                this.container.append('');
+                var html = '<form action="/profiler?handler=profiledrequests&action=add" method="post">' +
+                '<table width="800">' +
+                '<tr><th>Url (Supports Regular Expressions)</th><th>Server</th><th>Profile Count</th><th></th></tr>' +
+                '<tr><td><input id="Url" name="Url" style="width:500px" type="text" value="" /></td>' +
+                '<td><input name="Server" style="width:100px" type="text" value="" /></td>' +
+                '<td><input name="ProfilingCount" style="width:50px" type="text" value="" /></td>' +
+                '<td><input type="submit" value="Add" class="btn" /></td></tr>' +
+                '</table></form>' +
+                '<form action="/profiler?handler=profiledrequests&action=update" method="post">' +
+                '<table width="1000"><tr><th>Delete</th><th>Url</th><th>Profiled On</th><th>Elapsed</th><th>Server</th><th>Http Method</th><th>Profile Count</th></tr>';
+
+                $.each(data.Data, function (idx, itm) {
+                    var profilingCount = itm.ProfilingCount === null ? '' : itm.ProfilingCount;
+                    html += '<tr>' +
+                    '<input name="Urls[' + idx + ']Url" type="hidden" value="' + itm.Url + '" />' +
+                    '<td><input name="Urls[' + idx + ']Ignore" type="checkbox" value="true" /><input name="Urls[' + idx + ']Ignore" type="hidden" value="false" /></td>' +
+                    '<td>' + itm.Url + '</td>' +
+                    '<td>' + $.profiler.formatDate(itm.ProfiledOnUtc) + '</td>' +
+                    '<td>' + $.profiler.emptyIfNull(itm.ElapsedMilliseconds) + '</td>' +
+                    '<td>' + $.profiler.emptyIfNull(itm.Server) + '</td>' +
+                    '<td>' + $.profiler.emptyIfNull(itm.HttpMethod) + '</td>' +
+                    '<td><input name="Urls[' + idx + ']ProfilingCount" style="width:50px" type="text" value="' + profilingCount + '" /></td>' +
+                    '</tr>';
+                });
+
+                html += '<tr><td colspan="7"><input type="submit" value="Update" class="btn" /></td></tr></table></form>';
+                this.container.html(html);
+                this.title.html("<h1>Profiled Requests</h1>")
             }
         })
 

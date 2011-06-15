@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using ProductionProfiler.Interfaces;
 using ProductionProfiler.Interfaces.Entities;
@@ -18,19 +17,19 @@ namespace ProductionProfiler.DataAccess
             _configuration = configuration;
         }
 
-        public ProfiledRequest GetById(string id)
+        public ProfiledRequest GetById(string url)
         {
             using (MongoSession session = MongoSession.Connect(UrlProfilingDatabaseName, _configuration.Server, _configuration.Port))
             {
-                return session.Items<ProfiledRequest>().Where(b => b.Id == id).FirstOrDefault();
+                return session.Items<ProfiledRequest>().Where(b => b.Url == url).FirstOrDefault();
             }
         }
 
-        public void Delete(string id)
+        public void Delete<TTemplate>(TTemplate template)
         {
             using (MongoSession session = MongoSession.Connect(UrlProfilingDatabaseName, _configuration.Server, _configuration.Port))
             {
-                session.Delete<object>(new { Id = id });
+                session.Delete<ProfiledRequest, TTemplate>(template);
             }
         }
 
@@ -55,6 +54,17 @@ namespace ProductionProfiler.DataAccess
             using (MongoSession session = MongoSession.Connect(UrlProfilingDatabaseName, _configuration.Server, _configuration.Port))
             {
                 return session.Items<ProfiledRequest>(i => i.Server == null || i.Server == serverName).ToList();
+            }
+        }
+
+        public void Update(ProfiledRequest profiledRequest)
+        {
+            using (MongoSession session = MongoSession.Connect(UrlProfilingDatabaseName, _configuration.Server, _configuration.Port))
+            {
+                var request = session.Items<ProfiledRequest>().Where(b => b.Url == profiledRequest.Url).Select(r => r.Url).FirstOrDefault();
+
+                if(request == null)
+                    session.Save(profiledRequest);
             }
         }
     }

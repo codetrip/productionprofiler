@@ -38,7 +38,7 @@ namespace ProductionProfiler.Profiling
 
                 if(requestsToProfile != null && requestsToProfile.Count > 0)
                 {
-                    var requestToProfile = requestsToProfile.FirstOrDefault(req => req.ProfilingCount.HasValue && Regex.IsMatch(currentUrl, req.Url));
+                    var requestToProfile = requestsToProfile.FirstOrDefault(req => req.ProfilingCount.HasValue && Regex.IsMatch(currentUrl, string.Format("^{0}$", req.Url)));
 
                     if (requestToProfile != null)
                     {
@@ -82,9 +82,8 @@ namespace ProductionProfiler.Profiling
                     //if the request took over maxRequestLength and the profiler was not enabled for this request flag the URL for analysis
                     if (stopwatch.ElapsedMilliseconds >= maxRequestLength && !_requestProfiler.InitialisedForRequest)
                     {
-                        _profiledRequestRepository.Save(new ProfiledRequest
+                        _profiledRequestRepository.Update(new ProfiledRequest
                         {
-                            Id = Guid.NewGuid().ToString(),
                             Url = context.Request.RawUrl.ToLowerInvariant(),
                             ProfiledOnUtc = DateTime.UtcNow,
                             Server = Environment.MachineName,

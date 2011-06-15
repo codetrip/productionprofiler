@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Specialized;
 
 namespace ProductionProfiler.Interfaces.Entities
 {
@@ -12,5 +13,6 @@ namespace ProductionProfiler.Interfaces.Entities
         public string ContentType { get; set; }
         public string ResourceName { get; set; }
         public PagingInfo Paging { get; set; }
+        public NameValueCollection Form { get; set; }
     }
 }

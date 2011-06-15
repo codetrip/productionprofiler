@@ -25,11 +25,11 @@ namespace ProductionProfiler.DataAccess
             }
         }
 
-        public void Delete(Guid id)
+        public void Delete<TTemplate>(TTemplate template)
         {
             using (MongoSession session = MongoSession.Connect(ProfileRequestDataDatabaseName, _configuration.Server, _configuration.Port))
             {
-                session.Delete<object>(new { Id = id });
+                session.Delete<ProfiledRequestData, TTemplate>(template);
             }
         }
 

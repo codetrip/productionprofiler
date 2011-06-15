@@ -7,13 +7,9 @@ namespace ProductionProfiler.Interfaces.Entities
     public class ProfiledRequest
     {
         /// <summary>
-        /// Unique identifier
-        /// </summary>
-        [MongoIdentifier]
-        public string Id { get; set; }
-        /// <summary>
         /// The URL to be monitored
         /// </summary>
+        [MongoIdentifier]
         public string Url { get; set; }
         /// <summary>
         /// The length of time the URL took to execute originally
