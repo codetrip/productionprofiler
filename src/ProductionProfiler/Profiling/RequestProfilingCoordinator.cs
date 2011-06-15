@@ -14,15 +14,18 @@ namespace ProductionProfiler.Profiling
 {
     public class RequestProfilingCoordinator : IRequestProfilingCoordinator
     {
+        private readonly IProfiledRequestDataRepository _profiledRequestDataRepository;
         private readonly IProfiledRequestRepository _profiledRequestRepository;
         private readonly IRequestProfiler _requestProfiler;
         private readonly ProfilerConfiguration _configuration;
 
         public RequestProfilingCoordinator(IRequestProfiler requestProfiler, 
             IProfiledRequestRepository profiledRequestRepository, 
-            ProfilerConfiguration configuration)
+            ProfilerConfiguration configuration, 
+            IProfiledRequestDataRepository profiledRequestDataRepository)
         {
             _requestProfiler = requestProfiler;
+            _profiledRequestDataRepository = profiledRequestDataRepository;
             _configuration = configuration;
             _profiledRequestRepository = profiledRequestRepository;
         }
@@ -97,7 +100,7 @@ namespace ProductionProfiler.Profiling
                 //if the IRequestProfiler was running for this request we need to persist the captured data into Mongo via nservicebus
                 if (_requestProfiler.InitialisedForRequest)
                 {
-                    // _serviceBus.Publish(_requestProfiler.StopProfiling());
+                    _profiledRequestDataRepository.Save(_requestProfiler.StopProfiling());
                 }
             }
             catch (Exception e)
