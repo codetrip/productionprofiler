@@ -61,6 +61,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Binders\AddProfiledRequestModelBinder.cs" />
+    <Compile Include="Binders\IAddProfiledRequestModelBinder.cs" />
+    <Compile Include="Binders\IUpdateProfiledRequestModelBinder.cs" />
     <Compile Include="Binders\UpdateProfiledRequestModelBinder.cs" />
     <Compile Include="Configuration\Configure.cs" />
     <Compile Include="Configuration\ProfilerConfiguration.cs" />
@@ -68,9 +70,11 @@
     <Compile Include="DataAccess\ProfiledRequestMongoRepository.cs" />
     <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Extensions\QueryableExtensions.cs" />
+    <Compile Include="Handlers\AddProfiledRequestHandler.cs" />
+    <Compile Include="Handlers\ViewProfiledRequestsHandler.cs" />
     <Compile Include="Handlers\ErrorRequestHandler.cs" />
-    <Compile Include="Handlers\ProfiledRequestResultsRequestHandler.cs" />
-    <Compile Include="Handlers\ProfiledRequestsRequestHandler.cs" />
+    <Compile Include="Handlers\ViewResultsRequestHandler.cs" />
+    <Compile Include="Handlers\UpdateProfiledRequestHandler.cs" />
     <Compile Include="Handlers\ProfilerAdministrationHandler.cs" />
     <Compile Include="Handlers\RequestHandlerBase.cs" />
     <Compile Include="Handlers\RequestHandlerFactory.cs" />
@@ -99,6 +103,7 @@
     <Compile Include="Interfaces\IRequestHandler.cs" />
     <Compile Include="Interfaces\IRequestProfiler.cs" />
     <Compile Include="Interfaces\IWantToBeProfiled.cs" />
+    <Compile Include="Interfaces\Entities\ModelValidationError.cs" />
     <Compile Include="Interfaces\Resources\Constants.cs" />
     <Compile Include="Log4Net\AppendLoggingEventEventArgs.cs" />
     <Compile Include="Log4Net\Log4NetProfilingAppender.cs" />

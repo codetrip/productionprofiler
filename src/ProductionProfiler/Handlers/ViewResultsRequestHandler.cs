@@ -5,16 +5,16 @@ using ProductionProfiler.Interfaces.Resources;
 
 namespace ProductionProfiler.Handlers
 {
-    public class ProfiledRequestResultsRequestHandler : RequestHandlerBase
+    public class ViewResultsRequestHandler : RequestHandlerBase
     {
         private readonly IProfiledRequestDataRepository _profiledRequestsDataRepository;
 
-        public ProfiledRequestResultsRequestHandler(IProfiledRequestDataRepository profiledRequestsDataRepository)
+        public ViewResultsRequestHandler(IProfiledRequestDataRepository profiledRequestsDataRepository)
         {
             _profiledRequestsDataRepository = profiledRequestsDataRepository;
         }
 
-        protected override JsonResponse GetResponseData(RequestInfo requestInfo)
+        protected override JsonResponse DoHandleRequest(RequestInfo requestInfo)
         {
             if (requestInfo.Action == Constants.Actions.Results)
             {
@@ -47,11 +47,5 @@ namespace ProductionProfiler.Handlers
 
             return null;
         }
-
-        protected override string Action(RequestInfo requestInfo)
-        {
-            return requestInfo.Action;
-        }
-
     }
 }

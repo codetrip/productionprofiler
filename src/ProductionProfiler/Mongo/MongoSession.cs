@@ -18,21 +18,7 @@ namespace ProductionProfiler.Mongo
 
         private MongoSession(string database, string server, string port)
         {
-            //HRB: wrapping this in a try...catch and re-throwing a strongly-typed exception
-            // means that MongoDb exceptions can be caught by the global exception handler
-            // and given an event id.
-            try
-            {
-                _mongo = new Norm.Mongo(database, server, port, string.Empty);
-            }
-            catch (SocketException s)
-            {
-                //throw new HarmonyMongoDbException(string.Format("Unable to connect to Mongo database: {0}", s.Message), false, s);
-            }
-            catch (Exception e)
-            {
-                //throw new HarmonyMongoDbException(string.Format("Unable to create new Mongo session: {0}", e.Message), false, e);
-            }
+            _mongo = new Norm.Mongo(database, server, port, string.Empty);
         }
 
         #region Connect / Construct

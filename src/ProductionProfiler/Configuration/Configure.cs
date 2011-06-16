@@ -8,6 +8,7 @@ using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using log4net;
 using log4net.Core;
+using ProductionProfiler.Binders;
 using ProductionProfiler.DataAccess;
 using ProductionProfiler.Handlers;
 using ProductionProfiler.Interfaces;
@@ -151,6 +152,12 @@ namespace ProductionProfiler.Configuration
 
         void IFluentConfiguration.Initialise()
         {
+            RegisterDependencies();
+            RequestProfilerContext.Initialise(_requestFilter, _container);
+        }
+
+        private void RegisterDependencies()
+        {
             _container.Register(Component.For<IRequestProfiler>()
                 .ImplementedBy<RequestProfiler>()
                 .LifeStyle.Custom<HybridPerWebRequestPerThreadLifestyleManager>());
@@ -165,17 +172,33 @@ namespace ProductionProfiler.Configuration
 
             _container.Register(Component.For<IRequestHandler>()
                 .LifeStyle.Transient
-                .Named(Constants.Handlers.ProfiledRequests)
-                .ImplementedBy<ProfiledRequestsRequestHandler>());
+                .Named(Constants.Handlers.UpdateProfiledRequest)
+                .ImplementedBy<UpdateProfiledRequestHandler>());
 
             _container.Register(Component.For<IRequestHandler>()
                 .LifeStyle.Transient
                 .Named(Constants.Handlers.Results)
-                .ImplementedBy<ProfiledRequestResultsRequestHandler>());
+                .ImplementedBy<ViewResultsRequestHandler>());
+
+            _container.Register(Component.For<IRequestHandler>()
+                .LifeStyle.Transient
+                .Named(Constants.Handlers.AddProfiledRequest)
+                .ImplementedBy<AddProfiledRequestHandler>());
+
+            _container.Register(Component.For<IRequestHandler>()
+                .LifeStyle.Transient
+                .Named(Constants.Handlers.ViewProfiledRequests)
+                .ImplementedBy<ViewProfiledRequestsHandler>());
+
+            _container.Register(Component.For<IAddProfiledRequestModelBinder>()
+                .LifeStyle.Transient
+                .ImplementedBy<AddProfiledRequestModelBinder>());
+
+            _container.Register(Component.For<IUpdateProfiledRequestModelBinder>()
+                .LifeStyle.Transient
+                .ImplementedBy<UpdateProfiledRequestModelBinder>());
 
             _container.Kernel.ProxyFactory.AddInterceptorSelector(new ProfilingInterceptorSelector(_typesToIntercept));
-
-            RequestProfilerContext.Initialise(_requestFilter, _container);
         }
     }
 

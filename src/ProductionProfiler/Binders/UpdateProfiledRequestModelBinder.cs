@@ -1,57 +1,67 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Text.RegularExpressions;
+using System.Linq;
 using ProductionProfiler.Interfaces;
 using ProductionProfiler.Interfaces.Entities;
 
 namespace ProductionProfiler.Binders
 {
-    public class UpdateProfiledRequestModelBinder : IModelBinder<IEnumerable<ProfiledRequestUpdate>>
+    public class UpdateProfiledRequestModelBinder : IUpdateProfiledRequestModelBinder
     {
-        public IEnumerable<ProfiledRequestUpdate> Bind(NameValueCollection formParams)
-        {
-            var profiledRequest = new List<ProfiledRequestUpdate>();
+        private readonly List<ModelValidationError> _errors = new List<ModelValidationError>();
 
-            foreach(var key in formParams.AllKeys)
+        public ProfiledRequestUpdate Bind(NameValueCollection formParams)
+        {
+            var profiledRequest = new ProfiledRequestUpdate
             {
-                AddParam(key, formParams, profiledRequest);
-            }
+                Delete = formParams.AllKeys.Where(k => k == "Delete").FirstOrDefault() != null,
+                Url = formParams.Get("Url")
+            };
+
+            if (profiledRequest.Delete)
+                return profiledRequest;
+
+            profiledRequest.Server = formParams.Get("Server");
+            profiledRequest.ProfilingCount = int.Parse(formParams.Get("ProfilingCount"));
+            profiledRequest.Enabled = formParams.Get("Enabled").Contains("true");
 
             return profiledRequest;
         }
 
-        private static void AddParam(string key, NameValueCollection formParams, List<ProfiledRequestUpdate> requests)
+        public bool IsValid(NameValueCollection formParams)
         {
-            var match = Regex.Match(key, @"(.*)\[([0-9]+)\](.*)");
+            bool valid = true;
+            int profileCount;
 
-            if(match.Success)
+            if(!int.TryParse(formParams.Get("ProfilingCount"), out profileCount))
             {
-                int index = int.Parse(match.Groups[2].Value);
-                string property = match.Groups[3].Value;
-
-                if (requests.Count <= index)
-                    requests.Add(new ProfiledRequestUpdate());
-
-                var request = requests[index];
-
-                switch (property)
+                _errors.Add(new ModelValidationError
                 {
-                    case "Url":
-                        request.Url = formParams[key];
-                        break;
-                    case "ProfilingCount":
-                        request.ProfilingCount = string.IsNullOrEmpty(formParams[key]) ? (int?)null : int.Parse(formParams[key]);
-                        break;
-                    case "Server":
-                        request.Server = formParams[key];
-                        break;
-                    case "Ignore":
-                        request.Ignore = formParams[key].Contains("true");
-                        break;
-                    default:
-                        break;
-                }
+                    Field = "ProfilingCount",
+                    Message = "ProfileCount was not supplied"
+                });
+
+                valid = false;
             }
+
+            if (string.IsNullOrEmpty(formParams.Get("Url")))
+            {
+                _errors.Add(new ModelValidationError
+                {
+                    Field = "Url",
+                    Message = "Url was not supplied"
+                });
+
+                valid = false;
+            }
+
+            return valid;
+        }
+
+        public List<ModelValidationError> Errors
+        {
+            get { return _errors; }
         }
     }
 }
+

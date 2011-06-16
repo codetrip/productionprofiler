@@ -18,7 +18,7 @@ namespace ProductionProfiler.Interfaces.Entities
         /// <summary>
         /// The number of times remaining to profile this request
         /// </summary>
-        public int? ProfilingCount { get; set; }
+        public int ProfilingCount { get; set; }
         /// <summary>
         /// The date/time this URL was profiled
         /// </summary>
@@ -31,5 +31,9 @@ namespace ProductionProfiler.Interfaces.Entities
         /// Was the request a get or a post
         /// </summary>
         public string HttpMethod { get; set; }
+        /// <summary>
+        /// Is this enabled for profiling?
+        /// </summary>
+        public bool Enabled { get; set; }
     }
 }

@@ -13,5 +13,10 @@ namespace ProductionProfiler.Web.Controllers
             return View();
         }
 
+        public ActionResult Profile()
+        {
+            return View("index");
+        }
+
     }
 }

@@ -53,7 +53,7 @@ namespace ProductionProfiler.DataAccess
         {
             using (MongoSession session = MongoSession.Connect(UrlProfilingDatabaseName, _configuration.Server, _configuration.Port))
             {
-                return session.Items<ProfiledRequest>(i => i.Server == null || i.Server == serverName).ToList();
+                return session.Items<ProfiledRequest>(i => (i.Server == null || i.Server == serverName) && i.Enabled).ToList();
             }
         }
 

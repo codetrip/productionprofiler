@@ -49,7 +49,9 @@ namespace ProductionProfiler.Interfaces.Resources
         public static class Handlers
         {
             public const string Results = "results";
-            public const string ProfiledRequests = "profiledrequests";
+            public const string ViewProfiledRequests = "vpr";
+            public const string AddProfiledRequest = "apr";
+            public const string UpdateProfiledRequest = "upr";
         }
     }
 }

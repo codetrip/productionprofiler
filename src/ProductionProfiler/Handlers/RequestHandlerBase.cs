@@ -10,7 +10,7 @@ namespace ProductionProfiler.Handlers
     {
         public void HandleRequest(HttpContext context, RequestInfo requestInfo)
         {
-            var jsonResponse = GetResponseData(requestInfo);
+            var jsonResponse = DoHandleRequest(requestInfo);
 
             if(!string.IsNullOrEmpty(jsonResponse.Redirect))
             {
@@ -26,7 +26,7 @@ namespace ProductionProfiler.Handlers
             response.AppendFormat("<html><head>");
             response.AppendFormat("<link href=\"/Content/Resources.Css.css\" rel=\"stylesheet\" type=\"text/css\" />");
             response.AppendFormat("</head><body><span id='title'></span>");
-            response.AppendFormat("<script type='text/javascript'>var profileData = {0}, profilePath = '{1}', profileAction = '{2}';</script>", json, path, Action(requestInfo));
+            response.AppendFormat("<script type='text/javascript'>var profileData = {0}, profilePath = '{1}', profileAction = '{2}';</script>", json, path, requestInfo.Action);
             response.AppendFormat("<script type='text/javascript' src='/Content/Resources.Client.js'></script>");
             //response.AppendFormat("<link href=\"profiler?r=Css.css&ct={0}\" rel=\"stylesheet\" type=\"text/css\" />", HttpUtility.UrlEncode("text/css"));
             //response.AppendFormat("<script type='text/javascript' src='profiler?r=Client.js&ct={0}'></script>", HttpUtility.UrlEncode("application/javascript"));
@@ -37,7 +37,6 @@ namespace ProductionProfiler.Handlers
             context.Response.Cache.SetCacheability(HttpCacheability.Private);
         }
 
-        protected abstract JsonResponse GetResponseData(RequestInfo requestInfo);
-        protected abstract string Action(RequestInfo requestInfo);
+        protected abstract JsonResponse DoHandleRequest(RequestInfo requestInfo);
     }
 }

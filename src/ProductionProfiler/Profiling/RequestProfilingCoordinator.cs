@@ -41,7 +41,7 @@ namespace ProductionProfiler.Profiling
 
                 if(requestsToProfile != null && requestsToProfile.Count > 0)
                 {
-                    var requestToProfile = requestsToProfile.FirstOrDefault(req => req.ProfilingCount.HasValue && Regex.IsMatch(currentUrl, string.Format("^{0}$", req.Url)));
+                    var requestToProfile = requestsToProfile.FirstOrDefault(req => req.ProfilingCount > 0 && Regex.IsMatch(currentUrl, string.Format("^{0}$", req.Url)));
 
                     if (requestToProfile != null)
                     {
@@ -49,7 +49,7 @@ namespace ProductionProfiler.Profiling
 
                         if (requestToProfile.ProfilingCount <= 0)
                         {
-                            requestToProfile.ProfilingCount = null;
+                            requestToProfile.ProfilingCount = 0;
                         }
 
                         _profiledRequestRepository.Save(requestToProfile);
@@ -91,8 +91,9 @@ namespace ProductionProfiler.Profiling
                             ProfiledOnUtc = DateTime.UtcNow,
                             Server = Environment.MachineName,
                             ElapsedMilliseconds = stopwatch.ElapsedMilliseconds,
-                            ProfilingCount = null, //indicates we should not be monitoring this URL until its been validated via the admin console
-                            HttpMethod = context.Request.HttpMethod
+                            ProfilingCount = 0, //indicates we should not be monitoring this URL until its been validated via the admin console
+                            HttpMethod = context.Request.HttpMethod,
+                            Enabled = false
                         });
                     }
                 }

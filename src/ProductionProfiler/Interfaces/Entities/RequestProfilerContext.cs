@@ -20,7 +20,7 @@ namespace ProductionProfiler.Interfaces.Entities
 
         public bool ShouldProfile(HttpRequest request)
         {
-            return _shouldProfile == null ? false : _shouldProfile(request);
+            return _shouldProfile == null ? false : !request.RawUrl.Contains("/profiler") && _shouldProfile(request);
         }
 
         public IRequestProfilingCoordinator GetRequestProfilingManager()

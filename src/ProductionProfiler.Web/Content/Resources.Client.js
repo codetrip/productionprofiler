@@ -59,35 +59,47 @@ if (window.jQueryProfiler) {
                 this.container = $('#profiler');
                 this.title = $('#title');
             },
+            attachEvents: function () {
+                this.container.delegate('#delete', 'click', function (e) {
+                    if (!window.confirm("Are you sure you want to delete this item?")) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            },
             renderProfiledRequests: function (data) {
-                var html = '<form action="/profiler?handler=profiledrequests&action=add" method="post">' +
-                '<table width="800">' +
-                '<tr><th>Url (Supports Regular Expressions)</th><th>Server</th><th>Profile Count</th><th></th></tr>' +
-                '<tr><td><input id="Url" name="Url" style="width:500px" type="text" value="" /></td>' +
-                '<td><input name="Server" style="width:100px" type="text" value="" /></td>' +
-                '<td><input name="ProfilingCount" style="width:50px" type="text" value="" /></td>' +
+                var html = '<form action="/profiler?handler=apr" method="post">' +
+                '<table width="1000">' +
+                '<tr><th>Url to profile (Supports Regular Expressions)</th><th>Server</th><th>Profile Count</th><th></th></tr>' +
+                '<tr><td><input id="Url" name="Url" style="width:625px" type="text" value="" /></td>' +
+                '<td><input name="Server" style="width:200px" type="text" value="" /></td>' +
+                '<td><input name="ProfilingCount" maxlength="4" style="width:75px" type="text" value="" /></td>' +
                 '<td><input type="submit" value="Add" class="btn" /></td></tr>' +
                 '</table></form>' +
-                '<form action="/profiler?handler=profiledrequests&action=update" method="post">' +
-                '<table width="1000"><tr><th>Delete</th><th>Url</th><th>Profiled On</th><th>Elapsed</th><th>Server</th><th>Http Method</th><th>Profile Count</th></tr>';
+                '<table width="1000"><tr><th>Enable</th><th>Url</th><th>Profiled On</th><th>Elapsed</th><th>Server</th><th>Http Method</th><th>Profile Count</th><th>Delete</th><th>Update</th></tr>';
 
                 $.each(data.Data, function (idx, itm) {
                     var profilingCount = itm.ProfilingCount === null ? '' : itm.ProfilingCount;
-                    html += '<tr>' +
-                    '<input name="Urls[' + idx + ']Url" type="hidden" value="' + itm.Url + '" />' +
-                    '<td><input name="Urls[' + idx + ']Ignore" type="checkbox" value="true" /><input name="Urls[' + idx + ']Ignore" type="hidden" value="false" /></td>' +
+                    var checked = itm.Enabled ? 'checked="checked"' : '';
+                    var bgcolor = itm.Enabled ? 'style="background-color:#F5D0A9"' : '';
+                    html += '<tr ' + bgcolor + '><form action="/profiler?handler=upr" method="post">' +
+                    '<input name="Url" type="hidden" value="' + itm.Url + '" />' +
+                    '<td><input name="Enabled" type="checkbox" ' + checked + ' value="true" /><input name="Enabled" type="hidden" value="false" /></td>' +
                     '<td>' + itm.Url + '</td>' +
                     '<td>' + $.profiler.formatDate(itm.ProfiledOnUtc) + '</td>' +
                     '<td>' + $.profiler.emptyIfNull(itm.ElapsedMilliseconds) + '</td>' +
-                    '<td>' + $.profiler.emptyIfNull(itm.Server) + '</td>' +
+                    '<td><input name="Server" style="width:150px" type="text" value="' + $.profiler.emptyIfNull(itm.Server) + '" /></td>' +
                     '<td>' + $.profiler.emptyIfNull(itm.HttpMethod) + '</td>' +
-                    '<td><input name="Urls[' + idx + ']ProfilingCount" style="width:50px" type="text" value="' + profilingCount + '" /></td>' +
-                    '</tr>';
+                    '<td><input name="ProfilingCount" style="width:50px" type="text" value="' + profilingCount + '" /></td>' +
+                    '<td><input type="submit" value="Delete" name="Delete" id="delete" class="btn" /></td>' +
+                    '<td><input type="submit" value="Update" name="Update" id="update" class="btn" /></td>' +
+                    '</form></tr>';
                 });
 
-                html += '<tr><td colspan="7"><input type="submit" value="Update" class="btn" /></td></tr></table></form>';
+                html += '</table>';
                 this.container.html(html);
-                this.title.html("<h1>Profiled Requests</h1>")
+                this.title.html("<h1>Profiled Requests</h1>");
+                this.attachEvents();
             }
         })
 
