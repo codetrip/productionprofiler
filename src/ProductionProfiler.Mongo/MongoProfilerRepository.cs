@@ -53,14 +53,6 @@ namespace ProductionProfiler.Mongo
             }
         }
 
-        public void Delete<TTemplate>(TTemplate template)
-        {
-            using (MongoSession session = MongoSession.Connect(ProfiledRequestDataDatabaseName, _configuration.Server, _configuration.Port))
-            {
-                session.Delete<ProfiledRequestData, TTemplate>(template);
-            }
-        }
-
         public void SaveProfiledRequest(ProfiledRequest profiledRequest)
         {
             using (MongoSession session = MongoSession.Connect(ProfiledRequestDatabaseName, _configuration.Server, _configuration.Port))
@@ -89,7 +81,7 @@ namespace ProductionProfiler.Mongo
         {
             using (MongoSession session = MongoSession.Connect(ProfiledRequestDataDatabaseName, _configuration.Server, _configuration.Port))
             {
-                session.Delete<object>(new { RequestId = id });
+                session.Delete<ProfiledRequestData, object>(new { Id = id });
             }
         }
 
@@ -133,7 +125,7 @@ namespace ProductionProfiler.Mongo
         {
             using (MongoSession session = MongoSession.Connect(ProfiledRequestDataDatabaseName, _configuration.Server, _configuration.Port))
             {
-                session.Delete<object>(new { Url = url });
+                session.Delete<ProfiledRequestData, object>(new { Url = url });
             }
         }
     }

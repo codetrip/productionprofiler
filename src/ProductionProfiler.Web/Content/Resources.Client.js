@@ -61,7 +61,7 @@ if (window.jQueryProfiler) {
                 this.title = $('#title');
             },
             attachEvents: function () {
-                this.container.delegate('#delete', 'click', function (e) {
+                this.container.delegate('.delete', 'click', function (e) {
                     if (!window.confirm("Are you sure you want to delete this item?")) {
                         e.preventDefault();
                         return false;
@@ -107,38 +107,44 @@ if (window.jQueryProfiler) {
                     '<td><input name="Server" style="width:150px" type="text" value="' + $.profiler.emptyIfNull(itm.Server, '') + '" /></td>' +
                     '<td>' + $.profiler.emptyIfNull(itm.HttpMethod, '') + '</td>' +
                     '<td><input name="ProfilingCount" style="width:50px" type="text" value="' + profilingCount + '" /></td>' +
-                    '<td><input type="submit" value="Delete" name="Delete" id="delete" class="btn" /></td>' +
-                    '<td><input type="submit" value="Update" name="Update" id="update" class="btn" /></td>' +
+                    '<td><input type="submit" value="Delete" name="Delete" class="btn delete" /></td>' +
+                    '<td><input type="submit" value="Update" name="Update" class="btn" /></td>' +
                     '</form></tr>';
                 });
 
                 html += '</table>';
                 this.container.html(html);
-                this.title.html("<h1>Profiled Requests</h1>");
+                this.renderHeading("Profiled Requests");
                 this.attachEvents();
             },
             renderResults: function (data) {
-                var html = '<table width="600"><tr><th>Url</th></tr>'
+                var html = '<table width="800"><tr><th>Url</th><th>Delete</th></tr>'
 
                 $.each(data.Data, function (idx, itm) {
-                    html += '<tr><td><a href="/profiler?handler=results&action=previewresults&url=' + itm + '">' + itm + '</a></td></tr>';
+                    html += '<form action="/profiler?handler=dprurl" method="post"><input type="hidden" name="Url" value="' + itm + '" />' + 
+                    '<tr><td><a href="/profiler?handler=results&action=previewresults&url=' + itm + '">' + itm + '</a></td>' +
+                    '<td width="75px"><input type="submit" class="btn delete" value="Delete" /></td></tr></form>';
                 });
 
                 html += '</table>';
                 this.container.html(html);
-                this.title.html("<h1>Profiled Requests Results</h1>");
+                this.renderHeading("Profiled Requests Results");
+                this.attachEvents();
             },
             renderResultsPreview: function (data) {
-                var html = '<table width="1000"><tr><th>Url</th><th>CapturedOnUtc</th><th>ElapsedMilliseconds</th><th>Server</th></tr>'
+                var html = '<table width="1000"><tr><th>Url</th><th>CapturedOnUtc</th><th>ElapsedMilliseconds</th><th>Server</th><th>Delete</th></tr>'
 
                 $.each(data.Data, function (idx, itm) {
-                    html += '<tr><td><a href="/profiler?handler=results&action=resultsdetail&id=' + itm.Id + '">' + itm.Url + '</a></td>' +
-                    '<td>' + $.profiler.formatDate(itm.CapturedOnUtc) + '</td><td>' + itm.ElapsedMilliseconds + '</td><td>' + itm.Server + '</td></tr>';
+                    html += '<form action="/profiler?handler=dprid&url=' + itm.Url + '" method="post"><input type="hidden" name="Id" value="' + itm.Id + '" />' +
+                    '<tr><td><a href="/profiler?handler=results&action=resultsdetail&id=' + itm.Id + '">' + itm.Url + '</a></td>' +
+                    '<td>' + $.profiler.formatDate(itm.CapturedOnUtc) + '</td><td>' + itm.ElapsedMilliseconds + '</td><td>' + itm.Server + '</td>' +
+                    '<td><input type="submit" class="btn delete" value="Delete" /></td></tr></form>';
                 });
 
                 html += '</table>';
                 this.container.html(html);
-                this.title.html("<h1>Profiled Requests Results</h1>");
+                this.renderHeading("Profiled Requests Results");
+                this.attachEvents();
             },
             renderResultsDetail: function (data) {
                 this.html = '<table style="width:100%"><tr><td colspan="8" style="font-weight:bold">REQUEST INFO</td></tr><tr><th>Url</th><th>Request Id</th><th>Captured On</th><th>Server</th><th>Elapsed Milliseconds</th><th>Client IP</th><th>Ajax</th><th>User Agent</th></tr>' +
@@ -152,7 +158,7 @@ if (window.jQueryProfiler) {
 
                 this.html += '</table>';
                 this.container.html(this.html);
-                this.title.html("<h1>Profiled Request Details</h1>");
+                this.renderHeading("Profiled Request Details");
                 this.attachDetailEvents();
             },
             renderMethodInfo: function (method, level) {
@@ -178,7 +184,11 @@ if (window.jQueryProfiler) {
                         $.viewengine.renderMethodInfo(innerMethod, level + 1);
                     });
                 }
-            }
+            },
+            renderHeading: function (title) {
+                var html = '<div style="padding:5px 0px 15px 0px"><h1>' + title + '</h1><a class="heading" href="/profiler?handler=vpr">Profiled Requests</a><a class="heading" href="/profiler?handler=results&action=results">Results</a></div>'
+                this.title.html(html);
+            },
         });
 
         $(document).ready(function () {

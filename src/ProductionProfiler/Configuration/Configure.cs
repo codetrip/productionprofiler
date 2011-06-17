@@ -133,6 +133,8 @@ namespace ProductionProfiler.Configuration
             _container.RegisterTransient<IRequestHandler>(typeof(ViewResultsRequestHandler), Constants.Handlers.Results);
             _container.RegisterTransient<IRequestHandler>(typeof(AddProfiledRequestHandler), Constants.Handlers.AddProfiledRequest);
             _container.RegisterTransient<IRequestHandler>(typeof(ViewProfiledRequestsHandler), Constants.Handlers.ViewProfiledRequests);
+            _container.RegisterTransient<IRequestHandler>(typeof(DeleteProfiledDataByIdRequestHandler), Constants.Handlers.DeleteProfiledRequestDataById);
+            _container.RegisterTransient<IRequestHandler>(typeof(DeleteProfiledDataByUrlRequestHandler), Constants.Handlers.DeleteProfiledRequestDataByUrl);
             _container.RegisterTransient<IAddProfiledRequestModelBinder>(typeof(AddProfiledRequestModelBinder));
             _container.RegisterTransient<IUpdateProfiledRequestModelBinder>(typeof(UpdateProfiledRequestModelBinder));
             _container.RegisterTransient<IRequestProfilingCoordinator>(typeof(RequestProfilingCoordinator));

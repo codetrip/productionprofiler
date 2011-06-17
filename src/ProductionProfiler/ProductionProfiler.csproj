@@ -66,6 +66,8 @@
     <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Extensions\QueryableExtensions.cs" />
     <Compile Include="Handlers\AddProfiledRequestHandler.cs" />
+    <Compile Include="Handlers\DeleteProfiledRequestDataByUrlHandler.cs" />
+    <Compile Include="Handlers\DeleteProfiledRequestDataByIdHandler.cs" />
     <Compile Include="Handlers\ViewProfiledRequestsHandler.cs" />
     <Compile Include="Handlers\ErrorRequestHandler.cs" />
     <Compile Include="Handlers\ViewResultsRequestHandler.cs" />

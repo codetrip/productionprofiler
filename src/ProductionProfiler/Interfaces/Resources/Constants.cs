@@ -41,9 +41,6 @@ namespace ProductionProfiler.Interfaces.Resources
             public const string PreviewResults = "previewresults";
             public const string Results = "results";
             public const string ResultDetails = "resultsdetail";
-            public const string ViewProfiledRequests = "viewprofiledrequests";
-            public const string Add = "add";
-            public const string Update = "update";
         }
 
         public static class Handlers
@@ -52,6 +49,8 @@ namespace ProductionProfiler.Interfaces.Resources
             public const string ViewProfiledRequests = "vpr";
             public const string AddProfiledRequest = "apr";
             public const string UpdateProfiledRequest = "upr";
+            public const string DeleteProfiledRequestDataById = "dprid";
+            public const string DeleteProfiledRequestDataByUrl = "dprurl";
         }
     }
 }
