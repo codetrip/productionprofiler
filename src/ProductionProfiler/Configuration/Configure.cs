@@ -3,13 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Web;
-using Castle.MicroKernel.Lifestyle;
-using Castle.MicroKernel.Registration;
-using Castle.Windsor;
 using log4net;
 using log4net.Core;
+using log4net.Repository.Hierarchy;
 using ProductionProfiler.Binders;
-using ProductionProfiler.DataAccess;
 using ProductionProfiler.Handlers;
 using ProductionProfiler.Interfaces;
 using ProductionProfiler.Interfaces.Entities;
@@ -17,7 +14,6 @@ using ProductionProfiler.Interfaces.Exceptions;
 using ProductionProfiler.Interfaces.Resources;
 using ProductionProfiler.IoC;
 using ProductionProfiler.Log4Net;
-using ProductionProfiler.Mongo;
 using ProductionProfiler.Profiling;
 
 namespace ProductionProfiler.Configuration
@@ -27,10 +23,9 @@ namespace ProductionProfiler.Configuration
         private List<Type> _typesToIntercept;
         private Func<HttpRequest, bool> _requestFilter;
         private ProfilerConfiguration _profilerConfiguration;
-        private IWindsorContainer _container;
-        private bool _dataProviderInitialised;
+        private IContainer _container;
 
-        public static IFluentConfiguration With(IWindsorContainer container)
+        public static IFluentConfiguration With(IContainer container)
         {
             Configure config = new Configure
             {
@@ -39,7 +34,8 @@ namespace ProductionProfiler.Configuration
                 {
                     GetRequestThreshold = 3000,
                     Log4NetEnabled = false,
-                    PostRequestThreshold = 5000
+                    PostRequestThreshold = 5000,
+                    MonitoringEnabled = false
                 },
                 _requestFilter = req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty,
                 _container = container
@@ -81,17 +77,27 @@ namespace ProductionProfiler.Configuration
             if (profilingLogger == null)
                 throw new RequestProfilerConfigurationException(string.Format("No log4net logger named {0} was found in the log4net configuration", loggerName));
 
-            var appenderAttachable = profilingLogger as IAppenderAttachable;
+            var logger = profilingLogger.Logger as Logger;
 
-            if (appenderAttachable != null)
+            if (logger != null)
             {
+                logger.Level = Level.Debug;
+
                 var profilingAppender = new Log4NetProfilingAppender
                 {
                     Threshold = Level.Debug,
                     Name = Constants.ProfilingAppender
                 };
 
-                appenderAttachable.AddAppender(profilingAppender);
+                logger.AddAppender(profilingAppender);
+
+                Hierarchy repository = LogManager.GetRepository() as Hierarchy;
+
+                if (repository != null)
+                {
+                    repository.Configured = true;
+                    repository.RaiseConfigurationChanged(EventArgs.Empty);  
+                }
 
                 _profilerConfiguration.ProfilingAppender = profilingAppender;
             }
@@ -99,53 +105,16 @@ namespace ProductionProfiler.Configuration
             return this;
         }
 
-        IFluentConfiguration IFluentConfiguration.SqlServer(string connectionString)
+        public IFluentConfiguration EnableMonitoring()
         {
-            if (_dataProviderInitialised)
-                throw new RequestProfilerConfigurationException("You have already specified a data provider, you cannot specify more than one provider.");
-
-            _dataProviderInitialised = true;
+            _profilerConfiguration.MonitoringEnabled = true;
             return this;
         }
 
-        IFluentConfiguration IFluentConfiguration.Mongo(string server, int port)
+        IFluentConfiguration IFluentConfiguration.WithDataProvider(IDataProvider dataProvider)
         {
-            if (_dataProviderInitialised)
-                throw new RequestProfilerConfigurationException("You have already specified a data provider, you cannot specify more than one provider.");
-
-            _dataProviderInitialised = true;
-            MongoConfiguration mongoConfiguration = new MongoConfiguration(server, port.ToString());
-
-            _container.Register(Component.For<MongoConfiguration>()
-                .LifeStyle.Singleton
-                .Instance(mongoConfiguration));
-
-            _container.Register(Component.For<IProfiledRequestRepository>()
-                .ImplementedBy<ProfiledRequestMongoRepository>()
-                .LifeStyle.Transient);
-
-            _container.Register(Component.For<IProfiledRequestDataRepository>()
-                .ImplementedBy<ProfiledRequestDataMongoRepository>()
-                .LifeStyle.Transient);
-
-            return this;
-        }
-
-        IFluentConfiguration IFluentConfiguration.CustomDataProvider(ICustomDataProvider customProvider)
-        {
-            if (_dataProviderInitialised)
-                throw new RequestProfilerConfigurationException("You have already specified a data provider, you cannot specify more than one provider.");
-
-            _dataProviderInitialised = true;
-            _container.Register(Component.For<IProfiledRequestRepository>()
-                .ImplementedBy(customProvider.ProfiledRequestRepository)
-                .LifeStyle.Transient);
-
-            _container.Register(Component.For<IProfiledRequestDataRepository>()
-                .ImplementedBy(customProvider.ProfiledRequestDataRepositoryType)
-                .LifeStyle.Transient);
-
-            customProvider.RegisterDependentComponents(_container);
+            _container.RegisterTransient<IProfilerRepository>(dataProvider.RepositoryType);
+            dataProvider.RegisterDependentComponents(_container);
 
             return this;
         }
@@ -153,52 +122,22 @@ namespace ProductionProfiler.Configuration
         void IFluentConfiguration.Initialise()
         {
             RegisterDependencies();
-            RequestProfilerContext.Initialise(_requestFilter, _container);
+            RequestProfilerContext.Initialise(_requestFilter, _container, _profilerConfiguration.MonitoringEnabled);
         }
 
         private void RegisterDependencies()
         {
-            _container.Register(Component.For<IRequestProfiler>()
-                .ImplementedBy<RequestProfiler>()
-                .LifeStyle.Custom<HybridPerWebRequestPerThreadLifestyleManager>());
-
-            _container.Register(Component.For<IRequestProfilingCoordinator>()
-                .ImplementedBy<RequestProfilingCoordinator>()
-                .LifeStyle.Transient);
-
-            _container.Register(Component.For<ProfilerConfiguration>()
-                .LifeStyle.Singleton
-                .Instance(_profilerConfiguration));
-
-            _container.Register(Component.For<IRequestHandler>()
-                .LifeStyle.Transient
-                .Named(Constants.Handlers.UpdateProfiledRequest)
-                .ImplementedBy<UpdateProfiledRequestHandler>());
-
-            _container.Register(Component.For<IRequestHandler>()
-                .LifeStyle.Transient
-                .Named(Constants.Handlers.Results)
-                .ImplementedBy<ViewResultsRequestHandler>());
-
-            _container.Register(Component.For<IRequestHandler>()
-                .LifeStyle.Transient
-                .Named(Constants.Handlers.AddProfiledRequest)
-                .ImplementedBy<AddProfiledRequestHandler>());
-
-            _container.Register(Component.For<IRequestHandler>()
-                .LifeStyle.Transient
-                .Named(Constants.Handlers.ViewProfiledRequests)
-                .ImplementedBy<ViewProfiledRequestsHandler>());
-
-            _container.Register(Component.For<IAddProfiledRequestModelBinder>()
-                .LifeStyle.Transient
-                .ImplementedBy<AddProfiledRequestModelBinder>());
-
-            _container.Register(Component.For<IUpdateProfiledRequestModelBinder>()
-                .LifeStyle.Transient
-                .ImplementedBy<UpdateProfiledRequestModelBinder>());
-
-            _container.Kernel.ProxyFactory.AddInterceptorSelector(new ProfilingInterceptorSelector(_typesToIntercept));
+            _container.RegisterPerWebRequest<IRequestProfiler>(typeof(RequestProfiler));
+            _container.RegisterSingletonInstance(_profilerConfiguration);
+            _container.RegisterTransient<IRequestHandler>(typeof(UpdateProfiledRequestHandler), Constants.Handlers.UpdateProfiledRequest);
+            _container.RegisterTransient<IRequestHandler>(typeof(ViewResultsRequestHandler), Constants.Handlers.Results);
+            _container.RegisterTransient<IRequestHandler>(typeof(AddProfiledRequestHandler), Constants.Handlers.AddProfiledRequest);
+            _container.RegisterTransient<IRequestHandler>(typeof(ViewProfiledRequestsHandler), Constants.Handlers.ViewProfiledRequests);
+            _container.RegisterTransient<IAddProfiledRequestModelBinder>(typeof(AddProfiledRequestModelBinder));
+            _container.RegisterTransient<IUpdateProfiledRequestModelBinder>(typeof(UpdateProfiledRequestModelBinder));
+            _container.RegisterTransient<IRequestProfilingCoordinator>(typeof(RequestProfilingCoordinator));
+            _container.RegisterTransient<RequestProfilingInterceptor>(typeof(RequestProfilingInterceptor));
+            _container.InitialiseForProxyInterception(_typesToIntercept);
         }
     }
 
@@ -209,9 +148,8 @@ namespace ProductionProfiler.Configuration
         IFluentConfiguration InterceptTypes(Type[] typesToIntercept);
         IFluentConfiguration RequestFilter(Func<HttpRequest, bool> requestFilter);
         IFluentConfiguration Log4Net(string loggerName);
-        IFluentConfiguration SqlServer(string connectionString);
-        IFluentConfiguration Mongo(string server, int port);
-        IFluentConfiguration CustomDataProvider(ICustomDataProvider customProvider);
+        IFluentConfiguration EnableMonitoring();
+        IFluentConfiguration WithDataProvider(IDataProvider dataProvider);
         void Initialise();
     }
 }

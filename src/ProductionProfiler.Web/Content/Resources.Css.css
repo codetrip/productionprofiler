@@ -24,4 +24,4 @@ select { width: 200px; border: 1px solid #CCC; }
 .error { color:Red; }
 .btn { border:1px solid grey; padding:3px 8px 3px 8px; background-color:#E0ECF8; font-size:10px; text-transform:uppercase; color:#696969; cursor:pointer; font-weight:bold}
 .btn:hover {background-color:#fff;}
-.container { width:100%;  margin-bottom: 10px; text-align:center }
+.container { width:100%;  margin-bottom: 10px; }

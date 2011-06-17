@@ -1,6 +1,7 @@
 ﻿
 using ProductionProfiler.Interfaces;
 using ProductionProfiler.Interfaces.Entities;
+using ProductionProfiler.Interfaces.Resources;
 
 namespace ProductionProfiler.Handlers
 {
@@ -14,7 +15,7 @@ namespace ProductionProfiler.Handlers
             if (!string.IsNullOrEmpty(requestInfo.ResourceName))
                 return new ResourceRequestHandler();
 
-            return new ErrorRequestHandler();
+            return RequestProfilerContext.Current.GetRequestHandler(Constants.Handlers.ViewProfiledRequests);
         }
     }
 }

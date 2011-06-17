@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.Tests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.Web", "ProductionProfiler.Web\ProductionProfiler.Web.csproj", "{2B8EBB60-1757-4C26-A577-86958DBD84D2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.Mongo", "ProductionProfiler.Mongo\ProductionProfiler.Mongo.csproj", "{3B04FCA1-FEF7-472E-AAF4-70CBCC18453A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{2B8EBB60-1757-4C26-A577-86958DBD84D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B8EBB60-1757-4C26-A577-86958DBD84D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B8EBB60-1757-4C26-A577-86958DBD84D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B04FCA1-FEF7-472E-AAF4-70CBCC18453A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B04FCA1-FEF7-472E-AAF4-70CBCC18453A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B04FCA1-FEF7-472E-AAF4-70CBCC18453A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B04FCA1-FEF7-472E-AAF4-70CBCC18453A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

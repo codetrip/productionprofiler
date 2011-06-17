@@ -3,13 +3,20 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Castle.Facilities.FactorySupport;
+using Castle.MicroKernel.Registration;
+using Castle.MicroKernel.Releasers;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using log4net.Config;
 using ProductionProfiler.Configuration;
+using ProductionProfiler.IoC;
+using ProductionProfiler.Mongo;
+using ProductionProfiler.Web.Controllers;
 using ProductionProfiler.Web.Models;
 
 namespace ProductionProfiler.Web
@@ -19,7 +26,8 @@ namespace ProductionProfiler.Web
 
     public class MvcApplication : System.Web.HttpApplication, IContainerAccessor
     {
-        private IWindsorContainer _container;
+        private static IWindsorContainer _container;
+
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
             filters.Add(new HandleErrorAttribute());
@@ -35,7 +43,6 @@ namespace ProductionProfiler.Web
                 "{controller}/{action}/{id}", // URL with parameters
                 new { controller = "Home", action = "Index", id = UrlParameter.Optional } // Parameter defaults
             );
-
         }
 
         protected void Application_Start()
@@ -50,6 +57,8 @@ namespace ProductionProfiler.Web
             try
             {
                 _container = new WindsorContainer(new XmlInterpreter());
+                _container.AddFacility<FactorySupportFacility>();
+                _container.Kernel.ReleasePolicy = new NoTrackingReleasePolicy();
             }
             catch (ConfigurationErrorsException ex)
             {
@@ -59,20 +68,45 @@ namespace ProductionProfiler.Web
                     throw;
             }
 
+            ControllerBuilder.Current.SetControllerFactory(typeof(WindsorControllerFactory));
+
+            RegisterDependencies();
+
             //set up request profiler
-            Configure.With(Container)
+            Configure.With(new WindsorProfilerContainer(Container))
                 .GetThreshold(2500)
                 .PostThreshold(3500)
                 .Log4Net("Profiler")
-                .Mongo("127.0.0.1", 27017)
+                .WithDataProvider(new MongoDataProvider("127.0.0.1", 27017))
                 .RequestFilter(req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty)
-                .InterceptTypes(new []{typeof(IWorkflow)})
+                .InterceptTypes(new []
+                    {
+                        typeof(IWorkflow), 
+                        typeof(IActionFilter), 
+                        typeof(IAuthorizationFilter)
+                    })
+                .EnableMonitoring()
                 .Initialise();
         }
 
         public IWindsorContainer Container
         {
             get { return _container; }
+        }
+
+        private static void RegisterDependencies()
+        {
+            _container.Register(
+                AllTypes.FromAssembly(Assembly.GetExecutingAssembly())
+                    .BasedOn<IController>()
+                    .Configure(c => c.LifeStyle.Transient));
+
+            _container.Register(AllTypes.FromAssembly(Assembly.GetExecutingAssembly())
+                .BasedOn(typeof(IWorkflow<,>))
+                    .WithService
+                    .FromInterface(typeof(IWorkflow<,>))
+                .If(t => true)
+                .Configure(c => c.LifeStyle.Transient));
         }
     }
 }

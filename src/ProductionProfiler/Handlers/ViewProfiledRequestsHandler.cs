@@ -5,16 +5,16 @@ namespace ProductionProfiler.Handlers
 {
     public class ViewProfiledRequestsHandler : RequestHandlerBase
     {
-        private readonly IProfiledRequestRepository _profiledRequestsRepository;
+        private readonly IProfilerRepository _repository;
 
-        public ViewProfiledRequestsHandler(IProfiledRequestRepository profiledRequestsRepository)
+        public ViewProfiledRequestsHandler(IProfilerRepository repository)
         {
-            _profiledRequestsRepository = profiledRequestsRepository;
+            _repository = repository;
         }
 
         protected override JsonResponse DoHandleRequest(RequestInfo requestInfo)
         {
-            var profiledRequests = _profiledRequestsRepository.GetProfiledRequests(requestInfo.Paging);
+            var profiledRequests = _repository.GetProfiledRequests(requestInfo.Paging);
 
             return new JsonResponse
             {

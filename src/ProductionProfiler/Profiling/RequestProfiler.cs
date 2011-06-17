@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Web;
 using Castle.DynamicProxy;
+using log4net.Core;
 using ProductionProfiler.Configuration;
 using ProductionProfiler.Extensions;
 using ProductionProfiler.Interfaces;
@@ -22,6 +23,7 @@ namespace ProductionProfiler.Profiling
         public RequestProfiler(ProfilerConfiguration configuration)
         {
             _configuration = configuration;
+            RequestId = Guid.NewGuid();
         }
 
         public bool InitialisedForRequest { get; set; }
@@ -65,7 +67,14 @@ namespace ProductionProfiler.Profiling
         private void ProfilingAppenderAppendLoggingEvent(object sender, AppendLoggingEventEventArgs e)
         {
             if (_currentMethod != null)
+            {
+                if (e.LoggingEvent.Level >= Level.Error)
+                {
+                    _currentMethod.ErrorInMethod = true;
+                }
+
                 _currentMethod.LogMessages.Add(e.LoggingEvent.ToLogMessage(_currentMethod.Elapsed()));
+            }  
         }
 
         public ProfiledRequestData StopProfiling()

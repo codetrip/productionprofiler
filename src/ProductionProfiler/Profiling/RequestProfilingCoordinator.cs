@@ -14,20 +14,17 @@ namespace ProductionProfiler.Profiling
 {
     public class RequestProfilingCoordinator : IRequestProfilingCoordinator
     {
-        private readonly IProfiledRequestDataRepository _profiledRequestDataRepository;
-        private readonly IProfiledRequestRepository _profiledRequestRepository;
+        private readonly IProfilerRepository _repository;
         private readonly IRequestProfiler _requestProfiler;
         private readonly ProfilerConfiguration _configuration;
 
-        public RequestProfilingCoordinator(IRequestProfiler requestProfiler, 
-            IProfiledRequestRepository profiledRequestRepository, 
-            ProfilerConfiguration configuration, 
-            IProfiledRequestDataRepository profiledRequestDataRepository)
+        public RequestProfilingCoordinator(IRequestProfiler requestProfiler,
+            IProfilerRepository repository, 
+            ProfilerConfiguration configuration)
         {
             _requestProfiler = requestProfiler;
-            _profiledRequestDataRepository = profiledRequestDataRepository;
             _configuration = configuration;
-            _profiledRequestRepository = profiledRequestRepository;
+            _repository = repository;
         }
 
         public void BeginRequest(HttpContext context)
@@ -37,7 +34,7 @@ namespace ProductionProfiler.Profiling
                 context.Items["Stopwatch"] = Stopwatch.StartNew();
                 string currentUrl = context.Request.RawUrl.ToLowerInvariant();
 
-                var requestsToProfile = _profiledRequestRepository.GetRequestsToProfile(Environment.MachineName);
+                var requestsToProfile = _repository.GetRequestsToProfile(Environment.MachineName);
 
                 if(requestsToProfile != null && requestsToProfile.Count > 0)
                 {
@@ -52,7 +49,7 @@ namespace ProductionProfiler.Profiling
                             requestToProfile.ProfilingCount = 0;
                         }
 
-                        _profiledRequestRepository.Save(requestToProfile);
+                        _repository.SaveProfiledRequest(requestToProfile);
                         _requestProfiler.StartProfiling(context.Request);
                     }
                 }
@@ -85,7 +82,7 @@ namespace ProductionProfiler.Profiling
                     //if the request took over maxRequestLength and the profiler was not enabled for this request flag the URL for analysis
                     if (stopwatch.ElapsedMilliseconds >= maxRequestLength && !_requestProfiler.InitialisedForRequest)
                     {
-                        _profiledRequestRepository.Update(new ProfiledRequest
+                        _repository.SaveProfiledRequestWhenNotFound(new ProfiledRequest
                         {
                             Url = context.Request.RawUrl.ToLowerInvariant(),
                             ProfiledOnUtc = DateTime.UtcNow,
@@ -101,7 +98,7 @@ namespace ProductionProfiler.Profiling
                 //if the IRequestProfiler was running for this request we need to persist the captured data into Mongo via nservicebus
                 if (_requestProfiler.InitialisedForRequest)
                 {
-                    _profiledRequestDataRepository.Save(_requestProfiler.StopProfiling());
+                    _repository.SaveProfiledRequestData(_requestProfiler.StopProfiling());
                 }
             }
             catch (Exception e)

@@ -1,15 +1,14 @@
 ﻿using System;
-using Norm;
 
 namespace ProductionProfiler.Interfaces.Entities
 {
     [Serializable]
     public class ProfiledRequest
     {
+        public Guid Id { get; set; }
         /// <summary>
         /// The URL to be monitored
         /// </summary>
-        [MongoIdentifier]
         public string Url { get; set; }
         /// <summary>
         /// The length of time the URL took to execute originally
@@ -35,5 +34,10 @@ namespace ProductionProfiler.Interfaces.Entities
         /// Is this enabled for profiling?
         /// </summary>
         public bool Enabled { get; set; }
+
+        public ProfiledRequest()
+        {
+            Id = Guid.NewGuid();
+        }
     }
 }

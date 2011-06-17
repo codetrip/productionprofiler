@@ -46,9 +46,6 @@
     <Reference Include="log4net">
       <HintPath>..\..\lib\Log4net\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="Norm">
-      <HintPath>..\..\lib\NoRM\Norm.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
@@ -66,8 +63,6 @@
     <Compile Include="Binders\UpdateProfiledRequestModelBinder.cs" />
     <Compile Include="Configuration\Configure.cs" />
     <Compile Include="Configuration\ProfilerConfiguration.cs" />
-    <Compile Include="DataAccess\ProfiledRequestDataMongoRepository.cs" />
-    <Compile Include="DataAccess\ProfiledRequestMongoRepository.cs" />
     <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Extensions\QueryableExtensions.cs" />
     <Compile Include="Handlers\AddProfiledRequestHandler.cs" />
@@ -84,9 +79,9 @@
     <Compile Include="Interfaces\Entities\ProfiledRequestPreview.cs" />
     <Compile Include="Interfaces\Entities\ProfiledRequestUpdate.cs" />
     <Compile Include="Interfaces\Entities\RequestInfo.cs" />
-    <Compile Include="Interfaces\ICustomDataProvider.cs" />
+    <Compile Include="Interfaces\IContainer.cs" />
+    <Compile Include="Interfaces\IDataProvider.cs" />
     <Compile Include="Interfaces\IModelBinder.cs" />
-    <Compile Include="Interfaces\IProfiledRequestDataRepository.cs" />
     <Compile Include="Interfaces\Entities\Page.cs" />
     <Compile Include="Interfaces\Entities\Pagination.cs" />
     <Compile Include="Interfaces\Entities\PagingInfo.cs" />
@@ -98,18 +93,17 @@
     <Compile Include="Interfaces\Entities\ProfiledMethodData.cs" />
     <Compile Include="Interfaces\Entities\ProfiledRequestData.cs" />
     <Compile Include="Interfaces\Exceptions\RequestProfilerConfigurationException.cs" />
-    <Compile Include="Interfaces\IProfiledRequestRepository.cs" />
+    <Compile Include="Interfaces\IProfilerRepository.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\IRequestHandler.cs" />
     <Compile Include="Interfaces\IRequestProfiler.cs" />
     <Compile Include="Interfaces\IWantToBeProfiled.cs" />
     <Compile Include="Interfaces\Entities\ModelValidationError.cs" />
     <Compile Include="Interfaces\Resources\Constants.cs" />
+    <Compile Include="IoC\WindsorProfilerContainer.cs" />
     <Compile Include="Log4Net\AppendLoggingEventEventArgs.cs" />
     <Compile Include="Log4Net\Log4NetProfilingAppender.cs" />
     <Compile Include="Interfaces\IRequestProfilingCoordinator.cs" />
-    <Compile Include="Mongo\MongoConfiguration.cs" />
-    <Compile Include="Mongo\MongoSession.cs" />
     <Compile Include="Profiling\RequestProfiler.cs" />
     <Compile Include="IoC\ProfilingInterceptorSelector.cs" />
     <Compile Include="IoC\RequestProfilingInterceptor.cs" />

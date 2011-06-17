@@ -7,18 +7,18 @@ namespace ProductionProfiler.Handlers
 {
     public class ViewResultsRequestHandler : RequestHandlerBase
     {
-        private readonly IProfiledRequestDataRepository _profiledRequestsDataRepository;
+        private readonly IProfilerRepository _repository;
 
-        public ViewResultsRequestHandler(IProfiledRequestDataRepository profiledRequestsDataRepository)
+        public ViewResultsRequestHandler(IProfilerRepository repository)
         {
-            _profiledRequestsDataRepository = profiledRequestsDataRepository;
+            _repository = repository;
         }
 
         protected override JsonResponse DoHandleRequest(RequestInfo requestInfo)
         {
             if (requestInfo.Action == Constants.Actions.Results)
             {
-                var data = _profiledRequestsDataRepository.GetDistinctUrls(requestInfo.Paging);
+                var data = _repository.GetDistinctProfiledRequestUrls(requestInfo.Paging);
                 return new JsonResponse
                 {
                     Data = data,
@@ -28,7 +28,7 @@ namespace ProductionProfiler.Handlers
 
             if (requestInfo.Action == Constants.Actions.PreviewResults)
             {
-                var data = _profiledRequestsDataRepository.GetPreviewByUrl(requestInfo.Url, requestInfo.Paging);
+                var data = _repository.GetProfiledRequestDataPreviewByUrl(requestInfo.Url, requestInfo.Paging);
                 return new JsonResponse
                 {
                     Data = data,
@@ -38,7 +38,7 @@ namespace ProductionProfiler.Handlers
 
             if (requestInfo.Action == Constants.Actions.ResultDetails)
             {
-                var data = _profiledRequestsDataRepository.GetById(requestInfo.Id);
+                var data = _repository.GetProfiledRequestDataById(requestInfo.Id);
                 return new JsonResponse
                 {
                     Data = data

@@ -7,13 +7,13 @@ namespace ProductionProfiler.Handlers
 {
     public class UpdateProfiledRequestHandler : RequestHandlerBase
     {
-        private readonly IProfiledRequestRepository _profiledRequestsRepository;
+        private readonly IProfilerRepository _repository;
         private readonly IUpdateProfiledRequestModelBinder _updateProfiledRequestModelBinder;
 
-        public UpdateProfiledRequestHandler(IProfiledRequestRepository profiledRequestsRepository, 
+        public UpdateProfiledRequestHandler(IProfilerRepository repository, 
             IUpdateProfiledRequestModelBinder updateProfiledRequestModelBinder)
         {
-            _profiledRequestsRepository = profiledRequestsRepository;
+            _repository = repository;
             _updateProfiledRequestModelBinder = updateProfiledRequestModelBinder;
         }
 
@@ -32,14 +32,14 @@ namespace ProductionProfiler.Handlers
 
             if (request.Delete)
             {
-                var storedRequest = _profiledRequestsRepository.GetById(request.Url);
+                var storedRequest = _repository.GetProfiledRequestByUrl(request.Url);
 
                 if (storedRequest != null)
-                    _profiledRequestsRepository.Delete(new { _id = storedRequest.Url });
+                    _repository.DeleteProfiledRequestDataByUrl(storedRequest.Url);
             }
             else
             {
-                var storedRequest = _profiledRequestsRepository.GetById(request.Url);
+                var storedRequest = _repository.GetProfiledRequestByUrl(request.Url);
 
                 if (storedRequest != null)
                 {
@@ -47,7 +47,7 @@ namespace ProductionProfiler.Handlers
                     storedRequest.Server = request.Server;
                     storedRequest.Enabled = request.Enabled;
 
-                    _profiledRequestsRepository.Save(storedRequest);
+                    _repository.SaveProfiledRequest(storedRequest);
                 }
             }
 

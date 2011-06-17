@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Web;
-using Castle.Windsor;
 
 namespace ProductionProfiler.Interfaces.Entities
 {
     public class RequestProfilerContext
     {
-        private IWindsorContainer _container;
+        private IContainer _container;
         private Func<HttpRequest, bool> _shouldProfile;
+        private bool _monitoringEnabled;
         private static RequestProfilerContext _current = new RequestProfilerContext();
 
         public static RequestProfilerContext Current
@@ -20,7 +20,7 @@ namespace ProductionProfiler.Interfaces.Entities
 
         public bool ShouldProfile(HttpRequest request)
         {
-            return _shouldProfile == null ? false : !request.RawUrl.Contains("/profiler") && _shouldProfile(request);
+            return _monitoringEnabled && _shouldProfile == null ? false : !request.RawUrl.Contains("/profiler") && _shouldProfile(request);
         }
 
         public IRequestProfilingCoordinator GetRequestProfilingManager()
@@ -33,12 +33,13 @@ namespace ProductionProfiler.Interfaces.Entities
             return _container == null ? null : _container.Resolve<IRequestHandler>(name);
         }
 
-        internal static void Initialise(Func<HttpRequest, bool> shouldProfileRequest, IWindsorContainer container)
+        internal static void Initialise(Func<HttpRequest, bool> shouldProfileRequest, IContainer container, bool monitoringEnabled)
         {
             _current = new RequestProfilerContext
             {
                 _container = container,
-                _shouldProfile = shouldProfileRequest
+                _shouldProfile = shouldProfileRequest,
+                _monitoringEnabled = monitoringEnabled
             };
         }
 

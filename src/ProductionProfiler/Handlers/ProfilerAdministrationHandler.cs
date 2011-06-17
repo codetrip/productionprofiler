@@ -7,7 +7,8 @@ namespace ProductionProfiler.Handlers
         public void ProcessRequest(HttpContext context)
         {
             var requestInfo = RequestInfoParser.Parse(context.Request);
-            RequestHandlerFactory.Create(requestInfo).HandleRequest(context, requestInfo);
+            var requestHandler = RequestHandlerFactory.Create(requestInfo);
+            requestHandler.HandleRequest(context, requestInfo);
         }
 
         public bool IsReusable

@@ -47,14 +47,15 @@ if (window.jQueryProfiler) {
             formatDate: function (jsonDate) {
                 return jsonDate == null ? '' : new Date(parseInt(jsonDate.substr(6))).toUTCString();
             },
-            emptyIfNull: function (val) {
-                return val === null || val === 0 ? '' : val;
+            emptyIfNull: function (val, postfix) {
+                return val === null || val === 0 ? '' : val + postfix;
             }
         });
 
         $.extend($.viewengine, {
             container: null,
             title: null,
+            html: null,
             init: function (data) {
                 this.container = $('#profiler');
                 this.title = $('#title');
@@ -64,6 +65,21 @@ if (window.jQueryProfiler) {
                     if (!window.confirm("Are you sure you want to delete this item?")) {
                         e.preventDefault();
                         return false;
+                    }
+                });
+            },
+            attachDetailEvents: function () {
+                this.container.find("tr.methodinfo").click(function () {
+                    var currentRow = $(this);
+                    var row = currentRow.next("tr");
+                    row.toggleClass("hidden");
+
+                    var padding = parseInt(currentRow.attr("data-padding"));
+
+                    if (row.hasClass("hidden")) {
+                        currentRow.find('td:first').attr("style", 'cursor:pointer; background: url(content/images/plus.gif) ' + padding + ' 7 no-repeat; padding-left:' + (padding + 10) + '"');
+                    } else {
+                        currentRow.find('td:first').attr("style", 'cursor:pointer; background: url(content/images/minus.gif) ' + padding + ' 7 no-repeat; padding-left:' + (padding + 10) + '"');
                     }
                 });
             },
@@ -87,9 +103,9 @@ if (window.jQueryProfiler) {
                     '<td><input name="Enabled" type="checkbox" ' + checked + ' value="true" /><input name="Enabled" type="hidden" value="false" /></td>' +
                     '<td>' + itm.Url + '</td>' +
                     '<td>' + $.profiler.formatDate(itm.ProfiledOnUtc) + '</td>' +
-                    '<td>' + $.profiler.emptyIfNull(itm.ElapsedMilliseconds) + '</td>' +
-                    '<td><input name="Server" style="width:150px" type="text" value="' + $.profiler.emptyIfNull(itm.Server) + '" /></td>' +
-                    '<td>' + $.profiler.emptyIfNull(itm.HttpMethod) + '</td>' +
+                    '<td>' + $.profiler.emptyIfNull(itm.ElapsedMilliseconds, 'ms') + '</td>' +
+                    '<td><input name="Server" style="width:150px" type="text" value="' + $.profiler.emptyIfNull(itm.Server, '') + '" /></td>' +
+                    '<td>' + $.profiler.emptyIfNull(itm.HttpMethod, '') + '</td>' +
                     '<td><input name="ProfilingCount" style="width:50px" type="text" value="' + profilingCount + '" /></td>' +
                     '<td><input type="submit" value="Delete" name="Delete" id="delete" class="btn" /></td>' +
                     '<td><input type="submit" value="Update" name="Update" id="update" class="btn" /></td>' +
@@ -100,12 +116,96 @@ if (window.jQueryProfiler) {
                 this.container.html(html);
                 this.title.html("<h1>Profiled Requests</h1>");
                 this.attachEvents();
+            },
+            renderResults: function (data) {
+                var html = '<table width="600"><tr><th>Url</th></tr>'
+
+                $.each(data.Data, function (idx, itm) {
+                    html += '<tr><td><a href="/profiler?handler=results&action=previewresults&url=' + itm + '">' + itm + '</a></td></tr>';
+                });
+
+                html += '</table>';
+                this.container.html(html);
+                this.title.html("<h1>Profiled Requests Results</h1>");
+            },
+            renderResultsPreview: function (data) {
+                var html = '<table width="1000"><tr><th>Url</th><th>CapturedOnUtc</th><th>ElapsedMilliseconds</th><th>Server</th></tr>'
+
+                $.each(data.Data, function (idx, itm) {
+                    html += '<tr><td><a href="/profiler?handler=results&action=resultsdetail&id=' + itm.Id + '">' + itm.Url + '</a></td>' +
+                    '<td>' + $.profiler.formatDate(itm.CapturedOnUtc) + '</td><td>' + itm.ElapsedMilliseconds + '</td><td>' + itm.Server + '</td></tr>';
+                });
+
+                html += '</table>';
+                this.container.html(html);
+                this.title.html("<h1>Profiled Requests Results</h1>");
+            },
+            renderResultsDetail: function (data) {
+                this.html = '<table style="width:100%"><tr><td colspan="8" style="font-weight:bold">REQUEST INFO</td></tr><tr><th>Url</th><th>Request Id</th><th>Captured On</th><th>Server</th><th>Elapsed Milliseconds</th><th>Client IP</th><th>Ajax</th><th>User Agent</th></tr>' +
+                '<tr><td>' + data.Url + '</td><td>' + data.Id + '</td><td>' + $.profiler.formatDate(data.CapturedOnUtc) + '</td><td>' + data.Server + '</td><td>' + data.ElapsedMilliseconds + 'ms</td><td>' + data.ClientIpAddress + '</td><td>' + data.Ajax + '</td><td>' + data.UserAgent + '</td></tr></table><br /><br />';
+
+                this.html += '<table style="width:100%"><tr><td colspan="6" style="font-weight:bold">METHOD INFO</td></tr><tr><th>Method</th><th>Elapsed</th><th>Started</th><th>Stopped</th><th>Error</th><th>Audit Messages</th></tr>'
+
+                $.each(data.Methods, function (idx, method) {
+                    $.viewengine.renderMethodInfo(method, 0);
+                });
+
+                this.html += '</table>';
+                this.container.html(this.html);
+                this.title.html("<h1>Profiled Request Details</h1>");
+                this.attachDetailEvents();
+            },
+            renderMethodInfo: function (method, level) {
+                var padding = ((level * 20) + 5);
+                var hasLogMessages = method.LogMessages !== null && method.LogMessages.length > 0;
+                var rowClass = hasLogMessages ? 'class="methodinfo"' : '';
+                var css = hasLogMessages ? 'style="cursor:pointer; background: url(content/images/plus.gif) ' + padding + ' 7 no-repeat; padding-left:' + (padding + 10) + '"' : 'style="padding-left:' + padding + 'px"';
+
+                this.html += '<tr ' + rowClass + ' data-padding="' + padding + '"><td ' + css + '>&nbsp;' + method.MethodName + '</td><td>' + method.ElapsedMilliseconds + 'ms</td><td>' + method.StartedAtMilliseconds + 'ms</td><td>' + method.StoppedAtMilliseconds + 'ms</td><td>' + method.ErrorInMethod + '</td><td>' + method.LogMessages.length + '</td></tr>';
+
+                if (hasLogMessages) {
+                    this.html += '<tr class="hidden"><td style="padding-left:' + padding + 'px" colspan="6"><table style="width:100%"><tr><th>Logged at</th><th>Level</th><th>Message</th></tr>';
+
+                    $.each(method.LogMessages, function (idx, message) {
+                        $.viewengine.html += '<tr style="background-color:#fff"><td style="width:80px">' + message.Milliseconds + 'ms</td><td style="width:100px">' + message.Level + '</td><td>' + message.Message + '</td></tr>';
+                    });
+
+                    this.html += '</table></td></tr>';
+                }
+
+                if (method.InnerMethods.length > 0) {
+                    $.each(method.InnerMethods, function (idx, innerMethod) {
+                        $.viewengine.renderMethodInfo(innerMethod, level + 1);
+                    });
+                }
             }
-        })
+        });
 
         $(document).ready(function () {
             $.viewengine.init();
-            $.viewengine.renderProfiledRequests(profileData);
+
+            switch (profileAction) {
+                case "results":
+                    {
+                        $.viewengine.renderResults(profileData);
+                        break;
+                    }
+                case "previewresults":
+                    {
+                        $.viewengine.renderResultsPreview(profileData);
+                        break;
+                    }
+                case "resultsdetail":
+                    {
+                        $.viewengine.renderResultsDetail(profileData.Data);
+                        break;
+                    }
+                default:
+                    {
+                        $.viewengine.renderProfiledRequests(profileData);
+                        break;
+                    }
+            }
         });
 
     })(jQueryProfiler);

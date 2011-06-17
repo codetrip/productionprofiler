@@ -10,7 +10,6 @@ namespace ProductionProfiler.Extensions
         {
             return new LogMessage
             {
-                Domain = loggingEvent.Domain,
                 Message = loggingEvent.RenderedMessage,
                 Milliseconds = elapsedMillseconds,
                 Level = loggingEvent.Level.ToString()

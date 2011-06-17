@@ -7,10 +7,10 @@ namespace ProductionProfiler.Handlers
 {
     public class AddProfiledRequestHandler : RequestHandlerBase
     {
-        private readonly IProfiledRequestRepository _profiledRequestsRepository;
+        private readonly IProfilerRepository _profiledRequestsRepository;
         private readonly IAddProfiledRequestModelBinder _addProfiledRequestModelBinder;
 
-        public AddProfiledRequestHandler(IProfiledRequestRepository profiledRequestsRepository,
+        public AddProfiledRequestHandler(IProfilerRepository profiledRequestsRepository,
             IAddProfiledRequestModelBinder addProfiledRequestModelBinder)
         {
             _profiledRequestsRepository = profiledRequestsRepository;
@@ -28,7 +28,7 @@ namespace ProductionProfiler.Handlers
                 };
             }
 
-            _profiledRequestsRepository.Save(_addProfiledRequestModelBinder.Bind(requestInfo.Form));
+            _profiledRequestsRepository.SaveProfiledRequest(_addProfiledRequestModelBinder.Bind(requestInfo.Form));
 
             return new JsonResponse
             {
