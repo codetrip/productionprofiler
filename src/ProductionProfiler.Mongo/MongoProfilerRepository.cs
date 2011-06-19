@@ -38,7 +38,7 @@ namespace ProductionProfiler.Mongo
         {
             using (MongoSession session = MongoSession.Connect(ProfiledRequestDatabaseName, _configuration.Server, _configuration.Port))
             {
-                return session.Items<ProfiledRequest>(i => i.Server == null || i.Server == serverName).Where(i => i.Enabled).ToList();
+                return session.Items<ProfiledRequest>(i => i.Server == null || i.Server == "" || i.Server == serverName).Where(i => i.Enabled).ToList();
             }
         }
 
