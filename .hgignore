@@ -30,3 +30,4 @@ bin
 *.[Pp]ublish.xml
 _[Rr]e[Ss]harper*
 glob:.fsLockFile
+glob:*.docstates
