@@ -85,6 +85,7 @@ namespace ProductionProfiler.Web
                         typeof(IActionFilter), 
                         typeof(IAuthorizationFilter)
                     })
+                    .CaptureExceptions()
                 .EnableMonitoring()
                 .Initialise();
         }

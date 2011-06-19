@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.ExceptionServices;
+using System.Threading;
 using System.Web;
 using Castle.DynamicProxy;
 using log4net.Core;
@@ -20,10 +22,12 @@ namespace ProductionProfiler.Profiling
         private ProfiledMethodData _currentMethod;
         private Stopwatch _watch;
         private readonly ProfilerConfiguration _configuration;
+        private int _threadId;
 
         public RequestProfiler(ProfilerConfiguration configuration)
         {
             _configuration = configuration;
+            _threadId = Thread.CurrentThread.ManagedThreadId;
             RequestId = Guid.NewGuid();
         }
 
@@ -63,7 +67,26 @@ namespace ProductionProfiler.Profiling
                 };
 
                 _watch = Stopwatch.StartNew();
+
+                if (_configuration.CaptureExceptions)
+                {
+                    AppDomain.CurrentDomain.FirstChanceException += CaptureException;
+                }
             }
+        }
+
+        private void CaptureException(object sender, FirstChanceExceptionEventArgs e)
+        {
+            //we check the thread id to check its not an exception from some other web request.
+            //pretty sure this isn't a problem....
+            if (_currentMethod != null && _threadId == Thread.CurrentThread.ManagedThreadId)
+                _currentMethod.Exceptions.Add(new ThrownException()
+                                                {
+                                                    CallStack = e.Exception.StackTrace,
+                                                    Message = e.Exception.Message,
+                                                    Milliseconds = _watch.ElapsedMilliseconds,
+                                                    Type = e.Exception.GetType().FullName
+                                                });
         }
 
         private void ProfilingAppenderAppendLoggingEvent(object sender, AppendLoggingEventEventArgs e)
@@ -89,6 +112,9 @@ namespace ProductionProfiler.Profiling
                 //remove the logging event handler for this profiler instance
                 _configuration.ProfilingAppender.AppendLoggingEvent -= ProfilingAppenderAppendLoggingEvent;
             }
+
+            if (_configuration.CaptureExceptions)
+                AppDomain.CurrentDomain.FirstChanceException -= CaptureException;
 
             return _profileData;
         }

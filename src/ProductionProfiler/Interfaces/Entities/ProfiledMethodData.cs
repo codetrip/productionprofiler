@@ -19,6 +19,7 @@ namespace ProductionProfiler.Interfaces.Entities
         public long StoppedAtMilliseconds { get; set; }
         public string MethodName { get; set; }
         public bool ErrorInMethod { get; set; }
+        public List<ThrownException> Exceptions { get; set; }
 
         public ProfiledMethodData GetParentMethod()
         {
@@ -50,6 +51,7 @@ namespace ProductionProfiler.Interfaces.Entities
         {
             InnerMethods = new List<ProfiledMethodData>();
             LogMessages = new List<LogMessage>();
+            Exceptions = new List<ThrownException>();
         }
     }
 }

@@ -17,6 +17,16 @@ namespace ProductionProfiler.Web.Models
         {
             var log = LogManager.GetLogger("Profiler");
             log.Debug("Started workflow 1");
+
+            try
+            {
+                throw new Exception("test");
+            }
+            catch (Exception)
+            {
+                
+            }
+
             _workflow2.Invoke("test");
             log.Debug("Completed workflow 1");
             return "done";

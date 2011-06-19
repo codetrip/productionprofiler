@@ -1,4 +1,5 @@
-﻿using ProductionProfiler.Log4Net;
+﻿using System;
+using ProductionProfiler.Log4Net;
 
 namespace ProductionProfiler.Configuration
 {
@@ -9,5 +10,6 @@ namespace ProductionProfiler.Configuration
         public bool Log4NetEnabled { get; set; }
         public bool MonitoringEnabled { get; set; }
         public Log4NetProfilingAppender ProfilingAppender { get; set; }
+        public bool CaptureExceptions { get; set; }
     }
 }

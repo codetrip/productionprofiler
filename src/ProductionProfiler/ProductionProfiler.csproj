@@ -82,6 +82,7 @@
     <Compile Include="Interfaces\Entities\ProfiledRequestUpdate.cs" />
     <Compile Include="Interfaces\Entities\ProfilerError.cs" />
     <Compile Include="Interfaces\Entities\RequestInfo.cs" />
+    <Compile Include="Interfaces\Entities\ThrownException.cs" />
     <Compile Include="Interfaces\IContainer.cs" />
     <Compile Include="Interfaces\IDataProvider.cs" />
     <Compile Include="Interfaces\IModelBinder.cs" />

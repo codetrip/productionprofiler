@@ -173,18 +173,23 @@ if (window.jQueryProfiler) {
             },
             renderMethodInfo: function (method, level) {
                 var padding = ((level * 20) + 5);
-                var hasLogMessages = method.LogMessages !== null && method.LogMessages.length > 0;
+                var hasLogMessages = method.LogMessages && method.LogMessages.length;
+                var hasExceptions = method.Exceptions && method.Exceptions.length;
                 var rowClass = hasLogMessages ? 'class="methodinfo"' : '';
                 var css = hasLogMessages ? 'style="cursor:pointer; background: url(content/images/plus.gif) ' + padding + ' 7 no-repeat; padding-left:' + (padding + 10) + '"' : 'style="padding-left:' + padding + 'px"';
 
                 this.html += '<tr ' + rowClass + ' data-padding="' + padding + '"><td ' + css + '>&nbsp;' + method.MethodName + '</td><td>' + method.ElapsedMilliseconds + 'ms</td><td>' + method.StartedAtMilliseconds + 'ms</td><td>' + method.StoppedAtMilliseconds + 'ms</td><td>' + method.ErrorInMethod + '</td><td>' + method.LogMessages.length + '</td></tr>';
 
-                if (hasLogMessages) {
+                if (hasLogMessages || hasExceptions) {
                     this.html += '<tr class="hidden"><td style="padding-left:' + padding + 'px" colspan="6"><table style="width:100%"><tr><th>Logged at</th><th>Level</th><th>Message</th></tr>';
 
                     $.each(method.LogMessages, function (idx, message) {
-                        $.viewengine.html += '<tr style="background-color:#fff"><td style="width:80px">' + message.Milliseconds + 'ms</td><td style="width:100px">' + message.Level + '</td><td>' + message.Message + '</td></tr>';
-                    });
+                        this.html += '<tr style="background-color:#fff"><td style="width:80px">' + message.Milliseconds + 'ms</td><td style="width:100px">' + message.Level + '</td><td>' + message.Message + '</td></tr>';
+                    }.bind(this));
+
+                    $.each(method.Exceptions, function(idx, exception){
+                        this.html += '<tr style="background-color:#fff"><td>' + exception.Milliseconds + 'ms</td><td>' + exception.Type + '</td><td>' + exception.Message + '</td></tr>';
+                    }.bind(this));
 
                     this.html += '</table></td></tr>';
                 }

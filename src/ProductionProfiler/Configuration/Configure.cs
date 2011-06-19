@@ -24,6 +24,7 @@ namespace ProductionProfiler.Configuration
         private ProfilerConfiguration _profilerConfiguration;
         private IContainer _container;
         private List<ProfilerError> _profilerErrors = new List<ProfilerError>();
+        
 
         public static IFluentConfiguration With(IContainer container)
         {
@@ -65,6 +66,12 @@ namespace ProductionProfiler.Configuration
         IFluentConfiguration IFluentConfiguration.RequestFilter(Func<HttpRequest, bool> requestFilter)
         {
             _requestFilter = requestFilter;
+            return this;
+        }
+
+        IFluentConfiguration IFluentConfiguration.CaptureExceptions()
+        {
+            _profilerConfiguration.CaptureExceptions = true;
             return this;
         }
 
@@ -162,5 +169,6 @@ namespace ProductionProfiler.Configuration
         IFluentConfiguration EnableMonitoring();
         IFluentConfiguration WithDataProvider(IDataProvider dataProvider);
         void Initialise();
+        IFluentConfiguration CaptureExceptions();
     }
 }
