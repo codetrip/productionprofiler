@@ -52,7 +52,7 @@ namespace ProductionProfiler.Web
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
 
-            XmlConfigurator.ConfigureAndWatch(new FileInfo(Server.MapPath("bin/Config/log4net.config")));
+            XmlConfigurator.ConfigureAndWatch(new FileInfo(Server.MapPath("~/bin/Config/log4net.config")));
 
             try
             {
