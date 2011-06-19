@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Web;
+using System.Linq;
 
 namespace ProductionProfiler.Interfaces.Entities
 {
@@ -9,6 +11,7 @@ namespace ProductionProfiler.Interfaces.Entities
         private Func<HttpRequest, bool> _shouldProfile;
         private bool _monitoringEnabled;
         private static RequestProfilerContext _current = new RequestProfilerContext();
+        private List<ProfilerError> _persistentProfilerErrors;
 
         public static RequestProfilerContext Current
         {
@@ -33,13 +36,16 @@ namespace ProductionProfiler.Interfaces.Entities
             return _container == null ? null : _container.Resolve<IRequestHandler>(name);
         }
 
-        internal static void Initialise(Func<HttpRequest, bool> shouldProfileRequest, IContainer container, bool monitoringEnabled)
+        public List<ProfilerError> PersistentProfilerErrors { get { return _persistentProfilerErrors; } }
+
+        internal static void Initialise(Func<HttpRequest, bool> shouldProfileRequest, IContainer container, bool monitoringEnabled, IEnumerable<ProfilerError> profilerErrors)
         {
             _current = new RequestProfilerContext
             {
                 _container = container,
                 _shouldProfile = shouldProfileRequest,
-                _monitoringEnabled = monitoringEnabled
+                _monitoringEnabled = monitoringEnabled,
+                _persistentProfilerErrors = profilerErrors.ToList(),
             };
         }
 

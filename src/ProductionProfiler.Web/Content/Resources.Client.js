@@ -157,6 +157,16 @@ if (window.jQueryProfiler) {
                 });
 
                 this.html += '</table>';
+
+                if (data.ProfilerErrors)
+                {
+                    this.html += '<table><tr><td colspan="2" style="font-weight:bold">PROFILER ERRORS</td></td><tr><th>Type</th><th>Error</th></tr>';
+                    $.each(data.ProfilerErrors, function(idx, error) {
+                        this.html += '<tr><td>' + error.sType + '</td><td>' + error.Message + '</td></tr>';
+                        }.bind(this));
+                    this.html += '</table>';
+                }                    
+
                 this.container.html(this.html);
                 this.renderHeading("Profiled Request Details");
                 this.attachDetailEvents();

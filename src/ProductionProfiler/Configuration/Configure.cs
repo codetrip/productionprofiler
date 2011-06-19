@@ -10,7 +10,6 @@ using ProductionProfiler.Binders;
 using ProductionProfiler.Handlers;
 using ProductionProfiler.Interfaces;
 using ProductionProfiler.Interfaces.Entities;
-using ProductionProfiler.Interfaces.Exceptions;
 using ProductionProfiler.Interfaces.Resources;
 using ProductionProfiler.IoC;
 using ProductionProfiler.Log4Net;
@@ -24,6 +23,7 @@ namespace ProductionProfiler.Configuration
         private Func<HttpRequest, bool> _requestFilter;
         private ProfilerConfiguration _profilerConfiguration;
         private IContainer _container;
+        private List<ProfilerError> _profilerErrors = new List<ProfilerError>();
 
         public static IFluentConfiguration With(IContainer container)
         {
@@ -70,13 +70,20 @@ namespace ProductionProfiler.Configuration
 
         IFluentConfiguration IFluentConfiguration.Log4Net(string loggerName)
         {
-            _profilerConfiguration.Log4NetEnabled = true;
-
             var profilingLogger = LogManager.Exists(loggerName);
 
             if (profilingLogger == null)
-                throw new RequestProfilerConfigurationException(string.Format("No log4net logger named {0} was found in the log4net configuration", loggerName));
-
+            {
+                _profilerErrors.Add(new ProfilerError()
+                                        {
+                                            Message =
+                                                string.Format(
+                                                    "No log4net logger named {0} was found in the log4net configuration",
+                                                    loggerName),
+                                            Type = ProfilerErrorType.Configuration,
+                                        });
+                return this;
+            }
             var logger = profilingLogger.Logger as Logger;
 
             if (logger != null)
@@ -102,9 +109,11 @@ namespace ProductionProfiler.Configuration
                 _profilerConfiguration.ProfilingAppender = profilingAppender;
             }
 
+            _profilerConfiguration.Log4NetEnabled = true;
+
             return this;
         }
-
+        
         public IFluentConfiguration EnableMonitoring()
         {
             _profilerConfiguration.MonitoringEnabled = true;
@@ -122,7 +131,7 @@ namespace ProductionProfiler.Configuration
         void IFluentConfiguration.Initialise()
         {
             RegisterDependencies();
-            RequestProfilerContext.Initialise(_requestFilter, _container, _profilerConfiguration.MonitoringEnabled);
+            RequestProfilerContext.Initialise(_requestFilter, _container, _profilerConfiguration.MonitoringEnabled, _profilerErrors);
         }
 
         private void RegisterDependencies()

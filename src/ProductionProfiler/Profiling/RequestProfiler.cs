@@ -10,6 +10,7 @@ using ProductionProfiler.Interfaces;
 using ProductionProfiler.Interfaces.Entities;
 using ProductionProfiler.Interfaces.Resources;
 using ProductionProfiler.Log4Net;
+using System.Linq;
 
 namespace ProductionProfiler.Profiling
 {
@@ -57,7 +58,8 @@ namespace ProductionProfiler.Profiling
                     ClientIpAddress = request.ClientIpAddress(),
                     UserAgent = request.UserAgent,
                     Ajax = request.IsAjaxRequest(),
-                    Id = RequestId
+                    Id = RequestId,
+                    ProfilerErrors = RequestProfilerContext.Current.PersistentProfilerErrors.ToList(),
                 };
 
                 _watch = Stopwatch.StartNew();
@@ -89,6 +91,11 @@ namespace ProductionProfiler.Profiling
             }
 
             return _profileData;
+        }
+
+        public void ProfilerError(string message)
+        {
+            _profileData.ProfilerErrors.Add(new ProfilerError(){ErrorAtMilliseconds = _watch.ElapsedMilliseconds, Message = message, Type = ProfilerErrorType.Runtime});
         }
 
         public void MethodEntry(IInvocation invocation)

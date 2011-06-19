@@ -80,6 +80,7 @@
     <Compile Include="Interfaces\Entities\JsonResponse.cs" />
     <Compile Include="Interfaces\Entities\ProfiledRequestPreview.cs" />
     <Compile Include="Interfaces\Entities\ProfiledRequestUpdate.cs" />
+    <Compile Include="Interfaces\Entities\ProfilerError.cs" />
     <Compile Include="Interfaces\Entities\RequestInfo.cs" />
     <Compile Include="Interfaces\IContainer.cs" />
     <Compile Include="Interfaces\IDataProvider.cs" />
@@ -94,7 +95,6 @@
     <Compile Include="Interfaces\Entities\LogMessage.cs" />
     <Compile Include="Interfaces\Entities\ProfiledMethodData.cs" />
     <Compile Include="Interfaces\Entities\ProfiledRequestData.cs" />
-    <Compile Include="Interfaces\Exceptions\RequestProfilerConfigurationException.cs" />
     <Compile Include="Interfaces\IProfilerRepository.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\IRequestHandler.cs" />
@@ -118,6 +118,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.Client.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Interfaces\Exceptions\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

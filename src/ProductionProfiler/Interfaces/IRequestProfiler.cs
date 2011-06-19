@@ -14,5 +14,6 @@ namespace ProductionProfiler.Interfaces
         void MethodExit();
         void StartProfiling(HttpRequest request);
         ProfiledRequestData StopProfiling();
+        void ProfilerError(string message);
     }
 }

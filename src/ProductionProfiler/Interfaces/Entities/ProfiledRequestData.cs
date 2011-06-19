@@ -15,5 +15,6 @@ namespace ProductionProfiler.Interfaces.Entities
         public string UserAgent { get; set; }
         public bool Ajax { get; set; }
         public List<ProfiledMethodData> Methods { get; set; }
+        public List<ProfilerError> ProfilerErrors { get; set; }
     }
 }
