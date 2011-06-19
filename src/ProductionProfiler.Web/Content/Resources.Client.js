@@ -147,10 +147,10 @@ if (window.jQueryProfiler) {
                 this.attachEvents();
             },
             renderResultsDetail: function (data) {
-                this.html = '<table style="width:100%"><tr><td colspan="8" style="font-weight:bold">REQUEST INFO</td></tr><tr><th>Url</th><th>Request Id</th><th>Captured On</th><th>Server</th><th>Elapsed Milliseconds</th><th>Client IP</th><th>Ajax</th><th>User Agent</th></tr>' +
-                '<tr><td>' + data.Url + '</td><td>' + data.Id + '</td><td>' + $.profiler.formatDate(data.CapturedOnUtc) + '</td><td>' + data.Server + '</td><td>' + data.ElapsedMilliseconds + 'ms</td><td>' + data.ClientIpAddress + '</td><td>' + data.Ajax + '</td><td>' + data.UserAgent + '</td></tr></table><br /><br />';
+                this.html = '<table><tr><td colspan="8" class="section-title">Request Info</td></tr><tr><th>Url</th><th>Request Id</th><th>Captured On</th><th>Server</th><th>Elapsed Milliseconds</th><th>Client IP</th><th>Ajax</th><th>User Agent</th></tr>' +
+                '<tr><td>' + data.Url + '</td><td>' + data.Id + '</td><td>' + $.profiler.formatDate(data.CapturedOnUtc) + '</td><td>' + data.Server + '</td><td>' + data.ElapsedMilliseconds + 'ms</td><td>' + data.ClientIpAddress + '</td><td>' + data.Ajax + '</td><td>' + data.UserAgent + '</td></tr></table>';
 
-                this.html += '<table style="width:100%"><tr><td colspan="6" style="font-weight:bold">METHOD INFO</td></tr><tr><th>Method</th><th>Elapsed</th><th>Started</th><th>Stopped</th><th>Error</th><th>Audit Messages</th></tr>'
+                this.html += '<table><tr class="section-title"><td colspan="6">Method Info</td></tr><tr><th>Method</th><th>Elapsed</th><th>Started</th><th>Stopped</th><th>Error</th><th>Audit Messages</th></tr>'
 
                 $.each(data.Methods, function (idx, method) {
                     $.viewengine.renderMethodInfo(method, 0);
@@ -160,7 +160,7 @@ if (window.jQueryProfiler) {
 
                 if (data.ProfilerErrors)
                 {
-                    this.html += '<table><tr><td colspan="2" style="font-weight:bold">PROFILER ERRORS</td></td><tr><th>Type</th><th>Error</th></tr>';
+                    this.html += '<table><tr><td colspan="2" class="section-title">Profiler Errors</td></td><tr><th>Type</th><th>Error</th></tr>';
                     $.each(data.ProfilerErrors, function(idx, error) {
                         this.html += '<tr><td>' + error.sType + '</td><td>' + error.Message + '</td></tr>';
                         }.bind(this));
