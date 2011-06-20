@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{DF7CFB48-88BE-461D-953E-76CA7BB05E6C}</ProjectGuid>
+    <ProjectGuid>{FBD23662-A373-4A87-8CA9-E94333F00071}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ProductionProfiler.IoC.StructureMap</RootNamespace>
-    <AssemblyName>ProductionProfiler.IoC.StructureMap</AssemblyName>
+    <RootNamespace>ProductionProfiler.Persistence.Raven</RootNamespace>
+    <AssemblyName>ProductionProfiler.Persistence.Raven</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

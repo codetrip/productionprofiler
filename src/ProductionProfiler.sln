@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.IoC.Wind
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.IoC.StructureMap", "ProductionProfiler.IoC.StructureMap\ProductionProfiler.IoC.StructureMap.csproj", "{DF7CFB48-88BE-461D-953E-76CA7BB05E6C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.Persistence.Raven", "ProductionProfiler.Persistence.Raven\ProductionProfiler.Persistence.Raven.csproj", "{FBD23662-A373-4A87-8CA9-E94333F00071}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.Persistence.SqlServer", "ProductionProfiler.Persistence.SqlServer\ProductionProfiler.Persistence.SqlServer.csproj", "{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +47,14 @@ Global
 		{DF7CFB48-88BE-461D-953E-76CA7BB05E6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF7CFB48-88BE-461D-953E-76CA7BB05E6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF7CFB48-88BE-461D-953E-76CA7BB05E6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBD23662-A373-4A87-8CA9-E94333F00071}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBD23662-A373-4A87-8CA9-E94333F00071}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBD23662-A373-4A87-8CA9-E94333F00071}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBD23662-A373-4A87-8CA9-E94333F00071}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{DF7CFB48-88BE-461D-953E-76CA7BB05E6C}</ProjectGuid>
+    <ProjectGuid>{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ProductionProfiler.IoC.StructureMap</RootNamespace>
-    <AssemblyName>ProductionProfiler.IoC.StructureMap</AssemblyName>
+    <RootNamespace>ProductionProfiler.Persistence.SqlServer</RootNamespace>
+    <AssemblyName>ProductionProfiler.Persistence.SqlServer</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
