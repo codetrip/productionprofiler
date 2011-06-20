@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{3B04FCA1-FEF7-472E-AAF4-70CBCC18453A}</ProjectGuid>
+    <ProjectGuid>{DF7CFB48-88BE-461D-953E-76CA7BB05E6C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ProductionProfiler.Mongo</RootNamespace>
-    <AssemblyName>ProductionProfiler.Mongo</AssemblyName>
+    <RootNamespace>ProductionProfiler.IoC.StructureMap</RootNamespace>
+    <AssemblyName>ProductionProfiler.IoC.StructureMap</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,10 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Norm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f158f7900376a27d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\NoRM\Norm.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -44,17 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MongoConfiguration.cs" />
-    <Compile Include="MongoDataProvider.cs" />
-    <Compile Include="MongoProfilerRepository.cs" />
-    <Compile Include="MongoSession.cs" />
+    <Compile Include="Class1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ProductionProfiler\ProductionProfiler.csproj">
-      <Project>{767A9F14-9537-48A1-95B6-A1D753E1DA4E}</Project>
-      <Name>ProductionProfiler</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

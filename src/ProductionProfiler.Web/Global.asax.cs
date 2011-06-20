@@ -15,7 +15,7 @@ using Castle.Windsor.Configuration.Interpreters;
 using log4net.Config;
 using ProductionProfiler.Configuration;
 using ProductionProfiler.IoC;
-using ProductionProfiler.Mongo;
+using ProductionProfiler.Persistence.Mongo;
 using ProductionProfiler.Web.Controllers;
 using ProductionProfiler.Web.Models;
 
@@ -79,13 +79,7 @@ namespace ProductionProfiler.Web
                 .Log4Net("Profiler")
                 .WithDataProvider(new MongoDataProvider("127.0.0.1", 27017))
                 .RequestFilter(req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty)
-                .InterceptTypes(new []
-                    {
-                        typeof(IWorkflow), 
-                        typeof(IActionFilter), 
-                        typeof(IAuthorizationFilter)
-                    })
-                    .CaptureExceptions()
+                .CaptureExceptions()
                 .EnableMonitoring()
                 .Initialise();
         }

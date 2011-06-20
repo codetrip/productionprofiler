@@ -23,20 +23,16 @@ namespace ProductionProfiler.Configuration
         private Func<HttpRequest, bool> _requestFilter;
         private ProfilerConfiguration _profilerConfiguration;
         private IContainer _container;
-        private List<ProfilerError> _profilerErrors = new List<ProfilerError>();
-        
+        private readonly List<ProfilerError> _profilerErrors = new List<ProfilerError>();
 
         public static IFluentConfiguration With(IContainer container)
         {
             Configure config = new Configure
             {
-                _typesToIntercept = new List<Type>(new[] {typeof (IWantToBeProfiled)}),
                 _profilerConfiguration = new ProfilerConfiguration
                 {
                     GetRequestThreshold = 3000,
-                    Log4NetEnabled = false,
                     PostRequestThreshold = 5000,
-                    MonitoringEnabled = false
                 },
                 _requestFilter = req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty,
                 _container = container
@@ -59,6 +55,7 @@ namespace ProductionProfiler.Configuration
 
         IFluentConfiguration IFluentConfiguration.InterceptTypes(Type[] typesToIntercept)
         {
+            _typesToIntercept = new List<Type>(new[] {typeof (IWantToBeProfiled)});
             _typesToIntercept.AddRange(typesToIntercept);
             return this;
         }
@@ -81,16 +78,14 @@ namespace ProductionProfiler.Configuration
 
             if (profilingLogger == null)
             {
-                _profilerErrors.Add(new ProfilerError()
-                                        {
-                                            Message =
-                                                string.Format(
-                                                    "No log4net logger named {0} was found in the log4net configuration",
-                                                    loggerName),
-                                            Type = ProfilerErrorType.Configuration,
-                                        });
+                _profilerErrors.Add(new ProfilerError
+                {
+                    Message = string.Format("No log4net logger named {0} was found in the log4net configuration", loggerName),
+                    Type = ProfilerErrorType.Configuration,
+                });
                 return this;
             }
+
             var logger = profilingLogger.Logger as Logger;
 
             if (logger != null)
@@ -163,12 +158,12 @@ namespace ProductionProfiler.Configuration
     {
         IFluentConfiguration PostThreshold(long postRequestLengthThreshold);
         IFluentConfiguration GetThreshold(long getRequestLengthThreshold);
-        IFluentConfiguration InterceptTypes(Type[] typesToIntercept);
+        IFluentConfiguration InterceptTypes(Type[] typesToIntercept = null);
         IFluentConfiguration RequestFilter(Func<HttpRequest, bool> requestFilter);
         IFluentConfiguration Log4Net(string loggerName);
         IFluentConfiguration EnableMonitoring();
         IFluentConfiguration WithDataProvider(IDataProvider dataProvider);
-        void Initialise();
         IFluentConfiguration CaptureExceptions();
+        void Initialise();
     }
 }

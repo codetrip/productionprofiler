@@ -9,7 +9,6 @@ namespace ProductionProfiler.Interfaces
     {
         Guid RequestId { get; set; }
         bool InitialisedForRequest { get; set; }
-        bool AcceptingAuditOutput { get; }
         void MethodEntry(IInvocation invocation);
         void MethodExit();
         void StartProfiling(HttpRequest request);

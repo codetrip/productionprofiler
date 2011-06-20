@@ -9,7 +9,7 @@ using Norm.Responses;
 using ProductionProfiler.Extensions;
 using ProductionProfiler.Interfaces.Entities;
 
-namespace ProductionProfiler.Mongo
+namespace ProductionProfiler.Persistence.Mongo
 {
     public class MongoSession : IDisposable
     {

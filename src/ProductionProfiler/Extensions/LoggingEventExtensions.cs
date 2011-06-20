@@ -6,9 +6,9 @@ namespace ProductionProfiler.Extensions
 {
     public static class LoggingEventExtensions
     {
-        public static LogMessage ToLogMessage(this LoggingEvent loggingEvent, long elapsedMillseconds)
+        public static ProfilerMessage ToLogMessage(this LoggingEvent loggingEvent, long elapsedMillseconds)
         {
-            return new LogMessage
+            return new ProfilerMessage
             {
                 Message = loggingEvent.RenderedMessage,
                 Milliseconds = elapsedMillseconds,

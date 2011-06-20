@@ -22,7 +22,7 @@ namespace ProductionProfiler.Profiling
         private ProfiledMethodData _currentMethod;
         private Stopwatch _watch;
         private readonly ProfilerConfiguration _configuration;
-        private int _threadId;
+        private readonly int _threadId;
 
         public RequestProfiler(ProfilerConfiguration configuration)
         {
@@ -33,11 +33,6 @@ namespace ProductionProfiler.Profiling
 
         public bool InitialisedForRequest { get; set; }
         public Guid RequestId { get; set; }
-
-        public bool AcceptingAuditOutput
-        {
-            get { return InitialisedForRequest && _currentMethod != null; }
-        }
 
         public void StartProfiling(HttpRequest request)
         {
@@ -80,13 +75,15 @@ namespace ProductionProfiler.Profiling
             //we check the thread id to check its not an exception from some other web request.
             //pretty sure this isn't a problem....
             if (_currentMethod != null && _threadId == Thread.CurrentThread.ManagedThreadId)
+            {
                 _currentMethod.Exceptions.Add(new ThrownException()
-                                                {
-                                                    CallStack = e.Exception.StackTrace,
-                                                    Message = e.Exception.Message,
-                                                    Milliseconds = _watch.ElapsedMilliseconds,
-                                                    Type = e.Exception.GetType().FullName
-                                                });
+                {
+                    CallStack = e.Exception.StackTrace,
+                    Message = e.Exception.Message,
+                    Milliseconds = _watch.ElapsedMilliseconds,
+                    Type = e.Exception.GetType().FullName
+                });
+            }
         }
 
         private void ProfilingAppenderAppendLoggingEvent(object sender, AppendLoggingEventEventArgs e)
@@ -98,7 +95,7 @@ namespace ProductionProfiler.Profiling
                     _currentMethod.ErrorInMethod = true;
                 }
 
-                _currentMethod.LogMessages.Add(e.LoggingEvent.ToLogMessage(_currentMethod.Elapsed()));
+                _currentMethod.Messages.Add(e.LoggingEvent.ToLogMessage(_currentMethod.Elapsed()));
             }  
         }
 
@@ -121,7 +118,12 @@ namespace ProductionProfiler.Profiling
 
         public void ProfilerError(string message)
         {
-            _profileData.ProfilerErrors.Add(new ProfilerError(){ErrorAtMilliseconds = _watch.ElapsedMilliseconds, Message = message, Type = ProfilerErrorType.Runtime});
+            _profileData.ProfilerErrors.Add(new ProfilerError
+            {
+                ErrorAtMilliseconds = _watch.ElapsedMilliseconds, 
+                Message = message, 
+                Type = ProfilerErrorType.Runtime
+            });
         }
 
         public void MethodEntry(IInvocation invocation)
@@ -137,7 +139,7 @@ namespace ProductionProfiler.Profiling
             }
             else
             {
-                _currentMethod.InnerMethods.Add(method);
+                _currentMethod.Methods.Add(method);
                 method.SetParentMethod(_currentMethod);
             }
 

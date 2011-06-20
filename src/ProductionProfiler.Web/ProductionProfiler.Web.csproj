@@ -105,13 +105,13 @@
     <Content Include="Views\Home\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ProductionProfiler.Mongo\ProductionProfiler.Mongo.csproj">
+    <ProjectReference Include="..\ProductionProfiler.Mongo\ProductionProfiler.Persistence.Mongo.csproj">
       <Project>{3B04FCA1-FEF7-472E-AAF4-70CBCC18453A}</Project>
-      <Name>ProductionProfiler.Mongo</Name>
+      <Name>ProductionProfiler.Persistence.Mongo</Name>
     </ProjectReference>
     <ProjectReference Include="..\ProductionProfiler\ProductionProfiler.csproj">
       <Project>{767A9F14-9537-48A1-95B6-A1D753E1DA4E}</Project>
-      <Name>RequestProfiler</Name>
+      <Name>ProductionProfiler</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

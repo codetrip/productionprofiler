@@ -4,7 +4,7 @@ using System.Linq;
 using ProductionProfiler.Interfaces;
 using ProductionProfiler.Interfaces.Entities;
 
-namespace ProductionProfiler.Mongo
+namespace ProductionProfiler.Persistence.Mongo
 {
     public class MongoProfilerRepository : IProfilerRepository
     {

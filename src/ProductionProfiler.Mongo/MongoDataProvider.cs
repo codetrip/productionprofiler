@@ -1,7 +1,7 @@
 ﻿using System;
 using ProductionProfiler.Interfaces;
 
-namespace ProductionProfiler.Mongo
+namespace ProductionProfiler.Persistence.Mongo
 {
     public class MongoDataProvider : IDataProvider
     {

@@ -93,7 +93,7 @@
     <Compile Include="Interfaces\Entities\RequestProfilerContext.cs" />
     <Compile Include="Extensions\HttpRequestExtensions.cs" />
     <Compile Include="Extensions\LoggingEventExtensions.cs" />
-    <Compile Include="Interfaces\Entities\LogMessage.cs" />
+    <Compile Include="Interfaces\Entities\ProfilerMessage.cs" />
     <Compile Include="Interfaces\Entities\ProfiledMethodData.cs" />
     <Compile Include="Interfaces\Entities\ProfiledRequestData.cs" />
     <Compile Include="Interfaces\IProfilerRepository.cs" />

@@ -1,5 +1,5 @@
 ﻿
-namespace ProductionProfiler.Mongo
+namespace ProductionProfiler.Persistence.Mongo
 {
     public class MongoConfiguration
     {

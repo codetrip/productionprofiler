@@ -21,6 +21,14 @@ namespace ProductionProfiler.Interfaces.Entities
             }
         }
 
+        public List<ProfilerError> PersistentProfilerErrors
+        {
+            get
+            {
+                return _persistentProfilerErrors;
+            }
+        }
+
         public bool ShouldProfile(HttpRequest request)
         {
             return _monitoringEnabled && _shouldProfile == null ? false : !request.RawUrl.Contains("/profiler") && _shouldProfile(request);
@@ -36,7 +44,6 @@ namespace ProductionProfiler.Interfaces.Entities
             return _container == null ? null : _container.Resolve<IRequestHandler>(name);
         }
 
-        public List<ProfilerError> PersistentProfilerErrors { get { return _persistentProfilerErrors; } }
 
         internal static void Initialise(Func<HttpRequest, bool> shouldProfileRequest, IContainer container, bool monitoringEnabled, IEnumerable<ProfilerError> profilerErrors)
         {

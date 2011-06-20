@@ -21,7 +21,7 @@ namespace ProductionProfiler.IoC
         {
             if (HttpContext.Current != null && HttpContext.Current.Items.Contains(Constants.RequestProfileContextKey))
             {
-                return _typesToIntercept.Any(t => t.IsAssignableFrom(model.Service));
+                return _typesToIntercept == null || _typesToIntercept.Any(t => t.IsAssignableFrom(model.Service));
             }
 
             return false;
@@ -31,7 +31,7 @@ namespace ProductionProfiler.IoC
         {
             if (HttpContext.Current != null && HttpContext.Current.Items.Contains(Constants.RequestProfileContextKey))
             {
-                if (!_typesToIntercept.Any(t => t.IsAssignableFrom(model.Service)))
+                if (_typesToIntercept != null && !_typesToIntercept.Any(t => t.IsAssignableFrom(model.Service)))
                     return interceptors;
 
                 if (interceptors.Length == 0)
