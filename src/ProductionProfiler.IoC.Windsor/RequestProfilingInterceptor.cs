@@ -1,7 +1,7 @@
 ﻿using Castle.DynamicProxy;
-using ProductionProfiler.Interfaces;
+using ProductionProfiler.Core.Interfaces;
 
-namespace ProductionProfiler.IoC
+namespace ProductionProfiler.IoC.Windsor
 {
     public interface IRequestProfilingInterceptor : IInterceptor
     { }
@@ -23,7 +23,7 @@ namespace ProductionProfiler.IoC
             }
             else
             {
-                _requestProfiler.MethodEntry(invocation);
+                _requestProfiler.MethodEntry(string.Format("{0}.{1}", invocation.TargetType.FullName, invocation.Method.Name));
                 invocation.Proceed();
                 _requestProfiler.MethodExit();
             }

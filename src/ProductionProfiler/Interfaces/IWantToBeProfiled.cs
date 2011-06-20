@@ -1,6 +1,6 @@
 ﻿
 
-namespace ProductionProfiler.Interfaces
+namespace ProductionProfiler.Core.Interfaces
 {
     /// <summary>
     /// Marker interface which types should implement if they you want them proxied when profiling requests

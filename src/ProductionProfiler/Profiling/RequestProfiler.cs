@@ -4,17 +4,16 @@ using System.Diagnostics;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Web;
-using Castle.DynamicProxy;
 using log4net.Core;
-using ProductionProfiler.Configuration;
-using ProductionProfiler.Extensions;
-using ProductionProfiler.Interfaces;
-using ProductionProfiler.Interfaces.Entities;
-using ProductionProfiler.Interfaces.Resources;
-using ProductionProfiler.Log4Net;
+using ProductionProfiler.Core.Configuration;
+using ProductionProfiler.Core.Extensions;
+using ProductionProfiler.Core.Interfaces;
+using ProductionProfiler.Core.Interfaces.Entities;
+using ProductionProfiler.Core.Interfaces.Resources;
+using ProductionProfiler.Core.Log4Net;
 using System.Linq;
 
-namespace ProductionProfiler.Profiling
+namespace ProductionProfiler.Core.Profiling
 {
     public class RequestProfiler : IRequestProfiler
     {
@@ -126,11 +125,11 @@ namespace ProductionProfiler.Profiling
             });
         }
 
-        public void MethodEntry(IInvocation invocation)
+        public void MethodEntry(string methodName)
         {
             ProfiledMethodData method = new ProfiledMethodData
             {
-                MethodName = string.Format("{0}.{1}", invocation.TargetType.FullName, invocation.Method.Name)
+                MethodName = methodName
             };
 
             if (_currentMethod == null)

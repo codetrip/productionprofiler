@@ -6,16 +6,15 @@ using System.Web;
 using log4net;
 using log4net.Core;
 using log4net.Repository.Hierarchy;
-using ProductionProfiler.Binders;
-using ProductionProfiler.Handlers;
-using ProductionProfiler.Interfaces;
-using ProductionProfiler.Interfaces.Entities;
-using ProductionProfiler.Interfaces.Resources;
-using ProductionProfiler.IoC;
-using ProductionProfiler.Log4Net;
-using ProductionProfiler.Profiling;
+using ProductionProfiler.Core.Binders;
+using ProductionProfiler.Core.Handlers;
+using ProductionProfiler.Core.Interfaces;
+using ProductionProfiler.Core.Interfaces.Entities;
+using ProductionProfiler.Core.Interfaces.Resources;
+using ProductionProfiler.Core.Log4Net;
+using ProductionProfiler.Core.Profiling;
 
-namespace ProductionProfiler.Configuration
+namespace ProductionProfiler.Core.Configuration
 {
     public class Configure : IFluentConfiguration
     {
@@ -149,7 +148,6 @@ namespace ProductionProfiler.Configuration
             _container.RegisterTransient<IAddProfiledRequestModelBinder>(typeof(AddProfiledRequestModelBinder));
             _container.RegisterTransient<IUpdateProfiledRequestModelBinder>(typeof(UpdateProfiledRequestModelBinder));
             _container.RegisterTransient<IRequestProfilingCoordinator>(typeof(RequestProfilingCoordinator));
-            _container.RegisterTransient<RequestProfilingInterceptor>(typeof(RequestProfilingInterceptor));
             _container.InitialiseForProxyInterception(_typesToIntercept);
         }
     }

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Specialized;
 
-namespace ProductionProfiler.Interfaces.Entities
+namespace ProductionProfiler.Core.Interfaces.Entities
 {
     public class RequestInfo
     {

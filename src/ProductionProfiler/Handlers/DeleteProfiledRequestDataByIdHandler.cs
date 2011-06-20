@@ -1,9 +1,9 @@
 ﻿using System;
-using ProductionProfiler.Interfaces;
-using ProductionProfiler.Interfaces.Entities;
-using ProductionProfiler.Interfaces.Resources;
+using ProductionProfiler.Core.Interfaces;
+using ProductionProfiler.Core.Interfaces.Entities;
+using ProductionProfiler.Core.Interfaces.Resources;
 
-namespace ProductionProfiler.Handlers
+namespace ProductionProfiler.Core.Handlers
 {
     public class DeleteProfiledDataByIdRequestHandler : RequestHandlerBase
     {

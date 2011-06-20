@@ -1,5 +1,5 @@
 ﻿using System;
-using ProductionProfiler.Interfaces;
+using ProductionProfiler.Core.Interfaces;
 
 namespace ProductionProfiler.Persistence.Mongo
 {

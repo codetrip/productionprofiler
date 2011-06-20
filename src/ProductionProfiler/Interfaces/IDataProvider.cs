@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-namespace ProductionProfiler.Interfaces
+namespace ProductionProfiler.Core.Interfaces
 {
     public interface IDataProvider
     {

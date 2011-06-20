@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 
-namespace ProductionProfiler.Interfaces
+namespace ProductionProfiler.Core.Interfaces
 {
     public interface IModelBinder<out T>
     {

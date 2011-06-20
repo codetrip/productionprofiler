@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Web;
-using Castle.DynamicProxy;
-using ProductionProfiler.Interfaces.Entities;
+using ProductionProfiler.Core.Interfaces.Entities;
 
-namespace ProductionProfiler.Interfaces
+namespace ProductionProfiler.Core.Interfaces
 {
     public interface IRequestProfiler
     {
         Guid RequestId { get; set; }
         bool InitialisedForRequest { get; set; }
-        void MethodEntry(IInvocation invocation);
+        void MethodEntry(string methodName);
         void MethodExit();
         void StartProfiling(HttpRequest request);
         ProfiledRequestData StopProfiling();

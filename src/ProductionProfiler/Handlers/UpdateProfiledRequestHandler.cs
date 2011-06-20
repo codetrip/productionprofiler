@@ -1,9 +1,9 @@
-﻿using ProductionProfiler.Binders;
-using ProductionProfiler.Interfaces;
-using ProductionProfiler.Interfaces.Entities;
-using ProductionProfiler.Interfaces.Resources;
+﻿using ProductionProfiler.Core.Binders;
+using ProductionProfiler.Core.Interfaces;
+using ProductionProfiler.Core.Interfaces.Entities;
+using ProductionProfiler.Core.Interfaces.Resources;
 
-namespace ProductionProfiler.Handlers
+namespace ProductionProfiler.Core.Handlers
 {
     public class UpdateProfiledRequestHandler : RequestHandlerBase
     {
@@ -35,7 +35,7 @@ namespace ProductionProfiler.Handlers
                 var storedRequest = _repository.GetProfiledRequestByUrl(request.Url);
 
                 if (storedRequest != null)
-                    _repository.DeleteProfiledRequestDataByUrl(storedRequest.Url);
+                    _repository.DeleteProfiledRequest(storedRequest.Url);
             }
             else
             {

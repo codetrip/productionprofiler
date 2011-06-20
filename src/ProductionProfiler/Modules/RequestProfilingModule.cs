@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Web;
-using ProductionProfiler.Interfaces.Entities;
+using ProductionProfiler.Core.Interfaces.Entities;
 
-namespace ProductionProfiler.Modules
+namespace ProductionProfiler.Core.Modules
 {
     public class RequestProfilingModule : IHttpModule
     {

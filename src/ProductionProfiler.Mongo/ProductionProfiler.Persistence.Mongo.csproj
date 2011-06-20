@@ -51,9 +51,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ProductionProfiler\ProductionProfiler.csproj">
+    <ProjectReference Include="..\ProductionProfiler\ProductionProfiler.Core.csproj">
       <Project>{767A9F14-9537-48A1-95B6-A1D753E1DA4E}</Project>
-      <Name>ProductionProfiler</Name>
+      <Name>ProductionProfiler.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

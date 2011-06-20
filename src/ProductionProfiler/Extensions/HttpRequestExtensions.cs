@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web;
 
-namespace ProductionProfiler.Extensions
+namespace ProductionProfiler.Core.Extensions
 {
     public static class HttpRequestExtensions
     {

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
-using ProductionProfiler.Interfaces;
+using ProductionProfiler.Core.Interfaces;
 
-namespace ProductionProfiler.IoC
+namespace ProductionProfiler.IoC.Windsor
 {
     public class WindsorProfilerContainer : IContainer
     {
@@ -58,6 +58,7 @@ namespace ProductionProfiler.IoC
 
         public void InitialiseForProxyInterception(IList<Type> typesToIntercept)
         {
+            RegisterTransient<RequestProfilingInterceptor>(typeof(RequestProfilingInterceptor));
             _container.Kernel.ProxyFactory.AddInterceptorSelector(new ProfilingInterceptorSelector(typesToIntercept));
         }
     }

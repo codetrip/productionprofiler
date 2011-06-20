@@ -1,7 +1,7 @@
 ﻿using System;
-using ProductionProfiler.Log4Net;
+using ProductionProfiler.Core.Log4Net;
 
-namespace ProductionProfiler.Configuration
+namespace ProductionProfiler.Core.Configuration
 {
     public class ProfilerConfiguration
     {

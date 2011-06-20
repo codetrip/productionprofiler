@@ -1,6 +1,6 @@
 ﻿using System.Web;
 
-namespace ProductionProfiler.Handlers
+namespace ProductionProfiler.Core.Handlers
 {
     public class ProfilerAdministrationHandler : IHttpHandler
     {

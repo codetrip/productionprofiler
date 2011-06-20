@@ -1,9 +1,9 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using ProductionProfiler.Interfaces.Entities;
+using ProductionProfiler.Core.Interfaces.Entities;
 
-namespace ProductionProfiler.Interfaces
+namespace ProductionProfiler.Core.Interfaces
 {
     public interface IProfilerRepository
     {

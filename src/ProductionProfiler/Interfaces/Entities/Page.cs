@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ProductionProfiler.Interfaces.Entities
+namespace ProductionProfiler.Core.Interfaces.Entities
 {
     /// <summary>
     /// Represents one page of entities, along with information about which page it is.

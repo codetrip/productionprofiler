@@ -105,13 +105,17 @@
     <Content Include="Views\Home\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ProductionProfiler.IoC.Windsor\ProductionProfiler.IoC.Windsor.csproj">
+      <Project>{95469EAB-02B7-4F27-B542-F7F17F55F362}</Project>
+      <Name>ProductionProfiler.IoC.Windsor</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ProductionProfiler.Mongo\ProductionProfiler.Persistence.Mongo.csproj">
       <Project>{3B04FCA1-FEF7-472E-AAF4-70CBCC18453A}</Project>
       <Name>ProductionProfiler.Persistence.Mongo</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ProductionProfiler\ProductionProfiler.csproj">
+    <ProjectReference Include="..\ProductionProfiler\ProductionProfiler.Core.csproj">
       <Project>{767A9F14-9537-48A1-95B6-A1D753E1DA4E}</Project>
-      <Name>ProductionProfiler</Name>
+      <Name>ProductionProfiler.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

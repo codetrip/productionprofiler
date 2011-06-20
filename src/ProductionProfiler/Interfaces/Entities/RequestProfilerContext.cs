@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Web;
 using System.Linq;
 
-namespace ProductionProfiler.Interfaces.Entities
+namespace ProductionProfiler.Core.Interfaces.Entities
 {
     public class RequestProfilerContext
     {

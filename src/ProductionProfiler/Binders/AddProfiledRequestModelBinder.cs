@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
-using ProductionProfiler.Interfaces;
-using ProductionProfiler.Interfaces.Entities;
+using ProductionProfiler.Core.Interfaces;
+using ProductionProfiler.Core.Interfaces.Entities;
 
-namespace ProductionProfiler.Binders
+namespace ProductionProfiler.Core.Binders
 {
     public class AddProfiledRequestModelBinder : IAddProfiledRequestModelBinder
     {

@@ -1,6 +1,6 @@
 ﻿using System.Web;
 
-namespace ProductionProfiler.Interfaces
+namespace ProductionProfiler.Core.Interfaces
 {
     public interface IRequestProfilingCoordinator
     {

@@ -1,10 +1,10 @@
 ﻿using System.Text;
 using System.Web;
 using System.Web.Script.Serialization;
-using ProductionProfiler.Interfaces;
-using ProductionProfiler.Interfaces.Entities;
+using ProductionProfiler.Core.Interfaces;
+using ProductionProfiler.Core.Interfaces.Entities;
 
-namespace ProductionProfiler.Handlers
+namespace ProductionProfiler.Core.Handlers
 {
     public abstract class RequestHandlerBase : IRequestHandler
     {

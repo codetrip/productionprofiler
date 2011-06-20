@@ -4,9 +4,9 @@ using System.Linq;
 using System.Web;
 using Castle.Core;
 using Castle.MicroKernel.Proxy;
-using ProductionProfiler.Interfaces.Resources;
+using ProductionProfiler.Core.Interfaces.Resources;
 
-namespace ProductionProfiler.IoC
+namespace ProductionProfiler.IoC.Windsor
 {
     public class ProfilingInterceptorSelector : IModelInterceptorsSelector
     {

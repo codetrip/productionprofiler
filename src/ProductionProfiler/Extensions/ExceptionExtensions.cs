@@ -8,7 +8,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading;
 
-namespace ProductionProfiler.Extensions
+namespace ProductionProfiler.Core.Extensions
 {
     public static class ExceptionExtensions
     {

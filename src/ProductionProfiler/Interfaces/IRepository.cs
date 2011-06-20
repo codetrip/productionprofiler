@@ -1,5 +1,5 @@
 ﻿
-namespace ProductionProfiler.Interfaces
+namespace ProductionProfiler.Core.Interfaces
 {
     public interface IRepository<TEntity, in TId>
     {

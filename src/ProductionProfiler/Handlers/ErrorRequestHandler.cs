@@ -1,9 +1,9 @@
 ﻿
 using System.Web;
-using ProductionProfiler.Interfaces;
-using ProductionProfiler.Interfaces.Entities;
+using ProductionProfiler.Core.Interfaces;
+using ProductionProfiler.Core.Interfaces.Entities;
 
-namespace ProductionProfiler.Handlers
+namespace ProductionProfiler.Core.Handlers
 {
     public class ErrorRequestHandler : IRequestHandler
     {

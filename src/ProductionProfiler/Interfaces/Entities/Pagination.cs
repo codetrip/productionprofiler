@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ProductionProfiler.Interfaces.Entities
+namespace ProductionProfiler.Core.Interfaces.Entities
 {
     /// <summary>
     /// Information about Paginated results.

@@ -1,4 +1,4 @@
-namespace ProductionProfiler.Interfaces.Entities
+namespace ProductionProfiler.Core.Interfaces.Entities
 {
     public class ProfilerError
     {

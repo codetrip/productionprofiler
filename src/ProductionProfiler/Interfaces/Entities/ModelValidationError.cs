@@ -1,4 +1,4 @@
-﻿namespace ProductionProfiler.Interfaces
+﻿namespace ProductionProfiler.Core.Interfaces
 {
     public class ModelValidationError
     {

@@ -6,8 +6,8 @@ using Norm;
 using Norm.Collections;
 using Norm.Linq;
 using Norm.Responses;
-using ProductionProfiler.Extensions;
-using ProductionProfiler.Interfaces.Entities;
+using ProductionProfiler.Core.Extensions;
+using ProductionProfiler.Core.Interfaces.Entities;
 
 namespace ProductionProfiler.Persistence.Mongo
 {

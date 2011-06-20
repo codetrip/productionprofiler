@@ -8,8 +8,8 @@
     <ProjectGuid>{767A9F14-9537-48A1-95B6-A1D753E1DA4E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ProductionProfiler</RootNamespace>
-    <AssemblyName>ProductionProfiler</AssemblyName>
+    <RootNamespace>ProductionProfiler.Core</RootNamespace>
+    <AssemblyName>ProductionProfiler.Core</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,18 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Core">
-      <HintPath>..\..\lib\Castle\Castle.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.Services.Logging.log4netIntegration">
-      <HintPath>..\..\lib\Castle\Castle.Services.Logging.log4netIntegration.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.Windsor">
-      <HintPath>..\..\lib\Castle\Castle.Windsor.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.Windsor.Lifestyles">
-      <HintPath>..\..\lib\Castle\Castle.Windsor.Lifestyles.dll</HintPath>
-    </Reference>
     <Reference Include="log4net">
       <HintPath>..\..\lib\Log4net\log4net.dll</HintPath>
     </Reference>
@@ -103,13 +91,10 @@
     <Compile Include="Interfaces\IWantToBeProfiled.cs" />
     <Compile Include="Interfaces\Entities\ModelValidationError.cs" />
     <Compile Include="Interfaces\Resources\Constants.cs" />
-    <Compile Include="IoC\WindsorProfilerContainer.cs" />
     <Compile Include="Log4Net\AppendLoggingEventEventArgs.cs" />
     <Compile Include="Log4Net\Log4NetProfilingAppender.cs" />
     <Compile Include="Interfaces\IRequestProfilingCoordinator.cs" />
     <Compile Include="Profiling\RequestProfiler.cs" />
-    <Compile Include="IoC\ProfilingInterceptorSelector.cs" />
-    <Compile Include="IoC\RequestProfilingInterceptor.cs" />
     <Compile Include="Modules\RequestProfilingModule.cs" />
     <Compile Include="Profiling\RequestProfilingCoordinator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

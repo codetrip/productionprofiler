@@ -1,10 +1,10 @@
 ﻿
 using System;
 using System.Web;
-using ProductionProfiler.Interfaces.Entities;
-using ProductionProfiler.Interfaces.Resources;
+using ProductionProfiler.Core.Interfaces.Entities;
+using ProductionProfiler.Core.Interfaces.Resources;
 
-namespace ProductionProfiler.Handlers
+namespace ProductionProfiler.Core.Handlers
 {
     public class RequestInfoParser
     {

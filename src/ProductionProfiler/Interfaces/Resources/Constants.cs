@@ -1,5 +1,5 @@
 ﻿
-namespace ProductionProfiler.Interfaces.Resources
+namespace ProductionProfiler.Core.Interfaces.Resources
 {
     public static class Constants
     {

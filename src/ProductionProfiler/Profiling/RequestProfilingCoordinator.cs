@@ -3,14 +3,14 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Web;
 using log4net;
-using ProductionProfiler.Configuration;
-using ProductionProfiler.Interfaces;
+using ProductionProfiler.Core.Configuration;
+using ProductionProfiler.Core.Interfaces;
 using System.Linq;
-using ProductionProfiler.Interfaces.Entities;
-using ProductionProfiler.Interfaces.Resources;
-using ProductionProfiler.Extensions;
+using ProductionProfiler.Core.Interfaces.Entities;
+using ProductionProfiler.Core.Interfaces.Resources;
+using ProductionProfiler.Core.Extensions;
 
-namespace ProductionProfiler.Profiling
+namespace ProductionProfiler.Core.Profiling
 {
     public class RequestProfilingCoordinator : IRequestProfilingCoordinator
     {

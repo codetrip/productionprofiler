@@ -85,36 +85,42 @@ if (window.jQueryProfiler) {
             },
             renderProfiledRequests: function (data) {
                 var html = '<form action="/profiler?handler=apr" method="post">' +
-                '<table width="1000">' +
+                '<table class="w1000">' +
                 '<tr><th>Url to profile (Supports Regular Expressions)</th><th>Server</th><th>Profile Count</th><th></th></tr>' +
                 '<tr><td><input id="Url" name="Url" style="width:625px" type="text" value="" /></td>' +
                 '<td><input name="Server" style="width:200px" type="text" value="" /></td>' +
                 '<td><input name="ProfilingCount" maxlength="4" style="width:75px" type="text" value="" /></td>' +
                 '<td><input type="submit" value="Add" class="btn" /></td></tr>' +
-                '</table></form>' +
-                '<table width="1000"><tr><th>Enable</th><th>Url</th><th>Profiled On</th><th>Elapsed</th><th>Server</th><th>Http Method</th><th>Profile Count</th><th>Delete</th><th>Update</th></tr>';
+                '</table></form>';
 
-                $.each(data.Data, function (idx, itm) {
-                    var profilingCount = itm.ProfilingCount === null ? '' : itm.ProfilingCount;
-                    var checked = itm.Enabled ? 'checked="checked"' : '';
-                    var bgcolor = itm.Enabled ? 'style="background-color:#F5D0A9"' : '';
-                    html += '<tr ' + bgcolor + '><form action="/profiler?handler=upr" method="post">' +
-                    '<input name="Url" type="hidden" value="' + itm.Url + '" />' +
-                    '<td><input name="Enabled" type="checkbox" ' + checked + ' value="true" /><input name="Enabled" type="hidden" value="false" /></td>' +
-                    '<td>' + itm.Url + '</td>' +
-                    '<td>' + $.profiler.formatDate(itm.ProfiledOnUtc) + '</td>' +
-                    '<td>' + $.profiler.emptyIfNull(itm.ElapsedMilliseconds, 'ms') + '</td>' +
-                    '<td><input name="Server" style="width:150px" type="text" value="' + $.profiler.emptyIfNull(itm.Server, '') + '" /></td>' +
-                    '<td>' + $.profiler.emptyIfNull(itm.HttpMethod, '') + '</td>' +
-                    '<td><input name="ProfilingCount" style="width:50px" type="text" value="' + profilingCount + '" /></td>' +
-                    '<td><input type="submit" value="Delete" name="Delete" class="btn delete" /></td>' +
-                    '<td><input type="submit" value="Update" name="Update" class="btn" /></td>' +
-                    '</form></tr>';
-                });
+                if(data.Data.length > 0){
+                    html += '<table><tr><th>Enable</th><th>Url</th><th>Profiled On</th><th>Elapsed</th><th>Server</th><th>Http Method</th><th>Profile Count</th><th>Delete</th><th>Update</th></tr>';
 
-                html += '</table>';
+                    $.each(data.Data, function (idx, itm) {
+                        var profilingCount = itm.ProfilingCount === null ? '' : itm.ProfilingCount;
+                        var checked = itm.Enabled ? 'checked="checked"' : '';
+                        var bgcolor = itm.Enabled ? 'style="background-color:#F5D0A9"' : '';
+                        html += '<tr ' + bgcolor + '><form action="/profiler?handler=upr" method="post">' +
+                        '<input name="Url" type="hidden" value="' + itm.Url + '" />' +
+                        '<td><input name="Enabled" type="checkbox" ' + checked + ' value="true" /><input name="Enabled" type="hidden" value="false" /></td>' +
+                        '<td>' + itm.Url + '</td>' +
+                        '<td>' + $.profiler.formatDate(itm.ProfiledOnUtc) + '</td>' +
+                        '<td>' + $.profiler.emptyIfNull(itm.ElapsedMilliseconds, 'ms') + '</td>' +
+                        '<td><input name="Server" style="width:150px" type="text" value="' + $.profiler.emptyIfNull(itm.Server, '') + '" /></td>' +
+                        '<td>' + $.profiler.emptyIfNull(itm.HttpMethod, '') + '</td>' +
+                        '<td><input name="ProfilingCount" style="width:50px" type="text" value="' + profilingCount + '" /></td>' +
+                        '<td><input type="submit" value="Delete" name="Delete" class="btn delete" /></td>' +
+                        '<td><input type="submit" value="Update" name="Update" class="btn" /></td>' +
+                        '</form></tr>';
+                    });
+
+                    html += '</table>';
+                } else {
+                    html += '<div class="noresults">No URLs are currently being profiled, either turn on automatic monitoring in the profiler configuration or manually add URLs you want to profile using the form above.</div>';
+                }
+                
                 this.container.html(html);
-                this.renderHeading("Profiled Requests");
+                this.renderHeading("Profiled URLs");
                 this.attachEvents();
             },
             renderResults: function (data) {
@@ -201,7 +207,7 @@ if (window.jQueryProfiler) {
                 }
             },
             renderHeading: function (title) {
-                var html = '<div style="padding:5px 0px 15px 0px"><h1>' + title + '</h1><a class="heading" href="/profiler?handler=vpr">Profiled Requests</a><a class="heading" href="/profiler?handler=results&action=results">Results</a></div>'
+                var html = '<div style="padding:5px 0px 15px 0px"><h1>' + title + '</h1><a class="heading" href="/profiler?handler=vpr">Profiled URLs</a><a class="heading" href="/profiler?handler=results&action=results">Profiler Results</a></div>'
                 this.title.html(html);
             },
         });
