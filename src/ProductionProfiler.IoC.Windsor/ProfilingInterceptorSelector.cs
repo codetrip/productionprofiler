@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Castle.Core;
+using Castle.DynamicProxy;
 using Castle.MicroKernel.Proxy;
 using ProductionProfiler.Core.Interfaces.Resources;
 
@@ -10,6 +11,7 @@ namespace ProductionProfiler.IoC.Windsor
 {
     public class ProfilingInterceptorSelector : IModelInterceptorsSelector
     {
+        private static readonly Type _interceptorType = typeof (IInterceptor);
         private readonly IList<Type> _typesToIntercept;
 
         public ProfilingInterceptorSelector(IList<Type> typesToIntercept)
@@ -21,7 +23,7 @@ namespace ProductionProfiler.IoC.Windsor
         {
             if (HttpContext.Current != null && HttpContext.Current.Items.Contains(Constants.RequestProfileContextKey))
             {
-                return _typesToIntercept == null || _typesToIntercept.Any(t => t.IsAssignableFrom(model.Service));
+                return ShouldIntercept(model.Service);
             }
 
             return false;
@@ -31,7 +33,7 @@ namespace ProductionProfiler.IoC.Windsor
         {
             if (HttpContext.Current != null && HttpContext.Current.Items.Contains(Constants.RequestProfileContextKey))
             {
-                if (_typesToIntercept != null && !_typesToIntercept.Any(t => t.IsAssignableFrom(model.Service)))
+                if (!ShouldIntercept(model.Service))
                     return interceptors;
 
                 if (interceptors.Length == 0)
@@ -44,6 +46,11 @@ namespace ProductionProfiler.IoC.Windsor
             }
 
             return interceptors;
+        }
+
+        private bool ShouldIntercept(Type serviceType)
+        {
+            return (_typesToIntercept == null || _typesToIntercept.Any(t => t.IsAssignableFrom(serviceType))) && !_interceptorType.IsAssignableFrom(serviceType);
         }
     }
 }
