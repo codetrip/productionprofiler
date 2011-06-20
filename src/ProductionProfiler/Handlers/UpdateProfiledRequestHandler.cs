@@ -1,34 +1,38 @@
-﻿using ProductionProfiler.Core.Binders;
-using ProductionProfiler.Core.Interfaces;
-using ProductionProfiler.Core.Interfaces.Entities;
-using ProductionProfiler.Core.Interfaces.Resources;
+﻿using ProductionProfiler.Core.Binding;
+using ProductionProfiler.Core.Caching;
+using ProductionProfiler.Core.Handlers.Entities;
+using ProductionProfiler.Core.Persistence;
+using ProductionProfiler.Core.Resources;
 
 namespace ProductionProfiler.Core.Handlers
 {
     public class UpdateProfiledRequestHandler : RequestHandlerBase
     {
         private readonly IProfilerRepository _repository;
-        private readonly IUpdateProfiledRequestModelBinder _updateProfiledRequestModelBinder;
+        private readonly IUpdateProfiledRequestRequestBinder _updateProfiledRequestRequestBinder;
+        private readonly ICacheEngine _cacheEngine;
 
         public UpdateProfiledRequestHandler(IProfilerRepository repository, 
-            IUpdateProfiledRequestModelBinder updateProfiledRequestModelBinder)
+            IUpdateProfiledRequestRequestBinder updateProfiledRequestRequestBinder, 
+            ICacheEngine cacheEngine)
         {
             _repository = repository;
-            _updateProfiledRequestModelBinder = updateProfiledRequestModelBinder;
+            _cacheEngine = cacheEngine;
+            _updateProfiledRequestRequestBinder = updateProfiledRequestRequestBinder;
         }
 
         protected override JsonResponse DoHandleRequest(RequestInfo requestInfo)
         {
-            if (!_updateProfiledRequestModelBinder.IsValid(requestInfo.Form))
+            if (!_updateProfiledRequestRequestBinder.IsValid(requestInfo.Form))
             {
                 return new JsonResponse
                 {
                     Success = false,
-                    Errors = _updateProfiledRequestModelBinder.Errors
+                    Errors = _updateProfiledRequestRequestBinder.Errors
                 };
             }
 
-            var request = _updateProfiledRequestModelBinder.Bind(requestInfo.Form);
+            var request = _updateProfiledRequestRequestBinder.Bind(requestInfo.Form);
 
             if (request.Delete)
             {
@@ -50,6 +54,8 @@ namespace ProductionProfiler.Core.Handlers
                     _repository.SaveProfiledRequest(storedRequest);
                 }
             }
+
+            _cacheEngine.Remove(Constants.Handlers.ViewProfiledRequests, true);
 
             return new JsonResponse
             {

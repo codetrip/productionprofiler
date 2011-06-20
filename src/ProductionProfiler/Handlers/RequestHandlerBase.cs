@@ -1,8 +1,7 @@
 ﻿using System.Text;
 using System.Web;
 using System.Web.Script.Serialization;
-using ProductionProfiler.Core.Interfaces;
-using ProductionProfiler.Core.Interfaces.Entities;
+using ProductionProfiler.Core.Handlers.Entities;
 
 namespace ProductionProfiler.Core.Handlers
 {

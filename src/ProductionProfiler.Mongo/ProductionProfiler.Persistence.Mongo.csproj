@@ -45,7 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MongoConfiguration.cs" />
-    <Compile Include="MongoDataProvider.cs" />
+    <Compile Include="MongoPersistenceProvider.cs" />
     <Compile Include="MongoProfilerRepository.cs" />
     <Compile Include="MongoSession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

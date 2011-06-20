@@ -1,8 +1,9 @@
 ﻿
 using System;
 using System.Web;
-using ProductionProfiler.Core.Interfaces.Entities;
-using ProductionProfiler.Core.Interfaces.Resources;
+using ProductionProfiler.Core.Handlers.Entities;
+using ProductionProfiler.Core.Persistence.Entities;
+using ProductionProfiler.Core.Resources;
 
 namespace ProductionProfiler.Core.Handlers
 {

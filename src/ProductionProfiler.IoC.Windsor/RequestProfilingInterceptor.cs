@@ -1,5 +1,6 @@
 ﻿using Castle.DynamicProxy;
-using ProductionProfiler.Core.Interfaces;
+using ProductionProfiler.Core.Profiling;
+using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.IoC.Windsor
 {
@@ -23,9 +24,21 @@ namespace ProductionProfiler.IoC.Windsor
             }
             else
             {
-                _requestProfiler.MethodEntry(string.Format("{0}.{1}", invocation.TargetType.FullName, invocation.Method.Name));
+                var methodInvocation = new MethodInvocation
+                {
+                    Arguments = invocation.Arguments,
+                    InvocationTarget = invocation.InvocationTarget,
+                    TargetType = invocation.TargetType,
+                    MethodName = invocation.Method.Name
+                };
+
+                _requestProfiler.MethodEntry(methodInvocation);
+
                 invocation.Proceed();
-                _requestProfiler.MethodExit();
+
+                methodInvocation.ReturnValue = invocation.ReturnValue;
+
+                _requestProfiler.MethodExit(methodInvocation);
             }
         }
     }

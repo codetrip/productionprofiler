@@ -45,14 +45,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Binders\AddProfiledRequestModelBinder.cs" />
-    <Compile Include="Binders\IAddProfiledRequestModelBinder.cs" />
-    <Compile Include="Binders\IUpdateProfiledRequestModelBinder.cs" />
-    <Compile Include="Binders\UpdateProfiledRequestModelBinder.cs" />
+    <Compile Include="Binding\AddProfiledRequestRequestBinder.cs" />
+    <Compile Include="Binding\IAddProfiledRequestRequestBinder.cs" />
+    <Compile Include="Binding\IUpdateProfiledRequestRequestBinder.cs" />
+    <Compile Include="Binding\UpdateProfiledRequestRequestBinder.cs" />
+    <Compile Include="Caching\HttpRuntimeCacheEngine.cs" />
+    <Compile Include="Caching\ICacheEngine.cs" />
+    <Compile Include="Collectors\BasicHttpResponseDataCollector.cs" />
+    <Compile Include="Collectors\NullHttpResponseDataCollector.cs" />
+    <Compile Include="Collectors\NullMethodExitDataCollector.cs" />
+    <Compile Include="Collectors\NullMethodEntryDataCollector.cs" />
+    <Compile Include="Collectors\BasicHttpRequestDataCollector.cs" />
+    <Compile Include="Collectors\NullHttpRequestDataCollector.cs" />
     <Compile Include="Configuration\Configure.cs" />
     <Compile Include="Configuration\ProfilerConfiguration.cs" />
     <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Extensions\QueryableExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Handlers\AddProfiledRequestHandler.cs" />
     <Compile Include="Handlers\DeleteProfiledRequestDataByUrlHandler.cs" />
     <Compile Include="Handlers\DeleteProfiledRequestDataByIdHandler.cs" />
@@ -65,35 +74,40 @@
     <Compile Include="Handlers\RequestHandlerFactory.cs" />
     <Compile Include="Handlers\RequestInfoParser.cs" />
     <Compile Include="Handlers\ResourceRequestHandler.cs" />
-    <Compile Include="Interfaces\Entities\JsonResponse.cs" />
-    <Compile Include="Interfaces\Entities\ProfiledRequestPreview.cs" />
-    <Compile Include="Interfaces\Entities\ProfiledRequestUpdate.cs" />
-    <Compile Include="Interfaces\Entities\ProfilerError.cs" />
-    <Compile Include="Interfaces\Entities\RequestInfo.cs" />
-    <Compile Include="Interfaces\Entities\ThrownException.cs" />
-    <Compile Include="Interfaces\IContainer.cs" />
-    <Compile Include="Interfaces\IDataProvider.cs" />
-    <Compile Include="Interfaces\IModelBinder.cs" />
-    <Compile Include="Interfaces\Entities\Page.cs" />
-    <Compile Include="Interfaces\Entities\Pagination.cs" />
-    <Compile Include="Interfaces\Entities\PagingInfo.cs" />
-    <Compile Include="Interfaces\Entities\ProfiledRequest.cs" />
-    <Compile Include="Interfaces\Entities\RequestProfilerContext.cs" />
+    <Compile Include="Handlers\Entities\JsonResponse.cs" />
+    <Compile Include="Profiling\IHttpResponseDataCollector.cs" />
+    <Compile Include="Profiling\Entities\DataCollection.cs" />
+    <Compile Include="Profiling\Entities\ProfiledRequestPreview.cs" />
+    <Compile Include="Profiling\Entities\ProfiledRequestUpdate.cs" />
+    <Compile Include="Profiling\Entities\ProfilerError.cs" />
+    <Compile Include="Handlers\Entities\RequestInfo.cs" />
+    <Compile Include="Profiling\Entities\ThrownException.cs" />
+    <Compile Include="IoC\IContainer.cs" />
+    <Compile Include="Persistence\IPersistenceProvider.cs" />
+    <Compile Include="Profiling\IMethodEntryDataCollector.cs" />
+    <Compile Include="Profiling\IMethodExitDataCollector.cs" />
+    <Compile Include="Binding\IRequestBinder.cs" />
+    <Compile Include="Persistence\Entities\Page.cs" />
+    <Compile Include="Persistence\Entities\Pagination.cs" />
+    <Compile Include="Persistence\Entities\PagingInfo.cs" />
+    <Compile Include="Profiling\Entities\ProfiledRequest.cs" />
+    <Compile Include="Profiling\RequestProfilerContext.cs" />
     <Compile Include="Extensions\HttpRequestExtensions.cs" />
     <Compile Include="Extensions\LoggingEventExtensions.cs" />
-    <Compile Include="Interfaces\Entities\ProfilerMessage.cs" />
-    <Compile Include="Interfaces\Entities\ProfiledMethodData.cs" />
-    <Compile Include="Interfaces\Entities\ProfiledRequestData.cs" />
-    <Compile Include="Interfaces\IProfilerRepository.cs" />
-    <Compile Include="Interfaces\IRepository.cs" />
-    <Compile Include="Interfaces\IRequestHandler.cs" />
-    <Compile Include="Interfaces\IRequestProfiler.cs" />
-    <Compile Include="Interfaces\IWantToBeProfiled.cs" />
-    <Compile Include="Interfaces\Entities\ModelValidationError.cs" />
-    <Compile Include="Interfaces\Resources\Constants.cs" />
+    <Compile Include="Profiling\Entities\ProfilerMessage.cs" />
+    <Compile Include="Profiling\Entities\ProfiledMethodData.cs" />
+    <Compile Include="Profiling\Entities\ProfiledRequestData.cs" />
+    <Compile Include="Persistence\IProfilerRepository.cs" />
+    <Compile Include="Profiling\IHttpRequestDataCollector.cs" />
+    <Compile Include="Handlers\IRequestHandler.cs" />
+    <Compile Include="Profiling\IRequestProfiler.cs" />
+    <Compile Include="Profiling\IWantToBeProfiled.cs" />
+    <Compile Include="Handlers\Entities\ModelValidationError.cs" />
+    <Compile Include="Profiling\Entities\MethodInvocation.cs" />
+    <Compile Include="Resources\Constants.cs" />
     <Compile Include="Log4Net\AppendLoggingEventEventArgs.cs" />
     <Compile Include="Log4Net\Log4NetProfilingAppender.cs" />
-    <Compile Include="Interfaces\IRequestProfilingCoordinator.cs" />
+    <Compile Include="Profiling\IRequestProfilingCoordinator.cs" />
     <Compile Include="Profiling\RequestProfiler.cs" />
     <Compile Include="Modules\RequestProfilingModule.cs" />
     <Compile Include="Profiling\RequestProfilingCoordinator.cs" />
@@ -105,9 +119,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources.Client.js" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\Exceptions\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

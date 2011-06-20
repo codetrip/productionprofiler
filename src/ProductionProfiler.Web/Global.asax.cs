@@ -9,6 +9,8 @@ using Castle.MicroKernel.Releasers;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using log4net.Config;
+using ProductionProfiler.Core.Caching;
+using ProductionProfiler.Core.Collectors;
 using ProductionProfiler.Core.Configuration;
 using ProductionProfiler.IoC.Windsor;
 using ProductionProfiler.Persistence.Mongo;
@@ -70,13 +72,14 @@ namespace ProductionProfiler.Web
 
             //set up request profiler
             Configure.With(new WindsorProfilerContainer(Container))
-                .GetThreshold(2500)
-                .PostThreshold(3500)
-                .Log4Net("Profiler")
-                .WithDataProvider(new MongoDataProvider("127.0.0.1", 27017))
+                .WithLog4Net("Profiler")
+                .WithDataProvider(new MongoPersistenceProvider("127.0.0.1", 27017))
                 .RequestFilter(req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty)
+                .WithHttpRequestDataCollector<BasicHttpRequestDataCollector>()
+                .WithHttpResponseDataCollector<BasicHttpResponseDataCollector>()
+                .WithCacheEngine<HttpRuntimeCacheEngine>()
                 .CaptureExceptions()
-                .EnableMonitoring()
+                .EnableMonitoring(5000, 3000)
                 .Initialise();
         }
 

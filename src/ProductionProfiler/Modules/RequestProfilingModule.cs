@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
-using ProductionProfiler.Core.Interfaces.Entities;
+using ProductionProfiler.Core.Profiling;
+using ProductionProfiler.Core.Resources;
 
 namespace ProductionProfiler.Core.Modules
 {
@@ -29,6 +30,7 @@ namespace ProductionProfiler.Core.Modules
 
             if (RequestProfilerContext.Current.ShouldProfile(httpContext.Request))
             {
+                HttpContext.Current.Items.Remove(Constants.RequestProfileContextKey);
                 var profilingManager = RequestProfilerContext.Current.GetRequestProfilingManager();
                 profilingManager.EndRequest(httpContext);
             }

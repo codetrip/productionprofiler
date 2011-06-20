@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ProductionProfiler.Core.Interfaces;
-using ProductionProfiler.Core.Interfaces.Entities;
+using ProductionProfiler.Core.Persistence;
+using ProductionProfiler.Core.Persistence.Entities;
+using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Persistence.Mongo
 {

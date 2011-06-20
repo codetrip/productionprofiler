@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
-using ProductionProfiler.Core.Interfaces;
+using ProductionProfiler.Core.IoC;
 
 namespace ProductionProfiler.IoC.Windsor
 {

@@ -1,6 +1,6 @@
 ﻿
 using log4net.Core;
-using ProductionProfiler.Core.Interfaces.Entities;
+using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Core.Extensions
 {

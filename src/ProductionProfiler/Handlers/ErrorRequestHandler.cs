@@ -1,7 +1,6 @@
 ﻿
 using System.Web;
-using ProductionProfiler.Core.Interfaces;
-using ProductionProfiler.Core.Interfaces.Entities;
+using ProductionProfiler.Core.Handlers.Entities;
 
 namespace ProductionProfiler.Core.Handlers
 {

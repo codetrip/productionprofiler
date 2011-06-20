@@ -5,7 +5,7 @@ using System.Web;
 using Castle.Core;
 using Castle.DynamicProxy;
 using Castle.MicroKernel.Proxy;
-using ProductionProfiler.Core.Interfaces.Resources;
+using ProductionProfiler.Core.Resources;
 
 namespace ProductionProfiler.IoC.Windsor
 {

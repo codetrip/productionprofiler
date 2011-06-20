@@ -5,8 +5,8 @@ table { border: solid 1px #e8eef4; border-collapse: collapse; text-align:left; f
 td { padding: 5px; border: solid 1px #BDBDBD; text-align:left; word-wrap:break-word; }
 th { padding: 6px 5px; text-align: left; background-color: #e8eef4; border: solid 1px #BDBDBD; }
 
-table.w1000 {width:1000px;}
-table.w800 {width:800px;}
+.w1000 {width:1000px;}
+.w800 {width:800px;}
 
 .noresults {font-weight:bold; font-size:12px;}
 .section-title {font-weight:bold; text-transform:uppercase;}

@@ -1,34 +1,40 @@
-﻿using ProductionProfiler.Core.Binders;
-using ProductionProfiler.Core.Interfaces;
-using ProductionProfiler.Core.Interfaces.Entities;
-using ProductionProfiler.Core.Interfaces.Resources;
+﻿
+using ProductionProfiler.Core.Binding;
+using ProductionProfiler.Core.Caching;
+using ProductionProfiler.Core.Handlers.Entities;
+using ProductionProfiler.Core.Persistence;
+using ProductionProfiler.Core.Resources;
 
 namespace ProductionProfiler.Core.Handlers
 {
     public class AddProfiledRequestHandler : RequestHandlerBase
     {
         private readonly IProfilerRepository _profiledRequestsRepository;
-        private readonly IAddProfiledRequestModelBinder _addProfiledRequestModelBinder;
+        private readonly IAddProfiledRequestRequestBinder _addProfiledRequestRequestBinder;
+        private readonly ICacheEngine _cacheEngine;
 
         public AddProfiledRequestHandler(IProfilerRepository profiledRequestsRepository,
-            IAddProfiledRequestModelBinder addProfiledRequestModelBinder)
+            IAddProfiledRequestRequestBinder addProfiledRequestRequestBinder, 
+            ICacheEngine cacheEngine)
         {
             _profiledRequestsRepository = profiledRequestsRepository;
-            _addProfiledRequestModelBinder = addProfiledRequestModelBinder;
+            _cacheEngine = cacheEngine;
+            _addProfiledRequestRequestBinder = addProfiledRequestRequestBinder;
         }
 
         protected override JsonResponse DoHandleRequest(RequestInfo requestInfo)
         {
-            if (!_addProfiledRequestModelBinder.IsValid(requestInfo.Form))
+            if (!_addProfiledRequestRequestBinder.IsValid(requestInfo.Form))
             {
                 return new JsonResponse
                 {
                     Success = false,
-                    Errors = _addProfiledRequestModelBinder.Errors
+                    Errors = _addProfiledRequestRequestBinder.Errors
                 };
             }
 
-            _profiledRequestsRepository.SaveProfiledRequest(_addProfiledRequestModelBinder.Bind(requestInfo.Form));
+            _profiledRequestsRepository.SaveProfiledRequest(_addProfiledRequestRequestBinder.Bind(requestInfo.Form));
+            _cacheEngine.Remove(Constants.Handlers.ViewProfiledRequests, true);
 
             return new JsonResponse
             {

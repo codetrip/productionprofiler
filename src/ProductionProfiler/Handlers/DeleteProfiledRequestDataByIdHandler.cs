@@ -1,17 +1,21 @@
 ﻿using System;
-using ProductionProfiler.Core.Interfaces;
-using ProductionProfiler.Core.Interfaces.Entities;
-using ProductionProfiler.Core.Interfaces.Resources;
+using ProductionProfiler.Core.Caching;
+using ProductionProfiler.Core.Extensions;
+using ProductionProfiler.Core.Handlers.Entities;
+using ProductionProfiler.Core.Persistence;
+using ProductionProfiler.Core.Resources;
 
 namespace ProductionProfiler.Core.Handlers
 {
     public class DeleteProfiledDataByIdRequestHandler : RequestHandlerBase
     {
         private readonly IProfilerRepository _profiledRequestsRepository;
+        private readonly ICacheEngine _cacheEngine;
 
-        public DeleteProfiledDataByIdRequestHandler(IProfilerRepository profiledRequestsRepository)
+        public DeleteProfiledDataByIdRequestHandler(IProfilerRepository profiledRequestsRepository, ICacheEngine cacheEngine)
         {
             _profiledRequestsRepository = profiledRequestsRepository;
+            _cacheEngine = cacheEngine;
         }
 
         protected override JsonResponse DoHandleRequest(RequestInfo requestInfo)
@@ -20,6 +24,8 @@ namespace ProductionProfiler.Core.Handlers
             if (Guid.TryParse(requestInfo.Form.Get("Id"), out id))
             {
                 _profiledRequestsRepository.DeleteProfiledRequestDataById(id);
+                _cacheEngine.Remove(Constants.Actions.Results, true);
+                _cacheEngine.Remove("{0}-{1}".FormatWith(Constants.Actions.PreviewResults, requestInfo.Form.Get("Url")), true);
             }
 
             return new JsonResponse

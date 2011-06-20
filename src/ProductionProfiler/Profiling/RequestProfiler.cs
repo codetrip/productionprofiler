@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.ExceptionServices;
 using System.Threading;
@@ -7,11 +6,10 @@ using System.Web;
 using log4net.Core;
 using ProductionProfiler.Core.Configuration;
 using ProductionProfiler.Core.Extensions;
-using ProductionProfiler.Core.Interfaces;
-using ProductionProfiler.Core.Interfaces.Entities;
-using ProductionProfiler.Core.Interfaces.Resources;
 using ProductionProfiler.Core.Log4Net;
 using System.Linq;
+using ProductionProfiler.Core.Profiling.Entities;
+using ProductionProfiler.Core.Resources;
 
 namespace ProductionProfiler.Core.Profiling
 {
@@ -20,12 +18,24 @@ namespace ProductionProfiler.Core.Profiling
         private ProfiledRequestData _profileData;
         private ProfiledMethodData _currentMethod;
         private Stopwatch _watch;
-        private readonly ProfilerConfiguration _configuration;
         private readonly int _threadId;
+        private readonly ProfilerConfiguration _configuration;
+        private readonly IMethodEntryDataCollector _methodEntryDataCollector;
+        private readonly IMethodExitDataCollector _methodExitDataCollector;
+        private readonly IHttpRequestDataCollector _httpRequestDataCollector;
+        private readonly IHttpResponseDataCollector _httpResponseDataCollector;
 
-        public RequestProfiler(ProfilerConfiguration configuration)
+        public RequestProfiler(ProfilerConfiguration configuration, 
+            IMethodEntryDataCollector methodEntryDataCollector, 
+            IMethodExitDataCollector methodExitDataCollector, 
+            IHttpRequestDataCollector httpRequestDataCollector, 
+            IHttpResponseDataCollector httpResponseDataCollector)
         {
             _configuration = configuration;
+            _httpResponseDataCollector = httpResponseDataCollector;
+            _httpRequestDataCollector = httpRequestDataCollector;
+            _methodExitDataCollector = methodExitDataCollector;
+            _methodEntryDataCollector = methodEntryDataCollector;
             _threadId = Thread.CurrentThread.ManagedThreadId;
             RequestId = Guid.NewGuid();
         }
@@ -51,14 +61,19 @@ namespace ProductionProfiler.Core.Profiling
                 {
                     Url = request.RawUrl.ToLowerInvariant(),
                     CapturedOnUtc = DateTime.UtcNow,
-                    Methods = new List<ProfiledMethodData>(),
                     Server = Environment.MachineName,
                     ClientIpAddress = request.ClientIpAddress(),
                     UserAgent = request.UserAgent,
                     Ajax = request.IsAjaxRequest(),
                     Id = RequestId,
-                    ProfilerErrors = RequestProfilerContext.Current.PersistentProfilerErrors.ToList(),
+                    ProfilerErrors = RequestProfilerContext.Current.PersistentProfilerErrors.ToList()
                 };
+
+                //add data from the configured IHttpRequestDataCollector
+                var data = _httpRequestDataCollector.Collect(request);
+
+                if (data != null)
+                    _profileData.CollectedData.AddRange(data);
 
                 _watch = Stopwatch.StartNew();
 
@@ -75,7 +90,7 @@ namespace ProductionProfiler.Core.Profiling
             //pretty sure this isn't a problem....
             if (_currentMethod != null && _threadId == Thread.CurrentThread.ManagedThreadId)
             {
-                _currentMethod.Exceptions.Add(new ThrownException()
+                _currentMethod.Exceptions.Add(new ThrownException
                 {
                     CallStack = e.Exception.StackTrace,
                     Message = e.Exception.Message,
@@ -98,10 +113,16 @@ namespace ProductionProfiler.Core.Profiling
             }  
         }
 
-        public ProfiledRequestData StopProfiling()
+        public ProfiledRequestData StopProfiling(HttpResponse response)
         {
             _watch.Stop();
             _profileData.ElapsedMilliseconds = _watch.ElapsedMilliseconds;
+
+            //add data from the configured IHttpRequestDataCollector
+            var data = _httpResponseDataCollector.Collect(response);
+
+            if (data != null)
+                _profileData.CollectedData.AddRange(data);
 
             if (_configuration.Log4NetEnabled)
             {
@@ -125,11 +146,11 @@ namespace ProductionProfiler.Core.Profiling
             });
         }
 
-        public void MethodEntry(string methodName)
+        public void MethodEntry(MethodInvocation invocation)
         {
             ProfiledMethodData method = new ProfiledMethodData
             {
-                MethodName = methodName
+                MethodName = string.Format("{0}.{1}", invocation.TargetType.FullName, invocation.MethodName)
             };
 
             if (_currentMethod == null)
@@ -143,12 +164,23 @@ namespace ProductionProfiler.Core.Profiling
             }
 
             _currentMethod = method;
+
+            var data = _methodEntryDataCollector.Collect(invocation);
+
+            if (data != null)
+                _currentMethod.CollectedData.AddRange(data);
+
             _currentMethod.StartedAtMilliseconds = _watch.ElapsedMilliseconds;
             _currentMethod.Start();
         }
 
-        public void MethodExit()
+        public void MethodExit(MethodInvocation invocation)
         {
+            var data = _methodExitDataCollector.Collect(invocation);
+
+            if (data != null)
+                _currentMethod.CollectedData.AddRange(data);
+
             _currentMethod.StoppedAtMilliseconds = _watch.ElapsedMilliseconds;
             _currentMethod.ElapsedMilliseconds = _currentMethod.Stop();
             _currentMethod = _currentMethod.GetParentMethod();

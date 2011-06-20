@@ -3,11 +3,12 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Web;
 using log4net;
+using ProductionProfiler.Core.Caching;
 using ProductionProfiler.Core.Configuration;
-using ProductionProfiler.Core.Interfaces;
 using System.Linq;
-using ProductionProfiler.Core.Interfaces.Entities;
-using ProductionProfiler.Core.Interfaces.Resources;
+using ProductionProfiler.Core.Persistence;
+using ProductionProfiler.Core.Profiling.Entities;
+using ProductionProfiler.Core.Resources;
 using ProductionProfiler.Core.Extensions;
 
 namespace ProductionProfiler.Core.Profiling
@@ -17,12 +18,15 @@ namespace ProductionProfiler.Core.Profiling
         private readonly IProfilerRepository _repository;
         private readonly IRequestProfiler _requestProfiler;
         private readonly ProfilerConfiguration _configuration;
+        private readonly ICacheEngine _cacheEngine;
 
         public RequestProfilingCoordinator(IRequestProfiler requestProfiler,
             IProfilerRepository repository, 
-            ProfilerConfiguration configuration)
+            ProfilerConfiguration configuration, 
+            ICacheEngine cacheEngine)
         {
             _requestProfiler = requestProfiler;
+            _cacheEngine = cacheEngine;
             _configuration = configuration;
             _repository = repository;
         }
@@ -58,9 +62,8 @@ namespace ProductionProfiler.Core.Profiling
             {
                 if(_configuration.Log4NetEnabled)
                 {
-                    string formattedException = e.Format();
                     foreach (var log in LogManager.GetCurrentLoggers())
-                        log.Error(formattedException);
+                        log.Error(e);
                 }
             }
         }
@@ -82,6 +85,7 @@ namespace ProductionProfiler.Core.Profiling
                     //if the request took over maxRequestLength and the profiler was not enabled for this request flag the URL for analysis
                     if (stopwatch.ElapsedMilliseconds >= maxRequestLength && !_requestProfiler.InitialisedForRequest)
                     {
+                        _cacheEngine.Remove(Constants.Handlers.ViewProfiledRequests, true);
                         _repository.SaveProfiledRequestWhenNotFound(new ProfiledRequest
                         {
                             Url = context.Request.RawUrl.ToLowerInvariant(),
@@ -98,16 +102,17 @@ namespace ProductionProfiler.Core.Profiling
                 //if the IRequestProfiler was running for this request we need to persist the captured data into Mongo via nservicebus
                 if (_requestProfiler.InitialisedForRequest)
                 {
-                    _repository.SaveProfiledRequestData(_requestProfiler.StopProfiling());
+                    _cacheEngine.Remove(Constants.Actions.Results, true);
+                    _cacheEngine.Remove("{0}-{1}".FormatWith(Constants.Actions.PreviewResults, context.Request.RawUrl.ToLowerInvariant()), true);
+                    _repository.SaveProfiledRequestData(_requestProfiler.StopProfiling(context.Response));
                 }
             }
             catch (Exception e)
             {
                 if (_configuration.Log4NetEnabled)
                 {
-                    string formattedException = e.Format();
                     foreach (var log in LogManager.GetCurrentLoggers())
-                        log.Error(formattedException);
+                        log.Error(e);
                 }
             }
         }

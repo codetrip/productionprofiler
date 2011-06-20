@@ -103,7 +103,7 @@ if (window.jQueryProfiler) {
                         html += '<tr ' + bgcolor + '><form action="/profiler?handler=upr" method="post">' +
                         '<input name="Url" type="hidden" value="' + itm.Url + '" />' +
                         '<td><input name="Enabled" type="checkbox" ' + checked + ' value="true" /><input name="Enabled" type="hidden" value="false" /></td>' +
-                        '<td>' + itm.Url + '</td>' +
+                        '<td><a href="/profiler?handler=results&action=previewresults&url=' + itm.Url + '">' + itm.Url + '</a></td>' +
                         '<td>' + $.profiler.formatDate(itm.ProfiledOnUtc) + '</td>' +
                         '<td>' + $.profiler.emptyIfNull(itm.ElapsedMilliseconds, 'ms') + '</td>' +
                         '<td><input name="Server" style="width:150px" type="text" value="' + $.profiler.emptyIfNull(itm.Server, '') + '" /></td>' +
@@ -124,7 +124,7 @@ if (window.jQueryProfiler) {
                 this.attachEvents();
             },
             renderResults: function (data) {
-                var html = '<table width="800"><tr><th>Url</th><th>Delete</th></tr>'
+                var html = '<table class="w800"><tr><th>Url</th><th>Delete</th></tr>'
 
                 $.each(data.Data, function (idx, itm) {
                     html += '<form action="/profiler?handler=dprurl" method="post"><input type="hidden" name="Url" value="' + itm + '" />' + 
@@ -138,7 +138,7 @@ if (window.jQueryProfiler) {
                 this.attachEvents();
             },
             renderResultsPreview: function (data) {
-                var html = '<table width="1000"><tr><th>Url</th><th>CapturedOnUtc</th><th>ElapsedMilliseconds</th><th>Server</th><th>Delete</th></tr>'
+                var html = '<table class="w1000"><tr><th>Url</th><th>CapturedOnUtc</th><th>ElapsedMilliseconds</th><th>Server</th><th>Delete</th></tr>'
 
                 $.each(data.Data, function (idx, itm) {
                     html += '<form action="/profiler?handler=dprid&url=' + itm.Url + '" method="post"><input type="hidden" name="Id" value="' + itm.Id + '" />' +

@@ -7,7 +7,7 @@ using Norm.Collections;
 using Norm.Linq;
 using Norm.Responses;
 using ProductionProfiler.Core.Extensions;
-using ProductionProfiler.Core.Interfaces.Entities;
+using E = ProductionProfiler.Core.Persistence.Entities;
 
 namespace ProductionProfiler.Persistence.Mongo
 {
@@ -51,7 +51,7 @@ namespace ProductionProfiler.Persistence.Mongo
             return _mongo.GetCollection<T>().Distinct<TResult>(keyName);
         }
 
-        public Page<TResult> Distinct<T, TResult>(string keyName, PagingInfo pagingInfo) where T : class, new()
+        public E.Page<TResult> Distinct<T, TResult>(string keyName, E.PagingInfo pagingInfo) where T : class, new()
         {
             var page = _mongo.GetCollection<T>()
                  .Distinct<TResult>(keyName)
@@ -62,10 +62,10 @@ namespace ProductionProfiler.Persistence.Mongo
                  .Distinct<TResult>(keyName)
                  .Count();
 
-            return new Page<TResult>(page, new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
+            return new E.Page<TResult>(page, new E.Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
         }
 
-        public Page<TResult> Distinct<T, TSort, TResult>(string keyName, PagingInfo pagingInfo, Func<TResult, TSort> sortExpression, bool sortAscending) where T : class, new()
+        public E.Page<TResult> Distinct<T, TSort, TResult>(string keyName, E.PagingInfo pagingInfo, Func<TResult, TSort> sortExpression, bool sortAscending) where T : class, new()
         {
             var page = _mongo.GetCollection<T>()
                 .Distinct<TResult>(keyName)
@@ -78,10 +78,10 @@ namespace ProductionProfiler.Persistence.Mongo
                 .Distinct<TResult>(keyName)
                 .Count();
 
-            return new Page<TResult>(page, new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
+            return new E.Page<TResult>(page, new E.Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
         }
 
-        public Page<T> Page<T>(PagingInfo pagingInfo) where T : class, new()
+        public E.Page<T> Page<T>(E.PagingInfo pagingInfo) where T : class, new()
         {
             var page = Items<T>()
                 .Skip((pagingInfo.PageNumber - 1) * pagingInfo.PageSize)
@@ -89,10 +89,10 @@ namespace ProductionProfiler.Persistence.Mongo
 
             var count = Items<T>().Count();
 
-            return new Page<T>(page, new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
+            return new E.Page<T>(page, new E.Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
         }
 
-        public Page<T> Page<T>(PagingInfo pagingInfo, Expression<Func<T, bool>> expression) where T : class, new()
+        public E.Page<T> Page<T>(E.PagingInfo pagingInfo, Expression<Func<T, bool>> expression) where T : class, new()
         {
             var page = Items<T>()
                 .Where(expression)
@@ -103,10 +103,10 @@ namespace ProductionProfiler.Persistence.Mongo
                 .Where(expression)
                 .Count();
 
-            return new Page<T>(page, new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
+            return new E.Page<T>(page, new E.Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
         }
 
-        public Page<T> Page<T, TSort>(PagingInfo pagingInfo, Func<T, TSort> sortExpression, bool sortAscending) where T : class, new()
+        public E.Page<T> Page<T, TSort>(E.PagingInfo pagingInfo, Func<T, TSort> sortExpression, bool sortAscending) where T : class, new()
         {
             var page = Items<T>()
                 .SetSort(sortExpression, sortAscending)
@@ -117,10 +117,10 @@ namespace ProductionProfiler.Persistence.Mongo
             var count = Items<T>()
                 .Count();
 
-            return new Page<T>(page, new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
+            return new E.Page<T>(page, new E.Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
         }
 
-        public Page<T> Page<T, TSort>(PagingInfo pagingInfo, Expression<Func<T, bool>> expression, Func<T, TSort> sortExpression, bool sortAscending) where T : class, new()
+        public E.Page<T> Page<T, TSort>(E.PagingInfo pagingInfo, Expression<Func<T, bool>> expression, Func<T, TSort> sortExpression, bool sortAscending) where T : class, new()
         {
             var page = Items<T>()
                 .Where(expression)
@@ -133,10 +133,10 @@ namespace ProductionProfiler.Persistence.Mongo
                 .Where(expression)
                 .Count();
 
-            return new Page<T>(page, new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
+            return new E.Page<T>(page, new E.Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
         }
 
-        public Page<TResult> Page<T, TSort, TResult>(PagingInfo pagingInfo, Expression<Func<T, bool>> expression, Func<T, TSort> sortExpression, bool sortAscending, Func<T, TResult> selectExpression) where T : class, new()
+        public E.Page<TResult> Page<T, TSort, TResult>(E.PagingInfo pagingInfo, Expression<Func<T, bool>> expression, Func<T, TSort> sortExpression, bool sortAscending, Func<T, TResult> selectExpression) where T : class, new()
         {
             var page = Items<T>()
                 .Where(expression)
@@ -150,7 +150,7 @@ namespace ProductionProfiler.Persistence.Mongo
                 .Where(expression)
                 .Count();
 
-            return new Page<TResult>(page, new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
+            return new E.Page<TResult>(page, new E.Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
         }
 
         #endregion
