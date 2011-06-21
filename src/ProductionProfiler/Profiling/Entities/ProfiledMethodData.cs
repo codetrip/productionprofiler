@@ -15,12 +15,11 @@ namespace ProductionProfiler.Core.Profiling.Entities
         public List<ProfilerMessage> Messages { get; set; }
         public List<ProfiledMethodData> Methods { get; set; }
         public List<ThrownException> Exceptions { get; set; }
-        public List<DataCollection> CollectedData { get; set; }
+        public List<DataCollection> Data { get; set; }
         public long ElapsedMilliseconds { get; set; }
         public long StartedAtMilliseconds { get; set; }
         public long StoppedAtMilliseconds { get; set; }
         public string MethodName { get; set; }
-        public bool ErrorInMethod { get; set; }
 
         public ProfiledMethodData GetParentMethod()
         {
@@ -53,7 +52,7 @@ namespace ProductionProfiler.Core.Profiling.Entities
             Methods = new List<ProfiledMethodData>();
             Messages = new List<ProfilerMessage>();
             Exceptions = new List<ThrownException>();
-            CollectedData = new List<DataCollection>();
+            Data = new List<DataCollection>();
         }
     }
 }

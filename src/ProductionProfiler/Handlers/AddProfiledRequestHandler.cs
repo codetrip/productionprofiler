@@ -4,6 +4,7 @@ using ProductionProfiler.Core.Caching;
 using ProductionProfiler.Core.Handlers.Entities;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Resources;
+using ProductionProfiler.Core.Extensions;
 
 namespace ProductionProfiler.Core.Handlers
 {
@@ -38,7 +39,7 @@ namespace ProductionProfiler.Core.Handlers
 
             return new JsonResponse
             {
-                Redirect = string.Format("/profiler?handler={0}", Constants.Handlers.ViewProfiledRequests)
+                Redirect = Constants.Urls.ProfilerHandler.FormatWith(Constants.Handlers.ViewProfiledRequests)
             };
         }
     }

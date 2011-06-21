@@ -56,6 +56,11 @@ namespace ProductionProfiler.IoC.Windsor
             return _container.Resolve<T>(key);
         }
 
+        public T[] ResolveAll<T>()
+        {
+            return _container.ResolveAll<T>();
+        }
+
         public void InitialiseForProxyInterception(IList<Type> typesToIntercept)
         {
             RegisterTransient<RequestProfilingInterceptor>(typeof(RequestProfilingInterceptor));

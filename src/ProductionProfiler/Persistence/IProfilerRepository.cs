@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using ProductionProfiler.Core.Persistence.Entities;
-using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Core.Persistence
@@ -76,5 +75,26 @@ namespace ProductionProfiler.Core.Persistence
         /// </summary>
         /// <param name="profiledRequestData"></param>
         void SaveProfiledRequestData(ProfiledRequestData profiledRequestData);
+
+        /// <summary>
+        /// Saves the StoredResponse instance to the data store
+        /// </summary>
+        /// <param name="response"></param>
+        void SaveResponse(StoredResponse response);
+        /// <summary>
+        /// Retrieves a StoredResponse instance from the data store
+        /// </summary>
+        /// <param name="id"></param>
+        StoredResponse GetResponseById(Guid id);
+        /// <summary>
+        /// Deletes a StoredResponse instance from the data store
+        /// </summary>
+        /// <param name="id"></param>
+        void DeleteResponseById(Guid id);
+        /// <summary>
+        /// Deletes a StoredResponse instance from the data store using the URL
+        /// </summary>
+        /// <param name="url"></param>
+        void DeleteResponseByUrl(string url);
     }
 }

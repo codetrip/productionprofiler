@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using log4net;
 
 namespace ProductionProfiler.Web.Models
@@ -13,7 +14,7 @@ namespace ProductionProfiler.Web.Models
             _workflow2 = workflow2;
         }
 
-        public string Invoke(string request)
+        public TestResponse Invoke(TestRequest request)
         {
             var log = LogManager.GetLogger("Profiler");
             log.Debug("Started workflow 1");
@@ -23,13 +24,26 @@ namespace ProductionProfiler.Web.Models
                 throw new Exception("test");
             }
             catch (Exception)
-            {
-                
-            }
+            {}
 
             _workflow2.Invoke("test");
             log.Debug("Completed workflow 1");
-            return "done";
+
+            return new TestResponse
+            {
+                Id = 31,
+                Name = "Workflow One",
+                Test = new TestClass
+                {
+                    Id = 321,
+                    Name = "Test 1",
+                    Parent = new TestClass
+                    {
+                        Id = 432432,
+                        Name = "Bob"
+                    }
+                }
+            };
         }
     }
 
@@ -58,13 +72,26 @@ namespace ProductionProfiler.Web.Models
         {
             var log = LogManager.GetLogger("Profiler");
             log.Debug("Started workflow 3");
-            log.Error(new Exception("This is a test exception"));
+
+            try
+            {
+                int zero = 0;
+                if (10 / zero == 0)
+                {
+                    log.Debug("Devide by zero?");
+                }
+            }
+            catch (Exception e)
+            {
+                log.Error(e);
+            }
+           
             log.Debug("Completed workflow 3");
             return "done";
         }
     }
 
-    public interface IWorkflow1 : IWorkflow<string, string>
+    public interface IWorkflow1 : IWorkflow<TestRequest, TestResponse>
     { }
 
     public interface IWorkflow2 : IWorkflow<string, string>
@@ -72,4 +99,26 @@ namespace ProductionProfiler.Web.Models
 
     public interface IWorkflow3 : IWorkflow<string, string>
     { }
+
+    public class TestRequest
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public IList<string> Items { get; set; }
+        public IDictionary<Guid, TestClass> DictItems { get; set; }
+    }
+
+    public class TestResponse
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public TestClass Test { get; set; }
+    }
+
+    public class TestClass
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public TestClass Parent { get; set; }
+    }
 }

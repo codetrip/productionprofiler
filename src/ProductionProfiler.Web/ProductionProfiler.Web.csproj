@@ -87,6 +87,8 @@
     <EmbeddedResource Include="Content\Resources.Css.css" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Images\estuary.jpg" />
+    <Content Include="Images\flower.jpg" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

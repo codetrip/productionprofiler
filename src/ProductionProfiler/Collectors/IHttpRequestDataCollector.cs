@@ -2,7 +2,7 @@
 using System.Web;
 using ProductionProfiler.Core.Profiling.Entities;
 
-namespace ProductionProfiler.Core.Profiling
+namespace ProductionProfiler.Core.Collectors
 {
     public interface IHttpRequestDataCollector
     {

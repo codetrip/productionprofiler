@@ -43,9 +43,19 @@ namespace ProductionProfiler.Core.Resources
             public const string ResultDetails = "resultsdetail";
         }
 
+        public static class Urls
+        {
+            public const string Profiler = "/profiler";
+            public const string ProfilerHandler = "/profiler?handler={0}";
+            public const string ProfilerHandlerAction = "/profiler?handler={0}&action={1}";
+            public const string ProfilerHandlerActionId = "/profiler?handler={0}&action={1}&id={2}";
+            public const string ProfilerHandlerActionUrl = "/profiler?handler={0}&action={1}&url={2}";
+        }
+
         public static class Handlers
         {
             public const string Results = "results";
+            public const string ViewResponse = "response";
             public const string ViewProfiledRequests = "vpr";
             public const string AddProfiledRequest = "apr";
             public const string UpdateProfiledRequest = "upr";

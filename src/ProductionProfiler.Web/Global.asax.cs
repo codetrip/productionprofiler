@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.IO;
 using System.Reflection;
 using System.Web.Mvc;
@@ -12,6 +13,7 @@ using log4net.Config;
 using ProductionProfiler.Core.Caching;
 using ProductionProfiler.Core.Collectors;
 using ProductionProfiler.Core.Configuration;
+using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.IoC.Windsor;
 using ProductionProfiler.Persistence.Mongo;
 using ProductionProfiler.Web.Controllers;
@@ -70,15 +72,20 @@ namespace ProductionProfiler.Web
 
             RegisterDependencies();
 
-            //set up request profiler
+            //set up profiler
             Configure.With(new WindsorProfilerContainer(Container))
-                .WithLog4Net("Profiler")
-                .WithDataProvider(new MongoPersistenceProvider("127.0.0.1", 27017))
+                .Log4Net("Profiler")
+                .DataProvider(new MongoPersistenceProvider("127.0.0.1", 27017))
+                .HttpRequestDataCollector<BasicHttpRequestDataCollector>()
+                .HttpResponseDataCollector<BasicHttpResponseDataCollector>()
+                .AddMethodEntryDataCollector<BasicMethodEntryDataCollector>()
+                    .ForTypes(new Type[0])
+                .AddMethodExitDataCollector<BasicMethodExitDataCollector>()
+                    .ForTypes(new Type[0])
+                .CacheEngine<HttpRuntimeCacheEngine>()
                 .RequestFilter(req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty)
-                .WithHttpRequestDataCollector<BasicHttpRequestDataCollector>()
-                .WithHttpResponseDataCollector<BasicHttpResponseDataCollector>()
-                .WithCacheEngine<HttpRuntimeCacheEngine>()
                 .CaptureExceptions()
+                .CaptureResponse(context => new StoreResponseFilter(context.Response.Filter))
                 .EnableMonitoring(5000, 3000)
                 .Initialise();
         }

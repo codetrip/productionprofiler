@@ -53,10 +53,8 @@ namespace ProductionProfiler.Core.Extensions
 
             var eventInformation = new StringBuilder();
 
-            eventInformation.AppendLine();
             eventInformation.AppendLine("================================================================================================");
             eventInformation.AppendLine("Exception Info [Start]");
-            eventInformation.AppendLine();
 
             //append system info if requested
             if (appendEnvironmentInfo)

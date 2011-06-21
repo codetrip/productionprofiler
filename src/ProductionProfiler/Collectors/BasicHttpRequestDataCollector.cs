@@ -22,14 +22,15 @@ namespace ProductionProfiler.Core.Collectors
                 data.Add(new DataCollection("Request Headers", request.Headers));
             }
 
-            var cookies = new DataCollection("Request Cookies");
-
-            foreach(HttpCookie requestCookie in request.Cookies)
+            if(request.Cookies.Count > 0)
             {
-                cookies.Data.Add(new DataCollectionItem(requestCookie.Name, requestCookie.Value));
+                var cookies = new DataCollection("Request Cookies");
+                foreach (HttpCookie requestCookie in request.Cookies)
+                {
+                    cookies.Data.Add(new DataCollectionItem(requestCookie.Name, requestCookie.Value));
+                }
+                data.Add(cookies);
             }
-
-            data.Add(cookies);
 
             return data;
         }

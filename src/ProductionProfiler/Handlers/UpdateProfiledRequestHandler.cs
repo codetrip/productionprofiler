@@ -59,7 +59,7 @@ namespace ProductionProfiler.Core.Handlers
 
             return new JsonResponse
             {
-                Redirect = string.Format("/profiler?handler={0}", Constants.Handlers.ViewProfiledRequests)
+                Redirect = string.Format(Constants.Urls.ProfilerHandler, Constants.Handlers.ViewProfiledRequests)
             };
         }
     }

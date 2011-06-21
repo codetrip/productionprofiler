@@ -54,7 +54,7 @@ namespace ProductionProfiler.Core.Profiling
                         }
 
                         _repository.SaveProfiledRequest(requestToProfile);
-                        _requestProfiler.StartProfiling(context.Request);
+                        _requestProfiler.StartProfiling(context);
                     }
                 }
             }

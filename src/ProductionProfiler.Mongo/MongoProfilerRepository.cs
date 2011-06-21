@@ -10,6 +10,7 @@ namespace ProductionProfiler.Persistence.Mongo
     public class MongoProfilerRepository : IProfilerRepository
     {
         private const string ProfiledRequestDatabaseName = "profiledrequests";
+        private const string StoredResponseDatabaseName = "profiledresponses";
         private const string ProfiledRequestDataDatabaseName = "profiledrequestdata";
 
         private readonly MongoConfiguration _configuration;
@@ -39,7 +40,7 @@ namespace ProductionProfiler.Persistence.Mongo
         {
             using (MongoSession session = MongoSession.Connect(ProfiledRequestDatabaseName, _configuration.Server, _configuration.Port))
             {
-                return session.Items<ProfiledRequest>(i => i.Server == null || i.Server == "" || i.Server == serverName).Where(i => i.Enabled).ToList();
+                return session.Items<ProfiledRequest>(i => i.Server == null || i.Server == string.Empty || i.Server == serverName).Where(i => i.Enabled).ToList();
             }
         }
 
@@ -91,6 +92,38 @@ namespace ProductionProfiler.Persistence.Mongo
             using (MongoSession session = MongoSession.Connect(ProfiledRequestDataDatabaseName, _configuration.Server, _configuration.Port))
             {
                 session.Save(entity);
+            }
+        }
+
+        public void SaveResponse(StoredResponse response)
+        {
+            using (MongoSession session = MongoSession.Connect(StoredResponseDatabaseName, _configuration.Server, _configuration.Port))
+            {
+                session.Save(response);
+            }
+        }
+
+        public StoredResponse GetResponseById(Guid id)
+        {
+            using (MongoSession session = MongoSession.Connect(StoredResponseDatabaseName, _configuration.Server, _configuration.Port))
+            {
+                return session.Single<StoredResponse>(r => r.Id == id);
+            }
+        }
+
+        public void DeleteResponseById(Guid id)
+        {
+            using (MongoSession session = MongoSession.Connect(StoredResponseDatabaseName, _configuration.Server, _configuration.Port))
+            {
+                session.Delete<StoredResponse, object>(new { Id = id });
+            }
+        }
+
+        public void DeleteResponseByUrl(string url)
+        {
+            using (MongoSession session = MongoSession.Connect(StoredResponseDatabaseName, _configuration.Server, _configuration.Port))
+            {
+                session.Delete<StoredResponse, object>(new { Url = url });
             }
         }
 

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Web;
 using ProductionProfiler.Core.Log4Net;
 
 namespace ProductionProfiler.Core.Configuration
@@ -11,5 +14,8 @@ namespace ProductionProfiler.Core.Configuration
         public bool MonitoringEnabled { get; set; }
         public Log4NetProfilingAppender ProfilingAppender { get; set; }
         public bool CaptureExceptions { get; set; }
+        public bool CaptureResponse { get; set; }
+        public Func<HttpContext, Stream> GetResponseFilter { get; set; }
+        public IDictionary<Type, IEnumerable<Type>> CollectorTypeMappings { get; set; }
     }
 }

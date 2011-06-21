@@ -12,5 +12,6 @@ namespace ProductionProfiler.Core.IoC
         void InitialiseForProxyInterception(IList<Type> typesToIntercept);
         T Resolve<T>();
         T Resolve<T>(string key);
+        T[] ResolveAll<T>();
     }
 }

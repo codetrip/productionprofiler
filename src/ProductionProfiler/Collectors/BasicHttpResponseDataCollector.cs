@@ -12,17 +12,30 @@ namespace ProductionProfiler.Core.Collectors
         {
             var data = new List<DataCollection>();
 
+            var headers = new DataCollection("Response Headers", response.Headers);
+            headers.Data.Add(new DataCollectionItem("StatusCode", response.StatusCode.ToString()));
+            headers.Data.Add(new DataCollectionItem("Buffer", response.Buffer.ToString()));
+            headers.Data.Add(new DataCollectionItem("Charset", response.Charset));
+
             if (HttpRuntime.UsingIntegratedPipeline && response.Headers.Count > 0)
             {
-                data.Add(new DataCollection("Response Headers", response.Headers));
+                foreach (string header in response.Headers.AllKeys)
+                {
+                    headers.Data.Add(new DataCollectionItem(header, response.Headers.Get(header)));
+                }
             }
 
-            var responseData = new DataCollection("Response Data");
+            if (HttpRuntime.UsingIntegratedPipeline && response.Cookies.Count > 0)
+            {
+                var cookies = new DataCollection("Response Cookies");
+                foreach (HttpCookie cookie in response.Cookies)
+                {
+                    cookies.Data.Add(new DataCollectionItem(cookie.Name, cookie.Value));
+                }
+                data.Add(cookies);
+            }
 
-            //responseData.Data.Add("Body", new StreamReader(response.OutputStream).ReadToEnd());
-            responseData.Data.Add(new DataCollectionItem("StatusCode", response.StatusCode.ToString()));
-
-            data.Add(responseData);
+            data.Add(headers);
             return data;
         }
     }

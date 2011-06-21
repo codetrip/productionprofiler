@@ -30,7 +30,9 @@ namespace ProductionProfiler.Core.Modules
 
             if (RequestProfilerContext.Current.ShouldProfile(httpContext.Request))
             {
+                //remove the content key here so we dont proxy any profiler components
                 HttpContext.Current.Items.Remove(Constants.RequestProfileContextKey);
+
                 var profilingManager = RequestProfilerContext.Current.GetRequestProfilingManager();
                 profilingManager.EndRequest(httpContext);
             }

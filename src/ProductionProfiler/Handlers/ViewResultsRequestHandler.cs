@@ -1,5 +1,4 @@
 ﻿
-using System;
 using ProductionProfiler.Core.Caching;
 using ProductionProfiler.Core.Handlers.Entities;
 using ProductionProfiler.Core.Persistence;
@@ -49,7 +48,7 @@ namespace ProductionProfiler.Core.Handlers
 
             if (requestInfo.Action == Constants.Actions.ResultDetails)
             {
-                var data = _cacheEngine.Get(requestInfo.Id.ToString(), () => _repository.GetProfiledRequestDataById(requestInfo.Id), true, new TimeSpan(1, 0, 0));
+                var data = _repository.GetProfiledRequestDataById(requestInfo.Id);
 
                 return new JsonResponse
                 {

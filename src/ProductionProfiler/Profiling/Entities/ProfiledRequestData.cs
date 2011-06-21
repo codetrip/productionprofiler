@@ -12,15 +12,17 @@ namespace ProductionProfiler.Core.Profiling.Entities
         public long ElapsedMilliseconds { get; set; }
         public string Server { get; set; }
         public string ClientIpAddress { get; set; }
-        public string UserAgent { get; set; }
         public bool Ajax { get; set; }
+        public bool CapturedResponse { get; set; }
         public List<ProfiledMethodData> Methods { get; set; }
         public List<ProfilerError> ProfilerErrors { get; set; }
-        public List<DataCollection> CollectedData { get; set; }
+        public List<DataCollection> RequestData { get; set; }
+        public List<DataCollection> ResponseData { get; set; }
 
         public ProfiledRequestData()
         {
-            CollectedData = new List<DataCollection>();
+            RequestData = new List<DataCollection>();
+            ResponseData = new List<DataCollection>();
             Methods = new List<ProfiledMethodData>();
         }
     }

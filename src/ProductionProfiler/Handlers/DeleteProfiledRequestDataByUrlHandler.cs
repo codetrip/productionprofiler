@@ -19,12 +19,17 @@ namespace ProductionProfiler.Core.Handlers
 
         protected override JsonResponse DoHandleRequest(RequestInfo requestInfo)
         {
-            _profiledRequestsRepository.DeleteProfiledRequestDataByUrl(requestInfo.Form.Get("Url"));
-            _cacheEngine.Remove("{0}-{1}".FormatWith(Constants.Actions.PreviewResults, requestInfo.Form.Get("Url")), true);
+            string url = requestInfo.Form.Get("Url");
+
+            _profiledRequestsRepository.DeleteProfiledRequestDataByUrl(url);
+            _profiledRequestsRepository.DeleteResponseByUrl(url);
+
+            _cacheEngine.Remove("{0}".FormatWith(Constants.Actions.Results), true);
+            _cacheEngine.Remove("{0}-{1}".FormatWith(Constants.Actions.PreviewResults, url), true);
 
             return new JsonResponse
             {
-                Redirect = string.Format("/profiler?handler={0}&action={1}", Constants.Handlers.Results, Constants.Actions.Results)
+                Redirect = string.Format(Constants.Urls.ProfilerHandlerAction, Constants.Handlers.Results, Constants.Actions.Results)
             };
         }
     }

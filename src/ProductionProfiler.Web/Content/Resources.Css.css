@@ -1,7 +1,9 @@
 ﻿
 body { background-color: #F2F2F2; font-size: 11px; font-family: Arial, Helvetica, sans-serif; margin: 0; padding: 5px 15px 15px 15px; color: #696969; text-align:left;}
 
-table { border: solid 1px #e8eef4; border-collapse: collapse; text-align:left; font-size:11px; margin-bottom:20px; width:100%;}
+table { border: solid 1px #e8eef4; border-collapse: collapse; text-align:left; font-size:11px; width:100%;}
+table.heading { margin-bottom:20px;}
+table.nested { margin-bottom:5px; background-color:#fff;}
 td { padding: 5px; border: solid 1px #BDBDBD; text-align:left; word-wrap:break-word; }
 th { padding: 6px 5px; text-align: left; background-color: #e8eef4; border: solid 1px #BDBDBD; }
 
@@ -10,6 +12,12 @@ th { padding: 6px 5px; text-align: left; background-color: #e8eef4; border: soli
 
 .noresults {font-weight:bold; font-size:12px;}
 .section-title {font-weight:bold; text-transform:uppercase;}
+
+.rh, .rh-selected { font-weight:bold; text-transform:uppercase; padding:5px; }
+.rh-nested, .rh-nested-selected { font-weight:normal; text-transform:uppercase; padding:5px; }
+.rh, .rh-nested { background: url(images/plus.gif) 7 7 no-repeat; padding:5px 5px 5px 22px; cursor:pointer; border: solid 1px #BDBDBD; margin-bottom:5px; }
+.rh-selected, .rh-nested-selected {margin-bottom:0px; background: url(images/minus.gif) 7 7 no-repeat; padding:5px 5px 5px 22px;  cursor:pointer; border-top: solid 1px #BDBDBD; border-left: solid 1px #BDBDBD; border-right: solid 1px #BDBDBD;}
+.rh-nested, .rh-nested-selected { background-color:#fff;}
 
 a:link { color: #696969; text-decoration: underline; }
 a:visited { color: #696969; }

@@ -24,13 +24,14 @@ namespace ProductionProfiler.Core.Handlers
             if (Guid.TryParse(requestInfo.Form.Get("Id"), out id))
             {
                 _profiledRequestsRepository.DeleteProfiledRequestDataById(id);
+                _profiledRequestsRepository.DeleteResponseById(id);
                 _cacheEngine.Remove(Constants.Actions.Results, true);
                 _cacheEngine.Remove("{0}-{1}".FormatWith(Constants.Actions.PreviewResults, requestInfo.Form.Get("Url")), true);
             }
 
             return new JsonResponse
             {
-                Redirect = string.Format("/profiler?handler={0}&action={1}&url={2}", 
+                Redirect = string.Format(Constants.Urls.ProfilerHandlerActionUrl, 
                     Constants.Handlers.Results, 
                     Constants.Actions.PreviewResults,
                     requestInfo.Url)

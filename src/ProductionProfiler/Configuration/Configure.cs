@@ -24,14 +24,12 @@ namespace ProductionProfiler.Core.Configuration
     {
         private bool _requestDataCollectorSet;
         private bool _responseDataCollectorSet;
-        private bool _methodEntryDataCollectorSet;
-        private bool _methodExitDataCollectorSet;
         private bool _cacheEngineSet;
         private List<Type> _typesToIntercept;
         private Func<HttpRequest, bool> _requestFilter;
-        private ProfilerConfiguration _profilerConfiguration;
         private IContainer _container;
         private readonly List<ProfilerError> _profilerErrors = new List<ProfilerError>();
+        private ProfilerConfiguration _profilerConfiguration;
 
         public static IFluentConfiguration With(IContainer container)
         {
@@ -45,7 +43,7 @@ namespace ProductionProfiler.Core.Configuration
             return config;
         }
 
-        IFluentConfiguration IFluentConfiguration.InterceptTypes(Type[] typesToIntercept)
+        IFluentConfiguration IFluentConfiguration.Intercept(Type[] typesToIntercept)
         {
             _typesToIntercept = new List<Type>(new[] {typeof (IWantToBeProfiled)});
             _typesToIntercept.AddRange(typesToIntercept);
@@ -64,7 +62,14 @@ namespace ProductionProfiler.Core.Configuration
             return this;
         }
 
-        public IFluentConfiguration WithCacheEngine<T>() where T : ICacheEngine
+        IFluentConfiguration IFluentConfiguration.CaptureResponse<T>(Func<HttpContext, T> responseFilterConstructor)
+        {
+            _profilerConfiguration.CaptureResponse = true;
+            _profilerConfiguration.GetResponseFilter = responseFilterConstructor;
+            return this;
+        }
+
+        public IFluentConfiguration CacheEngine<T>() where T : ICacheEngine
         {
             if (_cacheEngineSet)
             {
@@ -81,39 +86,17 @@ namespace ProductionProfiler.Core.Configuration
             return this;
         }
 
-        public IFluentConfiguration WithMethodEntryDataCollector<T>() where T : IMethodEntryDataCollector
+        public IFluentCollectorConfiguration AddMethodEntryDataCollector<T>() where T : IMethodEntryDataCollector
         {
-            if (_methodEntryDataCollectorSet)
-            {
-                _profilerErrors.Add(new ProfilerError
-                {
-                    Message = string.Format("IMethodEntryDataCollector has already been specified, method entry data collector of type {0} was not registered".FormatWith(typeof(T).FullName)),
-                    Type = ProfilerErrorType.Configuration,
-                });
-            }
-
-            _methodEntryDataCollectorSet = true;
-            _container.RegisterTransient<IMethodEntryDataCollector>(typeof(T));
-            return this;
+            return new CollectorConfiguration<IMethodEntryDataCollector>(this, typeof(T));
         }
 
-        public IFluentConfiguration WithMethodExitDataCollector<T>() where T : IMethodExitDataCollector
+        public IFluentCollectorConfiguration AddMethodExitDataCollector<T>() where T : IMethodExitDataCollector
         {
-            if (_methodExitDataCollectorSet)
-            {
-                _profilerErrors.Add(new ProfilerError
-                {
-                    Message = string.Format("IMethodExitDataCollector has already been specified, method exit data collector of type {0} was not registered".FormatWith(typeof(T).FullName)),
-                    Type = ProfilerErrorType.Configuration,
-                });
-            }
-
-            _methodExitDataCollectorSet = true;
-            _container.RegisterTransient<IMethodExitDataCollector>(typeof(T));
-            return this;
+            return new CollectorConfiguration<IMethodExitDataCollector>(this, typeof(T));
         }
 
-        public IFluentConfiguration WithHttpRequestDataCollector<T>() where T : IHttpRequestDataCollector
+        public IFluentConfiguration HttpRequestDataCollector<T>() where T : IHttpRequestDataCollector
         {
             if (_requestDataCollectorSet)
             {
@@ -129,7 +112,7 @@ namespace ProductionProfiler.Core.Configuration
             return this;
         }
 
-        public IFluentConfiguration WithHttpResponseDataCollector<T>() where T : IHttpResponseDataCollector
+        public IFluentConfiguration HttpResponseDataCollector<T>() where T : IHttpResponseDataCollector
         {
             if (_responseDataCollectorSet)
             {
@@ -145,8 +128,7 @@ namespace ProductionProfiler.Core.Configuration
             return this;
         }
 
-
-        IFluentConfiguration IFluentConfiguration.WithLog4Net(string loggerName)
+        IFluentConfiguration IFluentConfiguration.Log4Net(string loggerName)
         {
             var profilingLogger = LogManager.Exists(loggerName);
 
@@ -198,7 +180,7 @@ namespace ProductionProfiler.Core.Configuration
             return this;
         }
 
-        IFluentConfiguration IFluentConfiguration.WithDataProvider(IPersistenceProvider persistenceProvider)
+        IFluentConfiguration IFluentConfiguration.DataProvider(IPersistenceProvider persistenceProvider)
         {
             _container.RegisterTransient<IProfilerRepository>(persistenceProvider.RepositoryType);
             persistenceProvider.RegisterDependentComponents(_container);
@@ -219,16 +201,13 @@ namespace ProductionProfiler.Core.Configuration
             _container.RegisterTransient<IRequestHandler>(typeof(ViewResultsRequestHandler), Constants.Handlers.Results);
             _container.RegisterTransient<IRequestHandler>(typeof(AddProfiledRequestHandler), Constants.Handlers.AddProfiledRequest);
             _container.RegisterTransient<IRequestHandler>(typeof(ViewProfiledRequestsHandler), Constants.Handlers.ViewProfiledRequests);
+            _container.RegisterTransient<IRequestHandler>(typeof(ViewResponseRequestHandler), Constants.Handlers.ViewResponse);
             _container.RegisterTransient<IRequestHandler>(typeof(DeleteProfiledDataByIdRequestHandler), Constants.Handlers.DeleteProfiledRequestDataById);
             _container.RegisterTransient<IRequestHandler>(typeof(DeleteProfiledDataByUrlRequestHandler), Constants.Handlers.DeleteProfiledRequestDataByUrl);
             _container.RegisterTransient<IAddProfiledRequestRequestBinder>(typeof(AddProfiledRequestRequestBinder));
             _container.RegisterTransient<IUpdateProfiledRequestRequestBinder>(typeof(UpdateProfiledRequestRequestBinder));
             _container.RegisterTransient<IRequestProfilingCoordinator>(typeof(RequestProfilingCoordinator));
 
-            if (!_methodEntryDataCollectorSet)
-                _container.RegisterTransient<IMethodEntryDataCollector>(typeof(NullMethodEntryDataCollector));
-            if (!_methodExitDataCollectorSet)
-                _container.RegisterTransient<IMethodExitDataCollector>(typeof(NullMethodExitDataCollector));
             if (!_requestDataCollectorSet)
                 _container.RegisterTransient<IHttpRequestDataCollector>(typeof(NullHttpRequestDataCollector));
             if (!_responseDataCollectorSet)
@@ -238,21 +217,58 @@ namespace ProductionProfiler.Core.Configuration
 
             _container.InitialiseForProxyInterception(_typesToIntercept);
         }
+
+        private class CollectorConfiguration<T> : IFluentCollectorConfiguration
+        {
+            private readonly Configure _configureInstance;
+            private readonly Type _collectorType;
+
+            public CollectorConfiguration(Configure configureInstance, Type collectorType)
+            {
+                _configureInstance = configureInstance;
+                _collectorType = collectorType;
+            }
+
+            public IFluentConfiguration ForTypes(IEnumerable<Type> types)
+            {
+                if (_configureInstance._profilerConfiguration.CollectorTypeMappings.ContainsKey(_collectorType))
+                {
+                    _configureInstance._profilerErrors.Add(new ProfilerError
+                    {
+                        Message = string.Format("{0} has already been registered for method entry data collector of type {1}.".FormatWith(typeof(T).FullName, _collectorType.FullName)),
+                        Type = ProfilerErrorType.Configuration,
+                    });
+                }
+                else
+                {
+                    _configureInstance._container.RegisterTransient<T>(_collectorType, _collectorType.FullName);
+                    _configureInstance._profilerConfiguration.CollectorTypeMappings.Add(_collectorType, types);
+                }
+
+                return _configureInstance;
+            }
+        }
     }
 
     public interface IFluentConfiguration
     {
-        IFluentConfiguration InterceptTypes(Type[] typesToIntercept = null);
+        IFluentConfiguration Intercept(Type[] typesToIntercept = null);
         IFluentConfiguration RequestFilter(Func<HttpRequest, bool> requestFilter);
         IFluentConfiguration EnableMonitoring(long postThreshold, long getThreshold);
         IFluentConfiguration CaptureExceptions();
-        IFluentConfiguration WithLog4Net(string loggerName);
-        IFluentConfiguration WithDataProvider(IPersistenceProvider persistenceProvider);
-        IFluentConfiguration WithCacheEngine<T>() where T : ICacheEngine;
-        IFluentConfiguration WithMethodEntryDataCollector<T>() where T : IMethodEntryDataCollector;
-        IFluentConfiguration WithMethodExitDataCollector<T>() where T : IMethodExitDataCollector;
-        IFluentConfiguration WithHttpRequestDataCollector<T>() where T : IHttpRequestDataCollector;
-        IFluentConfiguration WithHttpResponseDataCollector<T>() where T : IHttpResponseDataCollector;
+        IFluentConfiguration CaptureResponse<T>(Func<HttpContext, T> responseFilterConstructor) where T : Stream, IResponseFilter;
+        IFluentCollectorConfiguration AddMethodEntryDataCollector<T>() where T : IMethodEntryDataCollector;
+        IFluentCollectorConfiguration AddMethodExitDataCollector<T>() where T : IMethodExitDataCollector;
+        IFluentConfiguration Log4Net(string loggerName);
+        IFluentConfiguration DataProvider(IPersistenceProvider persistenceProvider);
+        IFluentConfiguration CacheEngine<T>() where T : ICacheEngine;
+        IFluentConfiguration HttpRequestDataCollector<T>() where T : IHttpRequestDataCollector;
+        IFluentConfiguration HttpResponseDataCollector<T>() where T : IHttpResponseDataCollector;
         void Initialise();
+    }
+
+    public interface IFluentCollectorConfiguration
+    {
+        IFluentConfiguration ForTypes(IEnumerable<Type> types);
     }
 }

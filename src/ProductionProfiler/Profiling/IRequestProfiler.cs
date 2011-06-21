@@ -10,7 +10,7 @@ namespace ProductionProfiler.Core.Profiling
         bool InitialisedForRequest { get; set; }
         void MethodEntry(MethodInvocation invocation);
         void MethodExit(MethodInvocation invocation);
-        void StartProfiling(HttpRequest request);
+        void StartProfiling(HttpContext context);
         ProfiledRequestData StopProfiling(HttpResponse response);
         void ProfilerError(string message);
     }

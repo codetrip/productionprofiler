@@ -69,7 +69,7 @@ if (window.jQueryProfiler) {
                 });
             },
             attachDetailEvents: function () {
-                this.container.find("tr.methodinfo").click(function () {
+                this.container.find("tr.togglechild").click(function () {
                     var currentRow = $(this);
                     var row = currentRow.next("tr");
                     row.toggleClass("hidden");
@@ -77,9 +77,32 @@ if (window.jQueryProfiler) {
                     var padding = parseInt(currentRow.attr("data-padding"));
 
                     if (row.hasClass("hidden")) {
-                        currentRow.find('td:first').attr("style", 'cursor:pointer; background: url(content/images/plus.gif) ' + padding + ' 7 no-repeat; padding-left:' + (padding + 10) + '"');
+                        currentRow.find('td:first').attr("style", 'cursor:pointer; background: url(content/images/plus.gif) ' + (padding - 10) + ' 7 no-repeat; padding-left:' + padding + '"');
                     } else {
-                        currentRow.find('td:first').attr("style", 'cursor:pointer; background: url(content/images/minus.gif) ' + padding + ' 7 no-repeat; padding-left:' + (padding + 10) + '"');
+                        currentRow.find('td:first').attr("style", 'cursor:pointer; background: url(content/images/minus.gif) ' + (padding - 10) + ' 7 no-repeat; padding-left:' + padding + '"');
+                    }
+                });
+                this.container.find("div.rh, div.rh-nested").click(function () {
+                    var css, cssSelected;
+                    var div = $(this);
+                    var table = div.next('table:first');
+
+                    table.toggleClass("hidden");
+
+                    if(div.hasClass("rh") || div.hasClass("rh-selected")){
+                        css = "rh";
+                        cssSelected = "rh-selected";
+                    } else {
+                         css = "rh-nested";
+                         cssSelected = "rh-nested-selected";
+                    }
+                    
+                    if (table.hasClass("hidden")) {
+                        div.removeClass(cssSelected);
+                        div.addClass(css);
+                    } else {
+                        div.removeClass(css);
+                        div.addClass(cssSelected);
                     }
                 });
             },
@@ -153,56 +176,77 @@ if (window.jQueryProfiler) {
                 this.attachEvents();
             },
             renderResultsDetail: function (data) {
-                this.html = '<table><tr><td colspan="8" class="section-title">Request Info</td></tr><tr><th>Url</th><th>Request Id</th><th>Captured On</th><th>Server</th><th>Elapsed Milliseconds</th><th>Client IP</th><th>Ajax</th><th>User Agent</th></tr>' +
-                '<tr><td>' + data.Url + '</td><td>' + data.Id + '</td><td>' + $.profiler.formatDate(data.CapturedOnUtc) + '</td><td>' + data.Server + '</td><td>' + data.ElapsedMilliseconds + 'ms</td><td>' + data.ClientIpAddress + '</td><td>' + data.Ajax + '</td><td>' + data.UserAgent + '</td></tr></table>';
+                var responseUrl = data.CapturedResponse ? '<a target="_blank" href="/profiler?handler=response&id=' + data.Id + '">view response</a>' : 'not captured';
+                this.html = '<table class="heading"><tr><th>Url</th><th>Request Id</th><th>Response</th><th>Captured On</th><th>Server</th><th>Elapsed Milliseconds</th><th>Client IP</th><th>Ajax</th></tr>' +
+                '<tr><td><a href="/profiler?handler=results&action=previewresults&url=' + data.Url + '">' + data.Url + '</a></td><td>' + data.Id + '</td><td>' + responseUrl + '</td><td>' + $.profiler.formatDate(data.CapturedOnUtc) + '</td><td>' + data.Server + '</td><td>' + data.ElapsedMilliseconds + 'ms</td><td>' + data.ClientIpAddress + '</td><td>' + data.Ajax + '</td></tr></table>';
 
-                this.html += '<table><tr class="section-title"><td colspan="6">Method Info</td></tr><tr><th>Method</th><th>Elapsed</th><th>Started</th><th>Stopped</th><th>Error</th><th>Audit Messages</th></tr>'
-
-                $.each(data.Methods, function (idx, method) {
-                    $.viewengine.renderMethodInfo(method, 0);
-                });
-
-                this.html += '</table>';
-
-                if (data.ProfilerErrors)
+                if (data.Methods.length > 0)
                 {
-                    this.html += '<table><tr><td colspan="2" class="section-title">Profiler Errors</td></td><tr><th>Type</th><th>Error</th></tr>';
-                    $.each(data.ProfilerErrors, function(idx, error) {
-                        this.html += '<tr><td>' + error.sType + '</td><td>' + error.Message + '</td></tr>';
+                    this.renderTable(["Method", "Elapsed", "Started", "Stopped", "Errors", "Messages"], "Method Info", data.Methods, "rh", "heading hidden", function(method) {
+                        this.renderMethodInfo(method, 0);
+                    }.bind(this));
+                } 
+
+                if (data.ProfilerErrors.length > 0)
+                {
+                    this.renderTable(["Type", "Error"], "Profiler Errors", data.ProfilerErrors, "rh", "heading hidden", function(error) {
+                            this.html += '<tr><td>' + error.TypeAsString + '</td><td>' + error.Message + '</td></tr>';
+                    }.bind(this));
+                }  
+                
+                if (data.RequestData.length > 0)
+                {
+                    $.each(data.RequestData, function(idx, itm){
+                        this.renderTable(["Name", "Value"], itm.Name, itm.Data, "rh", "heading hidden", function(dataItem) {
+                            this.html += '<tr><td>' + dataItem.Name + '</td><td>' + dataItem.Value + '</td></tr>';
                         }.bind(this));
-                    this.html += '</table>';
-                }                    
+                    }.bind(this));
+                }
+                
+                if (data.ResponseData.length > 0)
+                {
+                    $.each(data.ResponseData, function(idx, itm){
+                        this.renderTable(["Name", "Value"], itm.Name, itm.Data, "rh", "heading hidden", function(dataItem) {
+                            this.html += '<tr><td>' + dataItem.Name + '</td><td>' + dataItem.Value + '</td></tr>';
+                        }.bind(this));
+                    }.bind(this));
+                }                  
 
                 this.container.html(this.html);
                 this.renderHeading("Profiled Request Details");
                 this.attachDetailEvents();
             },
             renderMethodInfo: function (method, level) {
-                var padding = ((level * 20) + 5);
+                var padding = ((level * 25) + 5);
                 var hasLogMessages = method.Messages && method.Messages.length;
                 var hasExceptions = method.Exceptions && method.Exceptions.length;
-                var rowClass = hasLogMessages ? 'class="methodinfo"' : '';
-                var css = hasLogMessages ? 'style="cursor:pointer; background: url(content/images/plus.gif) ' + padding + ' 7 no-repeat; padding-left:' + (padding + 10) + '"' : 'style="padding-left:' + padding + 'px"';
+                var hasData = method.Data && method.Data.length;
+                var rowClass = hasLogMessages ? 'class="togglechild"' : '';
+                var css = hasLogMessages ? 'style="cursor:pointer; background: url(content/images/plus.gif) ' + (padding - 10) + ' 7 no-repeat; padding-left:' + padding + '"' : 'style="padding-left:' + padding + 'px"';
 
-                this.html += '<tr ' + rowClass + ' data-padding="' + padding + '"><td ' + css + '>&nbsp;' + method.MethodName + '</td><td>' + method.ElapsedMilliseconds + 'ms</td><td>' + method.StartedAtMilliseconds + 'ms</td><td>' + method.StoppedAtMilliseconds + 'ms</td><td>' + method.ErrorInMethod + '</td><td>' + method.Messages.length + '</td></tr>';
+                this.html += '<tr ' + rowClass + ' data-padding="' + padding + '"><td ' + css + '>&nbsp;' + method.MethodName + '</td><td>' + method.ElapsedMilliseconds + 'ms</td><td>' + method.StartedAtMilliseconds + 'ms</td><td>' + method.StoppedAtMilliseconds + 'ms</td><td>' + method.Exceptions.length + '</td><td>' + method.Messages.length + '</td></tr>';
 
-                if (hasLogMessages || hasExceptions) {
-                    this.html += '<tr class="hidden"><td style="padding-left:' + padding + 'px" colspan="6">';
+                if (hasLogMessages || hasExceptions || hasData) {
+                    this.html += '<tr class="hidden"><td style="padding-left:' + (padding + 5) + 'px" colspan="6">';
 
                     if(hasLogMessages){
-                        this.html += '<table><tr><th>Logged at</th><th>Level</th><th>Message</th></tr>';
-                        $.each(method.Messages, function (idx, message) {
-                            this.html += '<tr style="background-color:#fff"><td style="width:80px">' + message.Milliseconds + 'ms</td><td style="width:100px">' + message.Level + '</td><td>' + message.Message + '</td></tr>';
+                        this.renderTable(["Logged at", "Level", "Error"], "Messages", method.Messages, "rh-nested", "nested hidden", function(message) {
+                            this.html += '<tr><td style="width:80px">' + message.Milliseconds + 'ms</td><td style="width:100px">' + message.Level + '</td><td>' + message.Message + '</td></tr>';
                         }.bind(this));
-                        this.html += '</table>';
                     }
 
                     if(hasExceptions){
-                        this.html += '<table><tr><th>Logged at</th><th>Exception Type</th><th>Message</th></tr>';
-                        $.each(method.Exceptions, function(idx, exception){
-                            this.html += '<tr style="background-color:#fff"><td style="width:80px">' + exception.Milliseconds + 'ms</td><td style="width:250px">' + exception.Type + '</td><td>' + exception.Message + '</td></tr>';
+                        this.renderTable(["Logged at", "Exception Type", "Message"], "Exceptions", method.Exceptions, "rh-nested", "nested hidden", function(exception) {
+                            this.html += '<tr><td style="width:80px">' + exception.Milliseconds + 'ms</td><td style="width:250px">' + exception.Type + '</td><td>' + exception.Message.replace(new RegExp('\n', 'g'), '<br />') + '</td></tr>';
                         }.bind(this));
-                        this.html += '</table>';
+                    }
+
+                    if(hasData){
+                        $.each(method.Data, function(idx, itm){
+                            this.renderTable(["Name", "Value"], itm.Name, itm.Data, "rh-nested", "nested hidden", function(dataItem) {
+                                this.html += '<tr><td>' + dataItem.Name + '</td><td>' + dataItem.Value + '</td></tr>';
+                            }.bind(this));
+                        }.bind(this));
                     }
 
                     this.html += '</td></tr>';
@@ -210,13 +254,28 @@ if (window.jQueryProfiler) {
 
                 if (method.Methods.length > 0) {
                     $.each(method.Methods, function (idx, innerMethod) {
-                        $.viewengine.renderMethodInfo(innerMethod, level + 1);
-                    });
+                        this.renderMethodInfo(innerMethod, level + 1);
+                    }.bind(this));
                 }
             },
             renderHeading: function (title) {
                 var html = '<div style="padding:5px 0px 15px 0px"><h1>' + title + '</h1><a class="heading" href="/profiler?handler=vpr">Profiled URLs</a><a class="heading" href="/profiler?handler=results&action=results">Profiler Results</a></div>'
                 this.title.html(html);
+            },
+            renderTable: function (layout, heading, data, divCss, tableCss, render) {
+                if(data.length > 0){
+                    this.html += '<div class="' + divCss + '">' + heading + '</div><table class="' + tableCss + '"><tr>';
+                    for(var heading in layout){
+                        this.html += '<th>' + layout[heading] + '</th>'
+                    }
+                    this.html += '</tr>';
+
+                    $.each(data, function(idx, itm) {
+                        render(itm);
+                    });
+
+                    this.html += '</table>';
+                }
             },
         });
 
