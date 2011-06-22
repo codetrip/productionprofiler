@@ -17,6 +17,7 @@ using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Profiling.Entities;
 using ProductionProfiler.Core.Resources;
 using ProductionProfiler.Core.Extensions;
+using ProductionProfiler.Core.Serialization;
 
 namespace ProductionProfiler.Core.Configuration
 {
@@ -25,7 +26,9 @@ namespace ProductionProfiler.Core.Configuration
         private bool _requestDataCollectorSet;
         private bool _responseDataCollectorSet;
         private bool _cacheEngineSet;
-        private List<Type> _typesToIntercept;
+        private bool _serializerSet;
+        private IEnumerable<Type> _typesToIntercept;
+        private IEnumerable<Type> _typesToIgnore;
         private Func<HttpRequest, bool> _requestFilter;
         private IContainer _container;
         private readonly List<ProfilerError> _profilerErrors = new List<ProfilerError>();
@@ -43,10 +46,15 @@ namespace ProductionProfiler.Core.Configuration
             return config;
         }
 
-        IFluentConfiguration IFluentConfiguration.Intercept(Type[] typesToIntercept)
+        IFluentConfiguration IFluentConfiguration.TypesToIntercept(IEnumerable<Type> typesToIntercept)
         {
-            _typesToIntercept = new List<Type>(new[] {typeof (IWantToBeProfiled)});
-            _typesToIntercept.AddRange(typesToIntercept);
+            _typesToIntercept = typesToIntercept;
+            return this;
+        }
+
+        IFluentConfiguration IFluentConfiguration.TypesToIgnore(IEnumerable<Type> typesToIgnore)
+        {
+            _typesToIgnore = typesToIgnore;
             return this;
         }
 
@@ -69,7 +77,14 @@ namespace ProductionProfiler.Core.Configuration
             return this;
         }
 
-        public IFluentConfiguration CacheEngine<T>() where T : ICacheEngine
+        IFluentConfiguration IFluentConfiguration.CaptureResponse()
+        {
+            _profilerConfiguration.CaptureResponse = true;
+            _profilerConfiguration.GetResponseFilter = context => new StoreResponseFilter(context.Response.Filter);
+            return this;
+        }
+
+        IFluentConfiguration IFluentConfiguration.CacheEngine<T>()
         {
             if (_cacheEngineSet)
             {
@@ -86,17 +101,46 @@ namespace ProductionProfiler.Core.Configuration
             return this;
         }
 
-        public IFluentCollectorConfiguration AddMethodEntryDataCollector<T>() where T : IMethodEntryDataCollector
+        IFluentConfiguration IFluentConfiguration.Serializer<T>()
         {
-            return new CollectorConfiguration<IMethodEntryDataCollector>(this, typeof(T));
+            if (_serializerSet)
+            {
+                _profilerErrors.Add(new ProfilerError
+                {
+                    Message = string.Format("ISerializer has already been specified, serializer of type {0} was not registered".FormatWith(typeof(T).FullName)),
+                    Type = ProfilerErrorType.Configuration,
+                });
+                return this;
+            }
+
+            _serializerSet = true;
+            _container.RegisterTransient<ISerializer>(typeof(T));
+            return this;
         }
 
-        public IFluentCollectorConfiguration AddMethodExitDataCollector<T>() where T : IMethodExitDataCollector
+        IFluentConfiguration IFluentConfiguration.EnableMonitoring(long postThreshold, long getThreshold)
         {
-            return new CollectorConfiguration<IMethodExitDataCollector>(this, typeof(T));
+            _profilerConfiguration.GetRequestThreshold = getThreshold;
+            _profilerConfiguration.PostRequestThreshold = postThreshold;
+            _profilerConfiguration.MonitoringEnabled = true;
+            return this;
         }
 
-        public IFluentConfiguration HttpRequestDataCollector<T>() where T : IHttpRequestDataCollector
+        IFluentConfiguration IFluentConfiguration.DataProvider(IPersistenceProvider persistenceProvider)
+        {
+            _container.RegisterTransient<IProfilerRepository>(persistenceProvider.RepositoryType);
+            persistenceProvider.RegisterDependentComponents(_container);
+            return this;
+        }
+
+        #region Collectors
+
+        IFluentCollectorConfiguration IFluentConfiguration.AddMethodDataCollector<T>()
+        {
+            return new CollectorConfiguration(this, typeof(T));
+        }
+
+        IFluentConfiguration IFluentConfiguration.HttpRequestDataCollector<T>()
         {
             if (_requestDataCollectorSet)
             {
@@ -112,7 +156,7 @@ namespace ProductionProfiler.Core.Configuration
             return this;
         }
 
-        public IFluentConfiguration HttpResponseDataCollector<T>() where T : IHttpResponseDataCollector
+        IFluentConfiguration IFluentConfiguration.HttpResponseDataCollector<T>()
         {
             if (_responseDataCollectorSet)
             {
@@ -127,6 +171,10 @@ namespace ProductionProfiler.Core.Configuration
             _container.RegisterTransient<IHttpResponseDataCollector>(typeof(T));
             return this;
         }
+
+        #endregion
+
+        #region Log4Net
 
         IFluentConfiguration IFluentConfiguration.Log4Net(string loggerName)
         {
@@ -172,20 +220,9 @@ namespace ProductionProfiler.Core.Configuration
             return this;
         }
 
-        public IFluentConfiguration EnableMonitoring(long postThreshold, long getThreshold)
-        {
-            _profilerConfiguration.GetRequestThreshold = getThreshold;
-            _profilerConfiguration.PostRequestThreshold = postThreshold;
-            _profilerConfiguration.MonitoringEnabled = true;
-            return this;
-        }
+        #endregion
 
-        IFluentConfiguration IFluentConfiguration.DataProvider(IPersistenceProvider persistenceProvider)
-        {
-            _container.RegisterTransient<IProfilerRepository>(persistenceProvider.RepositoryType);
-            persistenceProvider.RegisterDependentComponents(_container);
-            return this;
-        }
+        #region Initialise & Dependencies
 
         void IFluentConfiguration.Initialise()
         {
@@ -214,11 +251,21 @@ namespace ProductionProfiler.Core.Configuration
                 _container.RegisterTransient<IHttpResponseDataCollector>(typeof(NullHttpResponseDataCollector));
             if (!_cacheEngineSet)
                 _container.RegisterTransient<ICacheEngine>(typeof(HttpRuntimeCacheEngine));
+            if (!_serializerSet)
+                _container.RegisterTransient<ISerializer>(typeof(JsonSerializer));
 
-            _container.InitialiseForProxyInterception(_typesToIntercept);
+            _container.InitialiseForProxyInterception(_typesToIntercept,
+                new List<Type>(_typesToIgnore ?? new Type[0])
+                {
+                    typeof (IDoNotWantToBeProxied)
+                });
         }
 
-        private class CollectorConfiguration<T> : IFluentCollectorConfiguration
+        #endregion
+
+        #region CollectorConfiguration
+
+        private class CollectorConfiguration : IFluentCollectorConfiguration
         {
             private readonly Configure _configureInstance;
             private readonly Type _collectorType;
@@ -229,46 +276,68 @@ namespace ProductionProfiler.Core.Configuration
                 _collectorType = collectorType;
             }
 
-            public IFluentConfiguration ForTypes(IEnumerable<Type> types)
+            IFluentConfiguration IFluentCollectorConfiguration.ForTypesAssignableFrom(IEnumerable<Type> types)
             {
-                if (_configureInstance._profilerConfiguration.CollectorTypeMappings.ContainsKey(_collectorType))
+                if (!MappingExists())
                 {
-                    _configureInstance._profilerErrors.Add(new ProfilerError
+                    _configureInstance._container.RegisterTransient<IMethodDataCollector>(_collectorType, _collectorType.FullName);
+                    _configureInstance._profilerConfiguration.MethodDataCollectorMappings.AddMapping(new CollectorMapping
                     {
-                        Message = string.Format("{0} has already been registered for method entry data collector of type {1}.".FormatWith(typeof(T).FullName, _collectorType.FullName)),
-                        Type = ProfilerErrorType.Configuration,
+                        CollectorType = _collectorType,
+                        ForTypesAssignableFrom = types
                     });
-                }
-                else
-                {
-                    _configureInstance._container.RegisterTransient<T>(_collectorType, _collectorType.FullName);
-                    _configureInstance._profilerConfiguration.CollectorTypeMappings.Add(_collectorType, types);
                 }
 
                 return _configureInstance;
             }
+
+            IFluentConfiguration IFluentCollectorConfiguration.ForAnyType()
+            {
+                if (!MappingExists())
+                {
+                    _configureInstance._container.RegisterTransient<IMethodDataCollector>(_collectorType, _collectorType.FullName);
+                    _configureInstance._profilerConfiguration.MethodDataCollectorMappings.AddMapping(new CollectorMapping
+                    {
+                        CollectorType = _collectorType,
+                        ForAnyType = true
+                    });
+                }
+
+                return _configureInstance;
+            }
+
+            IFluentConfiguration IFluentCollectorConfiguration.ForAnyUnmappedType()
+            {
+                if (!MappingExists())
+                {
+                    _configureInstance._container.RegisterTransient<IMethodDataCollector>(_collectorType, _collectorType.FullName);
+                    _configureInstance._profilerConfiguration.MethodDataCollectorMappings.AddMapping(new CollectorMapping
+                    {
+                        CollectorType = _collectorType,
+                        ForAnyUnmappedType = true
+                    });
+                }
+
+                return _configureInstance;
+            }
+
+            private bool MappingExists()
+            {
+                if (_configureInstance._profilerConfiguration.MethodDataCollectorMappings.IsCollectorTypeMapped(_collectorType))
+                {
+                    _configureInstance._profilerErrors.Add(new ProfilerError
+                    {
+                        Message = string.Format("IMethodDataCollector has already been registered for type {0}.".FormatWith(_collectorType.FullName)),
+                        Type = ProfilerErrorType.Configuration,
+                    });
+
+                    return true;
+                }
+
+                return false;
+            }
         }
-    }
 
-    public interface IFluentConfiguration
-    {
-        IFluentConfiguration Intercept(Type[] typesToIntercept = null);
-        IFluentConfiguration RequestFilter(Func<HttpRequest, bool> requestFilter);
-        IFluentConfiguration EnableMonitoring(long postThreshold, long getThreshold);
-        IFluentConfiguration CaptureExceptions();
-        IFluentConfiguration CaptureResponse<T>(Func<HttpContext, T> responseFilterConstructor) where T : Stream, IResponseFilter;
-        IFluentCollectorConfiguration AddMethodEntryDataCollector<T>() where T : IMethodEntryDataCollector;
-        IFluentCollectorConfiguration AddMethodExitDataCollector<T>() where T : IMethodExitDataCollector;
-        IFluentConfiguration Log4Net(string loggerName);
-        IFluentConfiguration DataProvider(IPersistenceProvider persistenceProvider);
-        IFluentConfiguration CacheEngine<T>() where T : ICacheEngine;
-        IFluentConfiguration HttpRequestDataCollector<T>() where T : IHttpRequestDataCollector;
-        IFluentConfiguration HttpResponseDataCollector<T>() where T : IHttpResponseDataCollector;
-        void Initialise();
-    }
-
-    public interface IFluentCollectorConfiguration
-    {
-        IFluentConfiguration ForTypes(IEnumerable<Type> types);
+        #endregion
     }
 }

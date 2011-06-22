@@ -1,0 +1,46 @@
+﻿
+body { background-color: #F2F2F2; font-size: 11px; font-family: Arial, Helvetica, sans-serif; margin: 0; padding: 5px 15px 15px 15px; color: #696969; text-align:left;}
+
+table { border: solid 1px #e8eef4; border-collapse: collapse; text-align:left; font-size:11px; width:100%;}
+table.heading { margin-bottom:20px;}
+table.nested { margin-bottom:5px; background-color:#fff;}
+td { padding: 5px; border: solid 1px #BDBDBD; text-align:left; word-wrap:break-word; }
+th { padding: 6px 5px; text-align: left; background-color: #e8eef4; border: solid 1px #BDBDBD; }
+
+.w1000 {width:1000px;}
+.w800 {width:800px;}
+
+.noresults {font-weight:bold; font-size:12px;}
+.section-title {font-weight:bold; text-transform:uppercase;}
+
+.rh, .rh-selected { font-weight:bold; text-transform:uppercase; padding:5px; }
+.rh-nested, .rh-nested-selected { font-weight:normal; text-transform:uppercase; padding:5px; }
+.rh, .rh-nested { background: url(profiler?resource=Plus.gif&contenttype=image/gif) 7 7 no-repeat; padding:5px 5px 5px 22px; cursor:pointer; border: solid 1px #BDBDBD; margin-bottom:5px; }
+.rh-selected, .rh-nested-selected {margin-bottom:0px; background: url(profiler?resource=Minus.gif&contenttype=image/gif) 7 7 no-repeat; padding:5px 5px 5px 22px;  cursor:pointer; border-top: solid 1px #BDBDBD; border-left: solid 1px #BDBDBD; border-right: solid 1px #BDBDBD;}
+.rh-nested, .rh-nested-selected { background-color:#fff;}
+
+a:link { color: #696969; text-decoration: underline; }
+a:visited { color: #696969; }
+a:hover { color: #696969; text-decoration: none; }
+a:active { color: #696969; }
+
+a.heading:link { color: #696969; text-decoration: underline; font-size:11px; text-transform:uppercase; font-weight:bold; padding: 10px 10px 0px 0px;}
+a.heading:visited { color: #696969; }
+a.heading:hover { color: #696969; text-decoration: none; }
+a.heading:active { color: #696969; }
+
+h1, h2, h3, h4, h5, h6 { font-size: 1.5em; font-family: Arial, Helvetica, sans-serif; }
+h1 { font-size: 2em; padding-bottom: 10; margin-bottom: 0; font-weight:bold }
+h2 { padding: 0 0 10px 0; }
+h3 { font-size: 1.2em; }
+h4 { font-size: 1.1em; }
+h5, h6 { font-size: 1em; }
+
+input[type="text"] { width: 200px; border: 1px solid #CCC; font-size: 11px; }
+select { width: 200px; border: 1px solid #CCC; }
+
+.hidden { display:none; }
+.error { color:Red; }
+.btn { border:1px solid grey; padding:3px 8px 3px 8px; background-color:#E0ECF8; font-size:10px; text-transform:uppercase; color:#696969; cursor:pointer; font-weight:bold}
+.btn:hover {background-color:#fff;}
+.container { width:100%;  margin-bottom: 10px; }

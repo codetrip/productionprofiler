@@ -11,12 +11,16 @@ namespace ProductionProfiler.IoC.Windsor
 {
     public class ProfilingInterceptorSelector : IModelInterceptorsSelector
     {
-        private static readonly Type _interceptorType = typeof (IInterceptor);
-        private readonly IList<Type> _typesToIntercept;
+        private readonly IEnumerable<Type> _typesToIntercept;
+        private readonly IEnumerable<Type> _typesToIgnore;
 
-        public ProfilingInterceptorSelector(IList<Type> typesToIntercept)
+        public ProfilingInterceptorSelector(IEnumerable<Type> typesToIntercept, IEnumerable<Type> typesToIgnore)
         {
             _typesToIntercept = typesToIntercept;
+            _typesToIgnore = new List<Type>(typesToIgnore ?? new Type[0])
+            {
+                typeof(IInterceptor)
+            };
         }
 
         public bool HasInterceptors(ComponentModel model)
@@ -50,7 +54,7 @@ namespace ProductionProfiler.IoC.Windsor
 
         private bool ShouldIntercept(Type serviceType)
         {
-            return (_typesToIntercept == null || _typesToIntercept.Any(t => t.IsAssignableFrom(serviceType))) && !_interceptorType.IsAssignableFrom(serviceType);
+            return (_typesToIntercept == null || _typesToIntercept.Any(t => t.IsAssignableFrom(serviceType))) && !_typesToIgnore.Any(t => t.IsAssignableFrom(serviceType));
         }
     }
 }

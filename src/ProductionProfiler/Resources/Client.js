@@ -43,28 +43,268 @@ if (window.jQueryProfiler) {
         $.extend($.profiler, {
             update: function () {
 
+            },
+            formatDate: function (jsonDate) {
+                return jsonDate == null ? '' : new Date(parseInt(jsonDate.substr(6))).toUTCString();
+            },
+            emptyIfNull: function (val, postfix) {
+                return val === null || val === 0 ? '' : val + postfix;
             }
         });
 
         $.extend($.viewengine, {
             container: null,
+            title: null,
+            html: null,
             init: function (data) {
                 this.container = $('#profiler');
+                this.title = $('#title');
+            },
+            attachEvents: function () {
+                this.container.delegate('.delete', 'click', function (e) {
+                    if (!window.confirm("Are you sure you want to delete this item?")) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            },
+            attachDetailEvents: function () {
+                this.container.find("tr.togglechild").click(function () {
+                    var currentRow = $(this);
+                    var row = currentRow.next("tr");
+                    row.toggleClass("hidden");
+
+                    var padding = parseInt(currentRow.attr("data-padding"));
+
+                    if (row.hasClass("hidden")) {
+                        currentRow.find('td:first').attr("style", 'cursor:pointer; background: url(/profiler?resource=Plus.gif&contenttype=image/gif) ' + (padding - 10) + ' 7 no-repeat; padding-left:' + padding + '"');
+                    } else {
+                        currentRow.find('td:first').attr("style", 'cursor:pointer; background: url(/profiler?resource=Minus.gif&contenttype=image/gif) ' + (padding - 10) + ' 7 no-repeat; padding-left:' + padding + '"');
+                    }
+                });
+                this.container.find("div.rh, div.rh-nested").click(function () {
+                    var css, cssSelected;
+                    var div = $(this);
+                    var table = div.next('table:first');
+
+                    table.toggleClass("hidden");
+
+                    if(div.hasClass("rh") || div.hasClass("rh-selected")){
+                        css = "rh";
+                        cssSelected = "rh-selected";
+                    } else {
+                         css = "rh-nested";
+                         cssSelected = "rh-nested-selected";
+                    }
+                    
+                    if (table.hasClass("hidden")) {
+                        div.removeClass(cssSelected);
+                        div.addClass(css);
+                    } else {
+                        div.removeClass(css);
+                        div.addClass(cssSelected);
+                    }
+                });
             },
             renderProfiledRequests: function (data) {
-                this.container.append('<form action="/profiler?add" method="post">');
-                this.container.append('<table width="700">');
-                this.container.append('<tr><th>Url (Supports Regular Expressions)</th><th>Profile Count</th><th></th></tr>');
-                this.container.append('<tr><td><input id="Url" name="Url" style="width:500px" type="text" value="" /></td><td><input name="ProfilingCount" style="width:50px" type="text" value="" /></td><td><input type="submit" value="Add" class="btn" /></td></tr>');
-                this.container.append('</table></form>');
-                this.container.append('');
-                this.container.append('');
-            }
-        })
+                var html = '<form action="/profiler?handler=apr" method="post">' +
+                '<table class="w1000">' +
+                '<tr><th>Url to profile (Supports Regular Expressions)</th><th>Server</th><th>Profile Count</th><th></th></tr>' +
+                '<tr><td><input id="Url" name="Url" style="width:625px" type="text" value="" /></td>' +
+                '<td><input name="Server" style="width:200px" type="text" value="" /></td>' +
+                '<td><input name="ProfilingCount" maxlength="4" style="width:75px" type="text" value="" /></td>' +
+                '<td><input type="submit" value="Add" class="btn" /></td></tr>' +
+                '</table></form>';
+
+                if(data.Data.length > 0){
+                    html += '<table><tr><th>Enable</th><th>Url</th><th>Profiled On</th><th>Elapsed</th><th>Server</th><th>Http Method</th><th>Profile Count</th><th>Delete</th><th>Update</th></tr>';
+
+                    $.each(data.Data, function (idx, itm) {
+                        var profilingCount = itm.ProfilingCount === null ? '' : itm.ProfilingCount;
+                        var checked = itm.Enabled ? 'checked="checked"' : '';
+                        var bgcolor = itm.Enabled ? 'style="background-color:#F5D0A9"' : '';
+                        html += '<tr ' + bgcolor + '><form action="/profiler?handler=upr" method="post">' +
+                        '<input name="Url" type="hidden" value="' + itm.Url + '" />' +
+                        '<td><input name="Enabled" type="checkbox" ' + checked + ' value="true" /><input name="Enabled" type="hidden" value="false" /></td>' +
+                        '<td><a href="/profiler?handler=results&action=previewresults&url=' + itm.Url + '">' + itm.Url + '</a></td>' +
+                        '<td>' + $.profiler.formatDate(itm.ProfiledOnUtc) + '</td>' +
+                        '<td>' + $.profiler.emptyIfNull(itm.ElapsedMilliseconds, 'ms') + '</td>' +
+                        '<td><input name="Server" style="width:150px" type="text" value="' + $.profiler.emptyIfNull(itm.Server, '') + '" /></td>' +
+                        '<td>' + $.profiler.emptyIfNull(itm.HttpMethod, '') + '</td>' +
+                        '<td><input name="ProfilingCount" style="width:50px" type="text" value="' + profilingCount + '" /></td>' +
+                        '<td><input type="submit" value="Delete" name="Delete" class="btn delete" /></td>' +
+                        '<td><input type="submit" value="Update" name="Update" class="btn" /></td>' +
+                        '</form></tr>';
+                    });
+
+                    html += '</table>';
+                } else {
+                    html += '<div class="noresults">No URLs are currently being profiled, either turn on automatic monitoring in the profiler configuration or manually add URLs you want to profile using the form above.</div>';
+                }
+                
+                this.container.html(html);
+                this.renderHeading("Profiled URLs");
+                this.attachEvents();
+            },
+            renderResults: function (data) {
+                var html = '<table class="w800"><tr><th>Url</th><th>Delete</th></tr>'
+
+                $.each(data.Data, function (idx, itm) {
+                    html += '<form action="/profiler?handler=dprurl" method="post"><input type="hidden" name="Url" value="' + itm + '" />' + 
+                    '<tr><td><a href="/profiler?handler=results&action=previewresults&url=' + itm + '">' + itm + '</a></td>' +
+                    '<td width="75px"><input type="submit" class="btn delete" value="Delete" /></td></tr></form>';
+                });
+
+                html += '</table>';
+                this.container.html(html);
+                this.renderHeading("Profiled Requests Results");
+                this.attachEvents();
+            },
+            renderResultsPreview: function (data) {
+                var html = '<table class="w1000"><tr><th>Url</th><th>CapturedOnUtc</th><th>ElapsedMilliseconds</th><th>Server</th><th>Delete</th></tr>'
+
+                $.each(data.Data, function (idx, itm) {
+                    html += '<form action="/profiler?handler=dprid&url=' + itm.Url + '" method="post"><input type="hidden" name="Id" value="' + itm.Id + '" />' +
+                    '<tr><td><a href="/profiler?handler=results&action=resultsdetail&id=' + itm.Id + '">' + itm.Url + '</a></td>' +
+                    '<td>' + $.profiler.formatDate(itm.CapturedOnUtc) + '</td><td>' + itm.ElapsedMilliseconds + '</td><td>' + itm.Server + '</td>' +
+                    '<td><input type="submit" class="btn delete" value="Delete" /></td></tr></form>';
+                });
+
+                html += '</table>';
+                this.container.html(html);
+                this.renderHeading("Profiled Requests Results");
+                this.attachEvents();
+            },
+            renderResultsDetail: function (data) {
+                var responseUrl = data.CapturedResponse ? '<a target="_blank" href="/profiler?handler=response&id=' + data.Id + '">view response</a>' : 'not captured';
+                this.html = '<table class="heading"><tr><th>Url</th><th>Request Id</th><th>Response</th><th>Captured On</th><th>Server</th><th>Elapsed Milliseconds</th><th>Client IP</th><th>Ajax</th></tr>' +
+                '<tr><td><a href="/profiler?handler=results&action=previewresults&url=' + data.Url + '">' + data.Url + '</a></td><td>' + data.Id + '</td><td>' + responseUrl + '</td><td>' + $.profiler.formatDate(data.CapturedOnUtc) + '</td><td>' + data.Server + '</td><td>' + data.ElapsedMilliseconds + 'ms</td><td>' + data.ClientIpAddress + '</td><td>' + data.Ajax + '</td></tr></table>';
+
+                if (data.Methods.length > 0)
+                {
+                    this.renderTable(["Method", "Elapsed", "Started", "Stopped", "Errors", "Messages"], "Method Info", data.Methods, "rh", "heading hidden", function(method) {
+                        this.renderMethodInfo(method, 0);
+                    }.bind(this));
+                } 
+
+                if (data.ProfilerErrors.length > 0)
+                {
+                    this.renderTable(["Type", "Error"], "Profiler Errors", data.ProfilerErrors, "rh", "heading hidden", function(error) {
+                            this.html += '<tr><td>' + error.TypeAsString + '</td><td>' + error.Message + '</td></tr>';
+                    }.bind(this));
+                }  
+                
+                if (data.RequestData.length > 0)
+                {
+                    $.each(data.RequestData, function(idx, itm){
+                        this.renderTable(["Name", "Value"], itm.Name, itm.Data, "rh", "heading hidden", function(dataItem) {
+                            this.html += '<tr><td>' + dataItem.Name + '</td><td>' + dataItem.Value + '</td></tr>';
+                        }.bind(this));
+                    }.bind(this));
+                }
+                
+                if (data.ResponseData.length > 0)
+                {
+                    $.each(data.ResponseData, function(idx, itm){
+                        this.renderTable(["Name", "Value"], itm.Name, itm.Data, "rh", "heading hidden", function(dataItem) {
+                            this.html += '<tr><td>' + dataItem.Name + '</td><td>' + dataItem.Value + '</td></tr>';
+                        }.bind(this));
+                    }.bind(this));
+                }                  
+
+                this.container.html(this.html);
+                this.renderHeading("Profiled Request Details");
+                this.attachDetailEvents();
+            },
+            renderMethodInfo: function (method, level) {
+                var padding = ((level * 25) + 5);
+                var hasLogMessages = method.Messages && method.Messages.length;
+                var hasExceptions = method.Exceptions && method.Exceptions.length;
+                var hasData = method.Data && method.Data.length;
+                var enableToggle = hasLogMessages || hasExceptions || hasData;
+                var rowClass = enableToggle ? 'class="togglechild"' : '';
+                var css = enableToggle ? 'style="cursor:pointer; background: url(/profiler?resource=Plus.gif&contenttype=image/gif) ' + (padding - 10) + ' 7 no-repeat; padding-left:' + padding + '"' : 'style="padding-left:' + padding + 'px"';
+
+                this.html += '<tr ' + rowClass + ' data-padding="' + padding + '"><td ' + css + '>&nbsp;' + method.MethodName + '</td><td>' + method.ElapsedMilliseconds + 'ms</td><td>' + method.StartedAtMilliseconds + 'ms</td><td>' + method.StoppedAtMilliseconds + 'ms</td><td>' + method.Exceptions.length + '</td><td>' + method.Messages.length + '</td></tr>';
+
+                if (hasLogMessages || hasExceptions || hasData) {
+                    this.html += '<tr class="hidden"><td style="padding-left:' + (padding + 5) + 'px" colspan="6">';
+
+                    if(hasLogMessages){
+                        this.renderTable(["Logged at", "Level", "Error"], "Messages", method.Messages, "rh-nested", "nested hidden", function(message) {
+                            this.html += '<tr><td style="width:80px">' + message.Milliseconds + 'ms</td><td style="width:100px">' + message.Level + '</td><td>' + message.Message + '</td></tr>';
+                        }.bind(this));
+                    }
+
+                    if(hasExceptions){
+                        this.renderTable(["Logged at", "Exception Type", "Message"], "Exceptions", method.Exceptions, "rh-nested", "nested hidden", function(exception) {
+                            this.html += '<tr><td style="width:80px">' + exception.Milliseconds + 'ms</td><td style="width:250px">' + exception.Type + '</td><td>' + exception.Message.replace(new RegExp('\n', 'g'), '<br />') + '</td></tr>';
+                        }.bind(this));
+                    }
+
+                    if(hasData){
+                        $.each(method.Data, function(idx, itm){
+                            this.renderTable(["Name", "Value"], itm.Name, itm.Data, "rh-nested", "nested hidden", function(dataItem) {
+                                this.html += '<tr><td>' + dataItem.Name + '</td><td>' + dataItem.Value.replace(new RegExp('\n', 'g'), '<br />').replace(new RegExp('\t', 'g'), '&nbsp;&nbsp;&nbsp;&nbsp;') + '</td></tr>';
+                            }.bind(this));
+                        }.bind(this));
+                    }
+
+                    this.html += '</td></tr>';
+                }
+
+                if (method.Methods.length > 0) {
+                    $.each(method.Methods, function (idx, innerMethod) {
+                        this.renderMethodInfo(innerMethod, level + 1);
+                    }.bind(this));
+                }
+            },
+            renderHeading: function (title) {
+                var html = '<div style="padding:5px 0px 15px 0px"><h1>' + title + '</h1><a class="heading" href="/profiler?handler=vpr">Profiled URLs</a><a class="heading" href="/profiler?handler=results&action=results">Profiler Results</a></div>'
+                this.title.html(html);
+            },
+            renderTable: function (layout, heading, data, divCss, tableCss, render) {
+                if(data.length > 0){
+                    this.html += '<div class="' + divCss + '">' + heading + '</div><table class="' + tableCss + '"><tr>';
+                    for(var heading in layout){
+                        this.html += '<th>' + layout[heading] + '</th>'
+                    }
+                    this.html += '</tr>';
+
+                    $.each(data, function(idx, itm) {
+                        render(itm);
+                    });
+
+                    this.html += '</table>';
+                }
+            },
+        });
 
         $(document).ready(function () {
             $.viewengine.init();
-            $.viewengine.renderProfiledRequests(profileData);
+
+            switch (profileAction) {
+                case "results":
+                    {
+                        $.viewengine.renderResults(profileData);
+                        break;
+                    }
+                case "previewresults":
+                    {
+                        $.viewengine.renderResultsPreview(profileData);
+                        break;
+                    }
+                case "resultsdetail":
+                    {
+                        $.viewengine.renderResultsDetail(profileData.Data);
+                        break;
+                    }
+                default:
+                    {
+                        $.viewengine.renderProfiledRequests(profileData);
+                        break;
+                    }
+            }
         });
 
     })(jQueryProfiler);

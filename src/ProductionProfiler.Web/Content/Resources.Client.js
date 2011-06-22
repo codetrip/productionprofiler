@@ -221,8 +221,9 @@ if (window.jQueryProfiler) {
                 var hasLogMessages = method.Messages && method.Messages.length;
                 var hasExceptions = method.Exceptions && method.Exceptions.length;
                 var hasData = method.Data && method.Data.length;
-                var rowClass = hasLogMessages ? 'class="togglechild"' : '';
-                var css = hasLogMessages ? 'style="cursor:pointer; background: url(content/images/plus.gif) ' + (padding - 10) + ' 7 no-repeat; padding-left:' + padding + '"' : 'style="padding-left:' + padding + 'px"';
+                var enableToggle = hasLogMessages || hasExceptions || hasData;
+                var rowClass = enableToggle ? 'class="togglechild"' : '';
+                var css = enableToggle ? 'style="cursor:pointer; background: url(content/images/plus.gif) ' + (padding - 10) + ' 7 no-repeat; padding-left:' + padding + '"' : 'style="padding-left:' + padding + 'px"';
 
                 this.html += '<tr ' + rowClass + ' data-padding="' + padding + '"><td ' + css + '>&nbsp;' + method.MethodName + '</td><td>' + method.ElapsedMilliseconds + 'ms</td><td>' + method.StartedAtMilliseconds + 'ms</td><td>' + method.StoppedAtMilliseconds + 'ms</td><td>' + method.Exceptions.length + '</td><td>' + method.Messages.length + '</td></tr>';
 
@@ -244,7 +245,7 @@ if (window.jQueryProfiler) {
                     if(hasData){
                         $.each(method.Data, function(idx, itm){
                             this.renderTable(["Name", "Value"], itm.Name, itm.Data, "rh-nested", "nested hidden", function(dataItem) {
-                                this.html += '<tr><td>' + dataItem.Name + '</td><td>' + dataItem.Value + '</td></tr>';
+                                this.html += '<tr><td>' + dataItem.Name + '</td><td>' + dataItem.Value.replace(new RegExp('\n', 'g'), '<br />').replace(new RegExp('\t', 'g'), '&nbsp;&nbsp;&nbsp;&nbsp;') + '</td></tr>';
                             }.bind(this));
                         }.bind(this));
                     }

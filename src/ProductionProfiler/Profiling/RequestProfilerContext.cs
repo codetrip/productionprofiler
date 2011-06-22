@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Web;
 using System.Linq;
-using ProductionProfiler.Core.Collectors;
 using ProductionProfiler.Core.Handlers;
 using ProductionProfiler.Core.IoC;
 using ProductionProfiler.Core.Profiling.Entities;
+using ProductionProfiler.Core.Resources;
 
 namespace ProductionProfiler.Core.Profiling
 {
@@ -38,24 +38,29 @@ namespace ProductionProfiler.Core.Profiling
             return _monitoringEnabled && _shouldProfile == null ? false : !request.RawUrl.Contains("/profiler") && _shouldProfile(request);
         }
 
-        public IRequestProfilingCoordinator GetRequestProfilingManager()
+        public void StartProfiling()
         {
-            return _container == null ? null : _container.Resolve<IRequestProfilingCoordinator>();
+            HttpContext.Current.Items[Constants.RequestProfileContextKey] = true;
+        }
+
+        public void StopProfiling()
+        {
+            HttpContext.Current.Items.Remove(Constants.RequestProfileContextKey);
+        }
+
+        public bool ProfilingCurrentRequest()
+        {
+            return HttpContext.Current.Items.Contains(Constants.RequestProfileContextKey);
+        }
+
+        public IContainer Container
+        {
+            get { return _container; }
         }
 
         public IRequestHandler GetRequestHandler(string name)
         {
             return _container == null ? null : _container.Resolve<IRequestHandler>(name);
-        }
-
-        public IMethodEntryDataCollector[] GetMethodEntryCollectors()
-        {
-            return _container == null ? null : _container.ResolveAll<IMethodEntryDataCollector>();
-        }
-
-        public IMethodExitDataCollector[] GetMethodExitCollectors()
-        {
-            return _container == null ? null : _container.ResolveAll<IMethodExitDataCollector>();
         }
 
         internal static void Initialise(Func<HttpRequest, bool> shouldProfileRequest, IContainer container, bool monitoringEnabled, IEnumerable<ProfilerError> profilerErrors)

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using ProductionProfiler.Core.Handlers.Entities;
+using ProductionProfiler.Core.Profiling;
 
 namespace ProductionProfiler.Core.Binding
 {
-    public interface IRequestBinder<out T>
+    public interface IRequestBinder<out T> : IDoNotWantToBeProxied
     {
         T Bind(NameValueCollection formParams);
         bool IsValid(NameValueCollection formParams);

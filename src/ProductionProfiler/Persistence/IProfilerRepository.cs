@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using ProductionProfiler.Core.Persistence.Entities;
+using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Core.Persistence
 {
-    public interface IProfilerRepository
+    public interface IProfilerRepository : IDoNotWantToBeProxied
     {
         /// <summary>
         /// Returns a page of Profiled requests ordered by date captured descending

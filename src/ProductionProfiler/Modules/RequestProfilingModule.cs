@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web;
 using ProductionProfiler.Core.Profiling;
-using ProductionProfiler.Core.Resources;
+using ProductionProfiler.Core.Extensions;
 
 namespace ProductionProfiler.Core.Modules
 {
@@ -15,27 +15,44 @@ namespace ProductionProfiler.Core.Modules
 
         void context_BeginRequest(object sender, EventArgs e)
         {
-            var httpContext = ((HttpApplication)sender).Context;
-
-            if (RequestProfilerContext.Current.ShouldProfile(httpContext.Request))
+            try
             {
-                var profilingManager = RequestProfilerContext.Current.GetRequestProfilingManager();
-                profilingManager.BeginRequest(httpContext);
+                var httpContext = ((HttpApplication)sender).Context;
+
+                if (RequestProfilerContext.Current.ShouldProfile(httpContext.Request))
+                {
+                    RequestProfilerContext.Current.StartProfiling();
+                    var profilingManager = RequestProfilerContext.Current.Container.Resolve<IRequestProfilingCoordinator>();
+                    profilingManager.BeginRequest(httpContext);
+                }
+            }
+            catch(Exception ex)
+            {
+                RequestProfilerContext.Current.StopProfiling();
+                System.Diagnostics.Debug.Write(ex.Format());
             }
         }
 
         void context_EndRequest(object sender, EventArgs e)
         {
-            var httpContext = ((HttpApplication) sender).Context;
-
-            if (RequestProfilerContext.Current.ShouldProfile(httpContext.Request))
+            try
             {
-                //remove the content key here so we dont proxy any profiler components
-                HttpContext.Current.Items.Remove(Constants.RequestProfileContextKey);
+                var httpContext = ((HttpApplication)sender).Context;
 
-                var profilingManager = RequestProfilerContext.Current.GetRequestProfilingManager();
-                profilingManager.EndRequest(httpContext);
+                if (RequestProfilerContext.Current.ShouldProfile(httpContext.Request) && RequestProfilerContext.Current.ProfilingCurrentRequest())
+                {
+                    RequestProfilerContext.Current.StopProfiling();
+
+                    var profilingManager = RequestProfilerContext.Current.Container.Resolve<IRequestProfilingCoordinator>();
+                    profilingManager.EndRequest(httpContext);
+                }
             }
+            catch (Exception ex)
+            {
+                RequestProfilerContext.Current.StopProfiling();
+                System.Diagnostics.Debug.Write(ex.Format());
+            }
+            
         }
 
         public void Dispose()

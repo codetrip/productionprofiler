@@ -7,5 +7,8 @@ namespace ProductionProfiler.Web.Models
     }
     
     public interface IWorkflow
-    {}
+    {
+        string Id { get; set; }
+        string Name { get; set; }
+    }
 }

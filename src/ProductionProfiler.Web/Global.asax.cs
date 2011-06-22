@@ -1,5 +1,4 @@
-﻿using System;
-using System.Configuration;
+﻿using System.Configuration;
 using System.IO;
 using System.Reflection;
 using System.Web.Mvc;
@@ -13,11 +12,11 @@ using log4net.Config;
 using ProductionProfiler.Core.Caching;
 using ProductionProfiler.Core.Collectors;
 using ProductionProfiler.Core.Configuration;
-using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.IoC.Windsor;
 using ProductionProfiler.Persistence.Mongo;
 using ProductionProfiler.Web.Controllers;
 using ProductionProfiler.Web.Models;
+using ProductionProfiler.Web.Profilng;
 
 namespace ProductionProfiler.Web
 {
@@ -78,14 +77,14 @@ namespace ProductionProfiler.Web
                 .DataProvider(new MongoPersistenceProvider("127.0.0.1", 27017))
                 .HttpRequestDataCollector<BasicHttpRequestDataCollector>()
                 .HttpResponseDataCollector<BasicHttpResponseDataCollector>()
-                .AddMethodEntryDataCollector<BasicMethodEntryDataCollector>()
-                    .ForTypes(new Type[0])
-                .AddMethodExitDataCollector<BasicMethodExitDataCollector>()
-                    .ForTypes(new Type[0])
+                //.AddMethodDataCollector<BasicMethodDataCollector>()
+                //    .ForAnyUnmappedType()
+                .AddMethodDataCollector<WorkflowMethodDataCollector>()
+                    .ForTypesAssignableFrom(new []{typeof(IWorkflow)})
                 .CacheEngine<HttpRuntimeCacheEngine>()
                 .RequestFilter(req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty)
                 .CaptureExceptions()
-                .CaptureResponse(context => new StoreResponseFilter(context.Response.Filter))
+                .CaptureResponse()
                 .EnableMonitoring(5000, 3000)
                 .Initialise();
         }

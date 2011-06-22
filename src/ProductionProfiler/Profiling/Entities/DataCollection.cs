@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using ProductionProfiler.Core.Serialization;
 
 namespace ProductionProfiler.Core.Profiling.Entities
 {
@@ -30,14 +31,18 @@ namespace ProductionProfiler.Core.Profiling.Entities
     {
         public string Name { get; set; }
         public string Value { get; set; }
+        public DataFormat Format { get; set; }
 
         public DataCollectionItem()
-        {}
+        {
+            Format = DataFormat.String;
+        }
 
-        public DataCollectionItem(string name, string value)
+        public DataCollectionItem(string name, string value, DataFormat format = DataFormat.String) 
         {
             Name = name;
             Value = value;
+            Format = format;
         }
     }
 }

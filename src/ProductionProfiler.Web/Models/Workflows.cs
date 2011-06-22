@@ -12,7 +12,12 @@ namespace ProductionProfiler.Web.Models
         public TestWorkflow1(IWorkflow2 workflow2)
         {
             _workflow2 = workflow2;
+            Id = Guid.NewGuid().ToString();
+            Name = "Workflow 2";
         }
+
+        public string Id { get; set; }
+        public string Name { get; set; }
 
         public TestResponse Invoke(TestRequest request)
         {
@@ -54,7 +59,12 @@ namespace ProductionProfiler.Web.Models
         public TestWorkflow2(IWorkflow3 workflow3)
         {
             _workflow3 = workflow3;
+            Id = Guid.NewGuid().ToString();
+            Name = "Workflow 2";
         }
+
+        public string Id { get; set; }
+        public string Name { get; set; }
 
         public string Invoke(string request)
         {
@@ -68,6 +78,15 @@ namespace ProductionProfiler.Web.Models
 
     public class TestWorkflow3 : IWorkflow3
     {
+        public string Id { get; set; }
+        public string Name { get; set; }
+
+        public TestWorkflow3()
+        {
+            Id = Guid.NewGuid().ToString();
+            Name = "Workflow 3";
+        }
+
         public string Invoke(string request)
         {
             var log = LogManager.GetLogger("Profiler");

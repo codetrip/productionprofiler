@@ -60,6 +60,8 @@ namespace ProductionProfiler.Core.Profiling
             }
             catch (Exception e)
             {
+                RequestProfilerContext.Current.StopProfiling();
+
                 if(_configuration.Log4NetEnabled)
                 {
                     foreach (var log in LogManager.GetCurrentLoggers())
@@ -109,6 +111,8 @@ namespace ProductionProfiler.Core.Profiling
             }
             catch (Exception e)
             {
+                RequestProfilerContext.Current.StopProfiling();
+
                 if (_configuration.Log4NetEnabled)
                 {
                     foreach (var log in LogManager.GetCurrentLoggers())

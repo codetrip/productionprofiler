@@ -30,9 +30,18 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\..\tools\profiler.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net">
       <HintPath>..\..\lib\Log4net\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json.Net35">
+      <HintPath>..\..\lib\Json.NET\Newtonsoft.Json.Net35.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -53,17 +62,15 @@
     <Compile Include="Caching\HttpRuntimeCacheEngine.cs" />
     <Compile Include="Caching\ICacheEngine.cs" />
     <Compile Include="Collectors\BasicHttpResponseDataCollector.cs" />
-    <Compile Include="Collectors\BasicMethodEntryDataCollector.cs" />
-    <Compile Include="Collectors\BasicMethodExitDataCollector.cs" />
+    <Compile Include="Collectors\BasicMethodDataCollector.cs" />
     <Compile Include="Collectors\NullHttpResponseDataCollector.cs" />
-    <Compile Include="Collectors\NullMethodExitDataCollector.cs" />
-    <Compile Include="Collectors\NullMethodEntryDataCollector.cs" />
     <Compile Include="Collectors\BasicHttpRequestDataCollector.cs" />
     <Compile Include="Collectors\NullHttpRequestDataCollector.cs" />
-    <Compile Include="Dynamic\AssembliesInBinLocator.cs" />
-    <Compile Include="Dynamic\DynamicCodeHelper.cs" />
-    <Compile Include="Dynamic\ILocator.cs" />
-    <Compile Include="Dynamic\XmlSummaryWriter.cs" />
+    <Compile Include="Configuration\CollectorMapping.cs" />
+    <Compile Include="Configuration\MethodDataCollectorMappingConfiguration.cs" />
+    <Compile Include="Configuration\IFluentCollectorConfiguration.cs" />
+    <Compile Include="Configuration\IFluentConfiguration.cs" />
+    <Compile Include="Profiling\IDoNotWantToBeProxied.cs" />
     <Compile Include="Profiling\StoreResponseFilter.cs" />
     <Compile Include="Configuration\Configure.cs" />
     <Compile Include="Configuration\ProfilerConfiguration.cs" />
@@ -95,8 +102,7 @@
     <Compile Include="Profiling\Entities\ThrownException.cs" />
     <Compile Include="IoC\IContainer.cs" />
     <Compile Include="Persistence\IPersistenceProvider.cs" />
-    <Compile Include="Collectors\IMethodEntryDataCollector.cs" />
-    <Compile Include="Collectors\IMethodExitDataCollector.cs" />
+    <Compile Include="Collectors\IMethodDataCollector.cs" />
     <Compile Include="Binding\IRequestBinder.cs" />
     <Compile Include="Persistence\Entities\Page.cs" />
     <Compile Include="Persistence\Entities\Pagination.cs" />
@@ -113,7 +119,6 @@
     <Compile Include="Collectors\IHttpRequestDataCollector.cs" />
     <Compile Include="Handlers\IRequestHandler.cs" />
     <Compile Include="Profiling\IRequestProfiler.cs" />
-    <Compile Include="Profiling\IWantToBeProfiled.cs" />
     <Compile Include="Handlers\Entities\ModelValidationError.cs" />
     <Compile Include="Profiling\Entities\MethodInvocation.cs" />
     <Compile Include="Resources\Constants.cs" />
@@ -124,14 +129,21 @@
     <Compile Include="Modules\RequestProfilingModule.cs" />
     <Compile Include="Profiling\RequestProfilingCoordinator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serialization\BinarySerializer.cs" />
+    <Compile Include="Serialization\XmlSerializer.cs" />
+    <Compile Include="Serialization\ISerializer.cs" />
+    <Compile Include="Serialization\JsonSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources.Css.css" />
+    <EmbeddedResource Include="Resources\Css.css" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources.Client.js" />
+    <EmbeddedResource Include="Resources\Client.js" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Minus.gif" />
+    <EmbeddedResource Include="Resources\Plus.gif" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

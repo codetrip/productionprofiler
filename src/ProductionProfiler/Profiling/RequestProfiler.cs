@@ -10,7 +10,6 @@ using ProductionProfiler.Core.Extensions;
 using ProductionProfiler.Core.Log4Net;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Profiling.Entities;
-using ProductionProfiler.Core.Resources;
 
 namespace ProductionProfiler.Core.Profiling
 {
@@ -43,8 +42,6 @@ namespace ProductionProfiler.Core.Profiling
 
         public void StartProfiling(HttpContext context)
         {
-            context.Items[Constants.RequestProfileContextKey] = true;
-
             InitialisedForRequest = true;
 
             if (_configuration.Log4NetEnabled)
@@ -169,9 +166,9 @@ namespace ProductionProfiler.Core.Profiling
 
             _currentMethod = method;
 
-            foreach (var collector in RequestProfilerContext.Current.GetMethodEntryCollectors())
+            foreach (var collector in _configuration.MethodDataCollectorMappings.GetMethodDataCollectorsForType(invocation.TargetType, RequestProfilerContext.Current.Container))
             {
-                _currentMethod.Data.AddRangeIfNotNull(collector.Collect(invocation));
+                collector.Entry(invocation);
             }
 
             _currentMethod.StartedAtMilliseconds = _watch.ElapsedMilliseconds;
@@ -180,13 +177,15 @@ namespace ProductionProfiler.Core.Profiling
 
         public void MethodExit(MethodInvocation invocation)
         {
-            foreach(var collector in RequestProfilerContext.Current.GetMethodExitCollectors())
-            {
-                _currentMethod.Data.AddRangeIfNotNull(collector.Collect(invocation));
-            }
-            
             _currentMethod.StoppedAtMilliseconds = _watch.ElapsedMilliseconds;
             _currentMethod.ElapsedMilliseconds = _currentMethod.Stop();
+
+            foreach (var collector in _configuration.MethodDataCollectorMappings.GetMethodDataCollectorsForType(invocation.TargetType, RequestProfilerContext.Current.Container))
+            {
+                collector.Exit(invocation);
+            }
+
+            _currentMethod.Data = invocation.MethodData;
             _currentMethod = _currentMethod.GetParentMethod();
         }
     }

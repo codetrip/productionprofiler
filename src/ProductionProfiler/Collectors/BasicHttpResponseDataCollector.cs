@@ -1,7 +1,6 @@
 ﻿
 using System.Collections.Generic;
 using System.Web;
-using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Core.Collectors
@@ -12,7 +11,7 @@ namespace ProductionProfiler.Core.Collectors
         {
             var data = new List<DataCollection>();
 
-            var headers = new DataCollection("Response Headers", response.Headers);
+            var headers = new DataCollection("Response Headers");
             headers.Data.Add(new DataCollectionItem("StatusCode", response.StatusCode.ToString()));
             headers.Data.Add(new DataCollectionItem("Buffer", response.Buffer.ToString()));
             headers.Data.Add(new DataCollectionItem("Charset", response.Charset));
@@ -28,9 +27,11 @@ namespace ProductionProfiler.Core.Collectors
             if (HttpRuntime.UsingIntegratedPipeline && response.Cookies.Count > 0)
             {
                 var cookies = new DataCollection("Response Cookies");
-                foreach (HttpCookie cookie in response.Cookies)
+                foreach (string key in response.Cookies)
                 {
-                    cookies.Data.Add(new DataCollectionItem(cookie.Name, cookie.Value));
+                    var requestCookie = response.Cookies[key];
+                    if (requestCookie != null)
+                        cookies.Data.Add(new DataCollectionItem(requestCookie.Name, requestCookie.Value));
                 }
                 data.Add(cookies);
             }

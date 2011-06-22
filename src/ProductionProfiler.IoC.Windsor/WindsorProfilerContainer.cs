@@ -61,10 +61,10 @@ namespace ProductionProfiler.IoC.Windsor
             return _container.ResolveAll<T>();
         }
 
-        public void InitialiseForProxyInterception(IList<Type> typesToIntercept)
+        public void InitialiseForProxyInterception(IEnumerable<Type> typesToIntercept, IEnumerable<Type> typesToIgnore)
         {
             RegisterTransient<RequestProfilingInterceptor>(typeof(RequestProfilingInterceptor));
-            _container.Kernel.ProxyFactory.AddInterceptorSelector(new ProfilingInterceptorSelector(typesToIntercept));
+            _container.Kernel.ProxyFactory.AddInterceptorSelector(new ProfilingInterceptorSelector(typesToIntercept, typesToIgnore));
         }
     }
 

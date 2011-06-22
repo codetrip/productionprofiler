@@ -15,7 +15,7 @@ namespace ProductionProfiler.Core.Handlers
         public void HandleRequest(HttpContext context, RequestInfo requestInfo)
         {
             HttpResponse response = context.Response;
-            using (Stream stream = typeof(ResourceRequestHandler).Assembly.GetManifestResourceStream("ProductionProfiler.Resources." + requestInfo.ResourceName))
+            using (Stream stream = typeof(ResourceRequestHandler).Assembly.GetManifestResourceStream("ProductionProfiler.Core.Resources." + requestInfo.ResourceName))
             {
                 if (stream != null)
                 {
@@ -25,7 +25,7 @@ namespace ProductionProfiler.Core.Handlers
                 }
             }
 
-            if (context.Request.Headers.Get(Constants.HttpHeaders.AcceptEncoding) != null && context.Request.Headers.Get(Constants.HttpHeaders.AcceptEncoding).Contains(Constants.RequestEncoding.GZip))
+            if (!requestInfo.ResourceName.Contains(".gif") && !requestInfo.ResourceName.Contains(".jpg") && context.Request.Headers.Get(Constants.HttpHeaders.AcceptEncoding) != null && context.Request.Headers.Get(Constants.HttpHeaders.AcceptEncoding).Contains(Constants.RequestEncoding.GZip))
             {
                 context.Response.Filter = new GZipStream(context.Response.Filter, CompressionMode.Compress);
                 context.Response.AppendHeader(Constants.HttpHeaders.ContentEncoding, Constants.RequestEncoding.GZip);

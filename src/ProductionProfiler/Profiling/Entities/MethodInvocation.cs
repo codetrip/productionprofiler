@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ProductionProfiler.Core.Profiling.Entities
 {
@@ -9,5 +10,11 @@ namespace ProductionProfiler.Core.Profiling.Entities
         public object[] Arguments { get; set; }
         public string MethodName { get; set; }
         public object ReturnValue { get; set; }
+        public List<DataCollection> MethodData { get; set; }
+
+        public MethodInvocation()
+        {
+            MethodData = new List<DataCollection>();
+        }
     }
 }

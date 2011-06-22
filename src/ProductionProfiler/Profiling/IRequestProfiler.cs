@@ -4,7 +4,7 @@ using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Core.Profiling
 {
-    public interface IRequestProfiler
+    public interface IRequestProfiler : IDoNotWantToBeProxied
     {
         Guid RequestId { get; set; }
         bool InitialisedForRequest { get; set; }
