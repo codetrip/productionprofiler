@@ -6,7 +6,7 @@ using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Core.Persistence
 {
-    public interface IProfilerRepository : IDoNotWantToBeProxied
+    public interface IProfilerRepository : IDoNotWantToBeProfiled
     {
         /// <summary>
         /// Returns a page of Profiled requests ordered by date captured descending

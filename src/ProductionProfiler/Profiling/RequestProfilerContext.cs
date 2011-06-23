@@ -13,9 +13,9 @@ namespace ProductionProfiler.Core.Profiling
     {
         private IContainer _container;
         private Func<HttpRequest, bool> _shouldProfile;
-        private bool _monitoringEnabled;
         private static RequestProfilerContext _current = new RequestProfilerContext();
         private List<ProfilerError> _persistentProfilerErrors;
+        private Func<HttpContext, bool> _authorizedForManagement;
 
         public static RequestProfilerContext Current
         {
@@ -35,7 +35,7 @@ namespace ProductionProfiler.Core.Profiling
 
         public bool ShouldProfile(HttpRequest request)
         {
-            return _monitoringEnabled && _shouldProfile == null ? false : !request.RawUrl.Contains("/profiler") && _shouldProfile(request);
+            return _shouldProfile == null ? false : !request.RawUrl.Contains("/profiler") && _shouldProfile(request);
         }
 
         public void StartProfiling()
@@ -58,19 +58,27 @@ namespace ProductionProfiler.Core.Profiling
             get { return _container; }
         }
 
+        public bool Authorised(HttpContext context)
+        {
+            return _authorizedForManagement(context);
+        }
+
         public IRequestHandler GetRequestHandler(string name)
         {
             return _container == null ? null : _container.Resolve<IRequestHandler>(name);
         }
 
-        internal static void Initialise(Func<HttpRequest, bool> shouldProfileRequest, IContainer container, bool monitoringEnabled, IEnumerable<ProfilerError> profilerErrors)
+        internal static void Initialise(Func<HttpRequest, bool> shouldProfileRequest, 
+            IContainer container, 
+            IEnumerable<ProfilerError> profilerErrors,
+            Func<HttpContext, bool> authorizedForManagement)
         {
             _current = new RequestProfilerContext
             {
                 _container = container,
                 _shouldProfile = shouldProfileRequest,
-                _monitoringEnabled = monitoringEnabled,
                 _persistentProfilerErrors = profilerErrors.ToList(),
+                _authorizedForManagement = authorizedForManagement
             };
         }
 

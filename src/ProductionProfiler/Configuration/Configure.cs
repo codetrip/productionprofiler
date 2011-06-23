@@ -33,6 +33,7 @@ namespace ProductionProfiler.Core.Configuration
         private IContainer _container;
         private readonly List<ProfilerError> _profilerErrors = new List<ProfilerError>();
         private ProfilerConfiguration _profilerConfiguration;
+        private Func<HttpContext, bool> _authorisedForManagement;
 
         public static IFluentConfiguration With(IContainer container)
         {
@@ -90,14 +91,14 @@ namespace ProductionProfiler.Core.Configuration
             {
                 _profilerErrors.Add(new ProfilerError
                 {
-                    Message = string.Format("ICacheEngine has already been specified, cache engine of type {0} was not registered".FormatWith(typeof(T).FullName)),
+                    Message = string.Format("IProfilerCacheEngine has already been specified, cache engine of type {0} was not registered".FormatWith(typeof(T).FullName)),
                     Type = ProfilerErrorType.Configuration,
                 });
                 return this;
             }
 
             _cacheEngineSet = true;
-            _container.RegisterTransient<ICacheEngine>(typeof(T));
+            _container.RegisterTransient<IProfilerCacheEngine>(typeof(T));
             return this;
         }
 
@@ -134,6 +135,12 @@ namespace ProductionProfiler.Core.Configuration
         }
 
         #region Collectors
+
+        public IFluentConfiguration Authorize(Func<HttpContext, bool> authorisedForManagement)
+        {
+            _authorisedForManagement = authorisedForManagement;
+            return this;
+        }
 
         IFluentCollectorConfiguration IFluentConfiguration.AddMethodDataCollector<T>()
         {
@@ -227,7 +234,7 @@ namespace ProductionProfiler.Core.Configuration
         void IFluentConfiguration.Initialise()
         {
             RegisterDependencies();
-            RequestProfilerContext.Initialise(_requestFilter, _container, _profilerConfiguration.MonitoringEnabled, _profilerErrors);
+            RequestProfilerContext.Initialise(_requestFilter, _container, _profilerErrors, _authorisedForManagement);
         }
 
         private void RegisterDependencies()
@@ -250,14 +257,14 @@ namespace ProductionProfiler.Core.Configuration
             if (!_responseDataCollectorSet)
                 _container.RegisterTransient<IHttpResponseDataCollector>(typeof(NullHttpResponseDataCollector));
             if (!_cacheEngineSet)
-                _container.RegisterTransient<ICacheEngine>(typeof(HttpRuntimeCacheEngine));
+                _container.RegisterTransient<IProfilerCacheEngine>(typeof(HttpRuntimeCacheEngine));
             if (!_serializerSet)
                 _container.RegisterTransient<ISerializer>(typeof(JsonSerializer));
 
             _container.InitialiseForProxyInterception(_typesToIntercept,
                 new List<Type>(_typesToIgnore ?? new Type[0])
                 {
-                    typeof (IDoNotWantToBeProxied)
+                    typeof (IDoNotWantToBeProfiled)
                 });
         }
 

@@ -4,10 +4,9 @@ using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Core.Profiling
 {
-    public interface IRequestProfiler : IDoNotWantToBeProxied
+    public interface IRequestProfiler : IDoNotWantToBeProfiled
     {
         Guid RequestId { get; set; }
-        bool InitialisedForRequest { get; set; }
         void MethodEntry(MethodInvocation invocation);
         void MethodExit(MethodInvocation invocation);
         void StartProfiling(HttpContext context);

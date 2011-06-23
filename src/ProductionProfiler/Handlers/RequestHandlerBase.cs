@@ -1,7 +1,9 @@
-﻿using System.Text;
+﻿using System.IO.Compression;
+using System.Text;
 using System.Web;
 using System.Web.Script.Serialization;
 using ProductionProfiler.Core.Handlers.Entities;
+using ProductionProfiler.Core.Resources;
 
 namespace ProductionProfiler.Core.Handlers
 {
@@ -30,6 +32,13 @@ namespace ProductionProfiler.Core.Handlers
             response.AppendFormat("<link href=\"profiler?resource=Css.css&contenttype={0}\" rel=\"stylesheet\" type=\"text/css\" />", HttpUtility.UrlEncode("text/css"));
             response.AppendFormat("<script type='text/javascript' src='profiler?resource=Client.js&contenttype={0}'></script>", HttpUtility.UrlEncode("application/javascript"));
             response.AppendFormat("<div id=\"profiler\" class=\"container\"></div></body></html>");
+
+            if (context.Request.Headers.Get(Constants.HttpHeaders.AcceptEncoding) != null && context.Request.Headers.Get(Constants.HttpHeaders.AcceptEncoding).Contains(Constants.RequestEncoding.GZip))
+            {
+                context.Response.Filter = new GZipStream(context.Response.Filter, CompressionMode.Compress);
+                context.Response.AppendHeader(Constants.HttpHeaders.ContentEncoding, Constants.RequestEncoding.GZip);
+                context.Response.Cache.VaryByHeaders[Constants.HttpHeaders.AcceptEncoding] = true;
+            }
 
             context.Response.Write(response.ToString());
             context.Response.AddHeader("Content-Type", "text/html");

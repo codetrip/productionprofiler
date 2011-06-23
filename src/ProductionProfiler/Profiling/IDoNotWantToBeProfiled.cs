@@ -1,6 +1,6 @@
 ﻿
 namespace ProductionProfiler.Core.Profiling
 {
-    public interface IDoNotWantToBeProxied
+    public interface IDoNotWantToBeProfiled
     {}
 }

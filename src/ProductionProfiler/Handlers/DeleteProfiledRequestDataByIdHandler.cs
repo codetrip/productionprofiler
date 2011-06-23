@@ -10,12 +10,12 @@ namespace ProductionProfiler.Core.Handlers
     public class DeleteProfiledDataByIdRequestHandler : RequestHandlerBase
     {
         private readonly IProfilerRepository _profiledRequestsRepository;
-        private readonly ICacheEngine _cacheEngine;
+        private readonly IProfilerCacheEngine _profilerCacheEngine;
 
-        public DeleteProfiledDataByIdRequestHandler(IProfilerRepository profiledRequestsRepository, ICacheEngine cacheEngine)
+        public DeleteProfiledDataByIdRequestHandler(IProfilerRepository profiledRequestsRepository, IProfilerCacheEngine profilerCacheEngine)
         {
             _profiledRequestsRepository = profiledRequestsRepository;
-            _cacheEngine = cacheEngine;
+            _profilerCacheEngine = profilerCacheEngine;
         }
 
         protected override JsonResponse DoHandleRequest(RequestInfo requestInfo)
@@ -25,8 +25,8 @@ namespace ProductionProfiler.Core.Handlers
             {
                 _profiledRequestsRepository.DeleteProfiledRequestDataById(id);
                 _profiledRequestsRepository.DeleteResponseById(id);
-                _cacheEngine.Remove(Constants.Actions.Results, true);
-                _cacheEngine.Remove("{0}-{1}".FormatWith(Constants.Actions.PreviewResults, requestInfo.Form.Get("Url")), true);
+                _profilerCacheEngine.Remove(Constants.Actions.Results, true);
+                _profilerCacheEngine.Remove("{0}-{1}".FormatWith(Constants.Actions.PreviewResults, requestInfo.Form.Get("Url")), true);
             }
 
             return new JsonResponse

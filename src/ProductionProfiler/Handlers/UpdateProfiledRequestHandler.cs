@@ -10,14 +10,14 @@ namespace ProductionProfiler.Core.Handlers
     {
         private readonly IProfilerRepository _repository;
         private readonly IUpdateProfiledRequestRequestBinder _updateProfiledRequestRequestBinder;
-        private readonly ICacheEngine _cacheEngine;
+        private readonly IProfilerCacheEngine _profilerCacheEngine;
 
         public UpdateProfiledRequestHandler(IProfilerRepository repository, 
             IUpdateProfiledRequestRequestBinder updateProfiledRequestRequestBinder, 
-            ICacheEngine cacheEngine)
+            IProfilerCacheEngine profilerCacheEngine)
         {
             _repository = repository;
-            _cacheEngine = cacheEngine;
+            _profilerCacheEngine = profilerCacheEngine;
             _updateProfiledRequestRequestBinder = updateProfiledRequestRequestBinder;
         }
 
@@ -55,7 +55,7 @@ namespace ProductionProfiler.Core.Handlers
                 }
             }
 
-            _cacheEngine.Remove(Constants.Handlers.ViewProfiledRequests, true);
+            _profilerCacheEngine.Remove(Constants.Handlers.ViewProfiledRequests, true);
 
             return new JsonResponse
             {

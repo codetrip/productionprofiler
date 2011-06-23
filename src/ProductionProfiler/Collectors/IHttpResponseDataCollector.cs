@@ -5,7 +5,7 @@ using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Core.Collectors
 {
-    public interface IHttpResponseDataCollector : IDoNotWantToBeProxied
+    public interface IHttpResponseDataCollector : IDoNotWantToBeProfiled
     {
         List<DataCollection> Collect(HttpResponse response);
     }

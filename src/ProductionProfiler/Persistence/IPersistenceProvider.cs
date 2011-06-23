@@ -4,7 +4,7 @@ using ProductionProfiler.Core.Profiling;
 
 namespace ProductionProfiler.Core.Persistence
 {
-    public interface IPersistenceProvider : IDoNotWantToBeProxied
+    public interface IPersistenceProvider : IDoNotWantToBeProfiled
     {
         Type RepositoryType { get; }
         void RegisterDependentComponents(IContainer container);

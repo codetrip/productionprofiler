@@ -3,7 +3,7 @@ using ProductionProfiler.Core.Profiling;
 
 namespace ProductionProfiler.Core.Serialization
 {
-    public interface ISerializer : IDoNotWantToBeProxied
+    public interface ISerializer : IDoNotWantToBeProfiled
     {
         string Serialize(object obj);
         DataFormat Format { get; }

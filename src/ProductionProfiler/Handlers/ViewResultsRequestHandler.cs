@@ -10,19 +10,19 @@ namespace ProductionProfiler.Core.Handlers
     public class ViewResultsRequestHandler : RequestHandlerBase
     {
         private readonly IProfilerRepository _repository;
-        private readonly ICacheEngine _cacheEngine;
+        private readonly IProfilerCacheEngine _profilerCacheEngine;
 
-        public ViewResultsRequestHandler(IProfilerRepository repository, ICacheEngine cacheEngine)
+        public ViewResultsRequestHandler(IProfilerRepository repository, IProfilerCacheEngine profilerCacheEngine)
         {
             _repository = repository;
-            _cacheEngine = cacheEngine;
+            _profilerCacheEngine = profilerCacheEngine;
         }
 
         protected override JsonResponse DoHandleRequest(RequestInfo requestInfo)
         {
             if (requestInfo.Action == Constants.Actions.Results)
             {
-                var data = _cacheEngine.Get(
+                var data = _profilerCacheEngine.Get(
                     "{0}-{1}-{2}".FormatWith(Constants.Actions.Results, requestInfo.Paging.PageNumber, requestInfo.Paging.PageSize), 
                     () => _repository.GetDistinctProfiledRequestUrls(requestInfo.Paging));
 
@@ -35,7 +35,7 @@ namespace ProductionProfiler.Core.Handlers
 
             if (requestInfo.Action == Constants.Actions.PreviewResults)
             {
-                var data = _cacheEngine.Get(
+                var data = _profilerCacheEngine.Get(
                     "{0}-{1}-{2}-{3}".FormatWith(Constants.Actions.PreviewResults, requestInfo.Url, requestInfo.Paging.PageNumber, requestInfo.Paging.PageSize),
                     () => _repository.GetProfiledRequestDataPreviewByUrl(requestInfo.Url, requestInfo.Paging));
 

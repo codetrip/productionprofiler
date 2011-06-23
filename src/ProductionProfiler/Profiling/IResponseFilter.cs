@@ -1,7 +1,7 @@
 ﻿
 namespace ProductionProfiler.Core.Profiling
 {
-    public interface IResponseFilter : IDoNotWantToBeProxied
+    public interface IResponseFilter : IDoNotWantToBeProfiled
     {
         string Response { get; }
     }

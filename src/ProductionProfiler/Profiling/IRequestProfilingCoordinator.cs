@@ -2,7 +2,7 @@
 
 namespace ProductionProfiler.Core.Profiling
 {
-    public interface IRequestProfilingCoordinator : IDoNotWantToBeProxied
+    public interface IRequestProfilingCoordinator : IDoNotWantToBeProfiled
     {
         void BeginRequest(HttpContext context);
         void EndRequest(HttpContext context);

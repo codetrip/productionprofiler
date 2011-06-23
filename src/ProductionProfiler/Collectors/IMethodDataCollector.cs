@@ -3,7 +3,7 @@ using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Core.Collectors
 {
-    public interface IMethodDataCollector : IDoNotWantToBeProxied
+    public interface IMethodDataCollector : IDoNotWantToBeProfiled
     {
         /// <summary>
         /// Invoked prior to the method being called

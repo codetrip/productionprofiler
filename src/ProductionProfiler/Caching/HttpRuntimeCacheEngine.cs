@@ -6,7 +6,7 @@ using System.Web.Caching;
 
 namespace ProductionProfiler.Core.Caching
 {
-    public class HttpRuntimeCacheEngine : ICacheEngine
+    public class HttpRuntimeCacheEngine : IProfilerCacheEngine
     {
         public T Get<T>(string key, Func<T> retrieverFunc, bool cacheIfNotFound = true, TimeSpan expires = default(TimeSpan)) where T : class
         {

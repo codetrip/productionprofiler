@@ -4,7 +4,7 @@ using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.IoC.Windsor
 {
-    public interface IRequestProfilingInterceptor : IInterceptor, IDoNotWantToBeProxied
+    public interface IRequestProfilingInterceptor : IInterceptor, IDoNotWantToBeProfiled
     { }
 
     public class RequestProfilingInterceptor : IRequestProfilingInterceptor
@@ -18,7 +18,7 @@ namespace ProductionProfiler.IoC.Windsor
 
         public void Intercept(IInvocation invocation)
         {
-            if (!_requestProfiler.InitialisedForRequest)
+            if (!RequestProfilerContext.Current.ProfilingCurrentRequest())
             {
                 invocation.Proceed();
             }

@@ -1,5 +1,7 @@
 ﻿
+using System;
 using Newtonsoft.Json;
+using ProductionProfiler.Core.Extensions;
 
 namespace ProductionProfiler.Core.Serialization
 {
@@ -7,7 +9,14 @@ namespace ProductionProfiler.Core.Serialization
     {
         public string Serialize(object obj)
         {
-            return JsonConvert.SerializeObject(obj);
+            try
+            {
+                return JsonConvert.SerializeObject(obj);
+            }
+            catch (Exception e)
+            {
+                return "Failed to serialize type:={0}, Message:={1}".FormatWith(obj.GetType(), e.Message);
+            }
         }
 
         public DataFormat Format

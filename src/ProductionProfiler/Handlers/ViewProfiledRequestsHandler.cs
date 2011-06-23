@@ -9,17 +9,17 @@ namespace ProductionProfiler.Core.Handlers
     public class ViewProfiledRequestsHandler : RequestHandlerBase
     {
         private readonly IProfilerRepository _repository;
-        private readonly ICacheEngine _cacheEngine;
+        private readonly IProfilerCacheEngine _profilerCacheEngine;
 
-        public ViewProfiledRequestsHandler(IProfilerRepository repository, ICacheEngine cacheEngine)
+        public ViewProfiledRequestsHandler(IProfilerRepository repository, IProfilerCacheEngine profilerCacheEngine)
         {
             _repository = repository;
-            _cacheEngine = cacheEngine;
+            _profilerCacheEngine = profilerCacheEngine;
         }
 
         protected override JsonResponse DoHandleRequest(RequestInfo requestInfo)
         {
-            var profiledRequests = _cacheEngine.Get("{0}-{1}-{2}".FormatWith(
+            var profiledRequests = _profilerCacheEngine.Get("{0}-{1}-{2}".FormatWith(
                 Constants.Handlers.ViewProfiledRequests, 
                 requestInfo.Paging.PageNumber, 
                 requestInfo.Paging.PageSize), () => _repository.GetProfiledRequests(requestInfo.Paging));

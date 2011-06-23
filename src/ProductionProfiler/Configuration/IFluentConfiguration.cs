@@ -74,10 +74,11 @@ namespace ProductionProfiler.Core.Configuration
         /// <param name="persistenceProvider"></param>
         /// <returns></returns>
         IFluentConfiguration DataProvider(IPersistenceProvider persistenceProvider);
-        IFluentConfiguration CacheEngine<T>() where T : ICacheEngine;
+        IFluentConfiguration CacheEngine<T>() where T : IProfilerCacheEngine;
         IFluentConfiguration Serializer<T>() where T : ISerializer;
         IFluentConfiguration HttpRequestDataCollector<T>() where T : IHttpRequestDataCollector;
         IFluentConfiguration HttpResponseDataCollector<T>() where T : IHttpResponseDataCollector;
+        IFluentConfiguration Authorize(Func<HttpContext, bool> authorisedForManagement);
         IFluentCollectorConfiguration AddMethodDataCollector<T>() where T : IMethodDataCollector;
         void Initialise();
     }

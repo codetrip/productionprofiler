@@ -37,13 +37,10 @@ namespace ProductionProfiler.Core.Profiling
             RequestId = Guid.NewGuid();
         }
 
-        public bool InitialisedForRequest { get; set; }
         public Guid RequestId { get; set; }
 
         public void StartProfiling(HttpContext context)
         {
-            InitialisedForRequest = true;
-
             if (_configuration.Log4NetEnabled)
             {
                 //add the logging event handler for this profiler instance
@@ -84,7 +81,7 @@ namespace ProductionProfiler.Core.Profiling
         {
             //we check the thread id to check its not an exception from some other web request.
             //pretty sure this isn't a problem....
-            if (_currentMethod != null && _threadId == Thread.CurrentThread.ManagedThreadId)
+            if (_currentMethod != null && _threadId == Thread.CurrentThread.ManagedThreadId && !_currentMethod.Exceptions.Any(ex => ex.Type == e.Exception.GetType().FullName))
             {
                 _currentMethod.Exceptions.Add(new ThrownException
                 {

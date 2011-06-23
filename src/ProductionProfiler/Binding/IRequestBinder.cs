@@ -5,7 +5,7 @@ using ProductionProfiler.Core.Profiling;
 
 namespace ProductionProfiler.Core.Binding
 {
-    public interface IRequestBinder<out T> : IDoNotWantToBeProxied
+    public interface IRequestBinder<out T> : IDoNotWantToBeProfiled
     {
         T Bind(NameValueCollection formParams);
         bool IsValid(NameValueCollection formParams);

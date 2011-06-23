@@ -44,6 +44,7 @@
       <HintPath>..\..\lib\Json.NET\Newtonsoft.Json.Net35.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web" />
@@ -60,7 +61,7 @@
     <Compile Include="Binding\IUpdateProfiledRequestRequestBinder.cs" />
     <Compile Include="Binding\UpdateProfiledRequestRequestBinder.cs" />
     <Compile Include="Caching\HttpRuntimeCacheEngine.cs" />
-    <Compile Include="Caching\ICacheEngine.cs" />
+    <Compile Include="Caching\IProfilerCacheEngine.cs" />
     <Compile Include="Collectors\BasicHttpResponseDataCollector.cs" />
     <Compile Include="Collectors\BasicMethodDataCollector.cs" />
     <Compile Include="Collectors\NullHttpResponseDataCollector.cs" />
@@ -70,7 +71,7 @@
     <Compile Include="Configuration\MethodDataCollectorMappingConfiguration.cs" />
     <Compile Include="Configuration\IFluentCollectorConfiguration.cs" />
     <Compile Include="Configuration\IFluentConfiguration.cs" />
-    <Compile Include="Profiling\IDoNotWantToBeProxied.cs" />
+    <Compile Include="Profiling\IDoNotWantToBeProfiled.cs" />
     <Compile Include="Profiling\StoreResponseFilter.cs" />
     <Compile Include="Configuration\Configure.cs" />
     <Compile Include="Configuration\ProfilerConfiguration.cs" />

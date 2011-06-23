@@ -3,7 +3,7 @@ using System;
 
 namespace ProductionProfiler.Core.Caching
 {
-    public interface ICacheEngine
+    public interface IProfilerCacheEngine
     {
         /// <summary>
         /// Get an item from the cache, if cacheIfNotFound is true (the default) the item should be added to the cache with the 

@@ -217,7 +217,7 @@ if (window.jQueryProfiler) {
                 this.attachDetailEvents();
             },
             renderMethodInfo: function (method, level) {
-                var padding = ((level * 25) + 5);
+                var padding = ((level * 25) + 15);
                 var hasLogMessages = method.Messages && method.Messages.length;
                 var hasExceptions = method.Exceptions && method.Exceptions.length;
                 var hasData = method.Data && method.Data.length;

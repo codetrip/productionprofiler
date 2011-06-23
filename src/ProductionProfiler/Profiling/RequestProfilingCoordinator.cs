@@ -18,15 +18,15 @@ namespace ProductionProfiler.Core.Profiling
         private readonly IProfilerRepository _repository;
         private readonly IRequestProfiler _requestProfiler;
         private readonly ProfilerConfiguration _configuration;
-        private readonly ICacheEngine _cacheEngine;
+        private readonly IProfilerCacheEngine _profilerCacheEngine;
 
         public RequestProfilingCoordinator(IRequestProfiler requestProfiler,
             IProfilerRepository repository, 
             ProfilerConfiguration configuration, 
-            ICacheEngine cacheEngine)
+            IProfilerCacheEngine profilerCacheEngine)
         {
             _requestProfiler = requestProfiler;
-            _cacheEngine = cacheEngine;
+            _profilerCacheEngine = profilerCacheEngine;
             _configuration = configuration;
             _repository = repository;
         }
@@ -54,6 +54,10 @@ namespace ProductionProfiler.Core.Profiling
                         }
 
                         _repository.SaveProfiledRequest(requestToProfile);
+
+                        //indicate we are profiling the current request
+                        RequestProfilerContext.Current.StartProfiling();
+
                         _requestProfiler.StartProfiling(context);
                     }
                 }
@@ -74,38 +78,43 @@ namespace ProductionProfiler.Core.Profiling
         {
             try
             {
-                Stopwatch stopwatch = context.Items["Stopwatch"] as Stopwatch;
-
-                if (stopwatch != null)
+                if(_configuration.MonitoringEnabled)
                 {
-                    stopwatch.Stop();
+                    Stopwatch stopwatch = context.Items["Stopwatch"] as Stopwatch;
 
-                    long maxRequestLength = context.Request.HttpMethod.ToLowerInvariant() == Constants.HttpMethods.Get
-                        ? _configuration.GetRequestThreshold
-                        : _configuration.PostRequestThreshold;
-
-                    //if the request took over maxRequestLength and the profiler was not enabled for this request flag the URL for analysis
-                    if (stopwatch.ElapsedMilliseconds >= maxRequestLength && !_requestProfiler.InitialisedForRequest)
+                    if (stopwatch != null)
                     {
-                        _cacheEngine.Remove(Constants.Handlers.ViewProfiledRequests, true);
-                        _repository.SaveProfiledRequestWhenNotFound(new ProfiledRequest
+                        stopwatch.Stop();
+
+                        long maxRequestLength = context.Request.HttpMethod.ToLowerInvariant() == Constants.HttpMethods.Get
+                            ? _configuration.GetRequestThreshold
+                            : _configuration.PostRequestThreshold;
+
+                        //if the request took over maxRequestLength and the profiler was not enabled for this request flag the URL for analysis
+                        if (stopwatch.ElapsedMilliseconds >= maxRequestLength && !RequestProfilerContext.Current.ProfilingCurrentRequest())
                         {
-                            Url = context.Request.RawUrl.ToLowerInvariant(),
-                            ProfiledOnUtc = DateTime.UtcNow,
-                            Server = Environment.MachineName,
-                            ElapsedMilliseconds = stopwatch.ElapsedMilliseconds,
-                            ProfilingCount = 0, //indicates we should not be monitoring this URL until its been validated via the admin console
-                            HttpMethod = context.Request.HttpMethod,
-                            Enabled = false
-                        });
-                    }
+                            _profilerCacheEngine.Remove(Constants.Handlers.ViewProfiledRequests, true);
+                            _repository.SaveProfiledRequestWhenNotFound(new ProfiledRequest
+                            {
+                                Url = context.Request.RawUrl.ToLowerInvariant(),
+                                ProfiledOnUtc = DateTime.UtcNow,
+                                Server = Environment.MachineName,
+                                ElapsedMilliseconds = stopwatch.ElapsedMilliseconds,
+                                ProfilingCount = 0, //indicates we should not be monitoring this URL until its been validated via the admin console
+                                HttpMethod = context.Request.HttpMethod,
+                                Enabled = false
+                            });
+                        }
+                    } 
                 }
 
                 //if the IRequestProfiler was running for this request we need to persist the captured data into Mongo via nservicebus
-                if (_requestProfiler.InitialisedForRequest)
+                if (RequestProfilerContext.Current.ProfilingCurrentRequest())
                 {
-                    _cacheEngine.Remove(Constants.Actions.Results, true);
-                    _cacheEngine.Remove("{0}-{1}".FormatWith(Constants.Actions.PreviewResults, context.Request.RawUrl.ToLowerInvariant()), true);
+                    RequestProfilerContext.Current.StopProfiling();
+
+                    _profilerCacheEngine.Remove(Constants.Actions.Results, true);
+                    _profilerCacheEngine.Remove("{0}-{1}".FormatWith(Constants.Actions.PreviewResults, context.Request.RawUrl.ToLowerInvariant()), true);
                     _repository.SaveProfiledRequestData(_requestProfiler.StopProfiling(context.Response));
                 }
             }
