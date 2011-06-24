@@ -183,43 +183,44 @@ namespace ProductionProfiler.Core.Configuration
 
         #region Log4Net
 
-        IFluentConfiguration IFluentConfiguration.Log4Net(string loggerName)
+        IFluentConfiguration IFluentConfiguration.Log4Net(IEnumerable<string> loggerNames)
         {
-            var profilingLogger = LogManager.Exists(loggerName);
-
-            if (profilingLogger == null)
+            foreach(string loggerName in loggerNames)
             {
-                _profilerErrors.Add(new ProfilerError
+                var profilingLogger = LogManager.Exists(loggerName);
+
+                if (profilingLogger == null)
                 {
-                    Message = string.Format("No log4net logger named {0} was found in the log4net configuration", loggerName),
-                    Type = ProfilerErrorType.Configuration,
-                });
-                return this;
-            }
+                    _profilerErrors.Add(new ProfilerError
+                    {
+                        Message = string.Format("No log4net logger named {0} was found in the log4net configuration", loggerName),
+                        Type = ProfilerErrorType.Configuration,
+                    });
 
-            var logger = profilingLogger.Logger as Logger;
-
-            if (logger != null)
-            {
-                logger.Level = Level.Debug;
-
-                var profilingAppender = new Log4NetProfilingAppender
-                {
-                    Threshold = Level.Debug,
-                    Name = Constants.ProfilingAppender
-                };
-
-                logger.AddAppender(profilingAppender);
-
-                Hierarchy repository = LogManager.GetRepository() as Hierarchy;
-
-                if (repository != null)
-                {
-                    repository.Configured = true;
-                    repository.RaiseConfigurationChanged(EventArgs.Empty);  
+                    continue;
                 }
 
-                _profilerConfiguration.ProfilingAppender = profilingAppender;
+                var logger = profilingLogger.Logger as Logger;
+
+                if (logger != null)
+                {
+                    var profilingAppender = new Log4NetProfilingAppender
+                    {
+                        Threshold = Level.Debug,
+                        Name = "{0}-{1}".FormatWith(loggerName, Constants.ProfilingAppender)
+                    };
+
+                    logger.AddAppender(profilingAppender);
+                    _profilerConfiguration.ProfilingAppenders.Add(profilingAppender);
+                }
+            }
+
+            Hierarchy repository = LogManager.GetRepository() as Hierarchy;
+
+            if (repository != null)
+            {
+                repository.Configured = true;
+                repository.RaiseConfigurationChanged(EventArgs.Empty);
             }
 
             _profilerConfiguration.Log4NetEnabled = true;

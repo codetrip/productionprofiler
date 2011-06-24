@@ -73,7 +73,7 @@ namespace ProductionProfiler.Web
 
             //set up profiler
             Configure.With(new WindsorProfilerContainer(Container))
-                .Log4Net("Profiler")
+                .Log4Net(new [] {"Profiler"})
                 .DataProvider(new MongoPersistenceProvider("127.0.0.1", 27017))
                 .HttpRequestDataCollector<BasicHttpRequestDataCollector>()
                 .HttpResponseDataCollector<BasicHttpResponseDataCollector>()

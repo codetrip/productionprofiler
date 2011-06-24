@@ -14,7 +14,7 @@ namespace ProductionProfiler.Core.Profiling.Entities
         public string ClientIpAddress { get; set; }
         public bool Ajax { get; set; }
         public bool CapturedResponse { get; set; }
-        public List<ProfiledMethodData> Methods { get; set; }
+        public List<MethodData> Methods { get; set; }
         public List<ProfilerError> ProfilerErrors { get; set; }
         public List<DataCollection> RequestData { get; set; }
         public List<DataCollection> ResponseData { get; set; }
@@ -23,7 +23,7 @@ namespace ProductionProfiler.Core.Profiling.Entities
         {
             RequestData = new List<DataCollection>();
             ResponseData = new List<DataCollection>();
-            Methods = new List<ProfiledMethodData>();
+            Methods = new List<MethodData>();
         }
     }
 }

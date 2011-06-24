@@ -21,7 +21,7 @@ namespace ProductionProfiler.Core.Profiling
         private readonly IProfilerRepository _repository;
         private readonly int _threadId;
         private ProfiledRequestData _profileData;
-        private ProfiledMethodData _currentMethod;
+        private MethodData _currentMethod;
         private Stopwatch _watch;
 
         public RequestProfiler(ProfilerConfiguration configuration, 
@@ -44,7 +44,8 @@ namespace ProductionProfiler.Core.Profiling
             if (_configuration.Log4NetEnabled)
             {
                 //add the logging event handler for this profiler instance
-                _configuration.ProfilingAppender.AppendLoggingEvent += ProfilingAppenderAppendLoggingEvent;
+                foreach(var appender in _configuration.ProfilingAppenders)
+                    appender.AppendLoggingEvent += ProfilingAppenderAppendLoggingEvent;
             }
 
             _profileData = new ProfiledRequestData
@@ -110,8 +111,9 @@ namespace ProductionProfiler.Core.Profiling
 
             if (_configuration.Log4NetEnabled)
             {
-                //remove the logging event handler for this profiler instance
-                _configuration.ProfilingAppender.AppendLoggingEvent -= ProfilingAppenderAppendLoggingEvent;
+                //remove the logging event handlers for this profiler instance
+                foreach (var appender in _configuration.ProfilingAppenders)
+                    appender.AppendLoggingEvent -= ProfilingAppenderAppendLoggingEvent;
             }
 
             if (_configuration.CaptureExceptions)
@@ -122,7 +124,7 @@ namespace ProductionProfiler.Core.Profiling
                 var responseFilter = response.Filter as IResponseFilter;
                 if(responseFilter != null)
                 {
-                    _repository.SaveResponse(new StoredResponse
+                    _repository.SaveResponse(new ProfiledResponse
                     {
                         Body = responseFilter.Response,
                         Id = RequestId,
@@ -146,7 +148,7 @@ namespace ProductionProfiler.Core.Profiling
 
         public void MethodEntry(MethodInvocation invocation)
         {
-            ProfiledMethodData method = new ProfiledMethodData
+            MethodData method = new MethodData
             {
                 MethodName = string.Format("{0}.{1}", invocation.TargetType.FullName, invocation.MethodName)
             };

@@ -1,7 +1,7 @@
-﻿using ProductionProfiler.Core.Profiling.Entities;
+﻿using ProductionProfiler.Core.Handlers.Entities;
 
 namespace ProductionProfiler.Core.Binding
 {
-    public interface IUpdateProfiledRequestRequestBinder : IRequestBinder<ProfiledRequestUpdate>
+    public interface IUpdateProfiledRequestRequestBinder : IRequestBinder<ProfiledRequestUpdateModel>
     {}
 }

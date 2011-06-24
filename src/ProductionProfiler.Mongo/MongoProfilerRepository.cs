@@ -36,11 +36,11 @@ namespace ProductionProfiler.Persistence.Mongo
             }
         }
 
-        public IList<ProfiledRequest> GetRequestsToProfile(string serverName)
+        public List<ProfiledRequest> GetCurrentRequestsToProfile()
         {
             using (MongoSession session = MongoSession.Connect(ProfiledRequestDatabaseName, _configuration.Server, _configuration.Port))
             {
-                return session.Items<ProfiledRequest>(i => i.Server == null || i.Server == string.Empty || i.Server == serverName).Where(i => i.Enabled).ToList();
+                return session.Items<ProfiledRequest>().Where(req => req.Enabled).Where(req => req.ProfilingCount > 0).ToList();
             }
         }
 
@@ -95,7 +95,7 @@ namespace ProductionProfiler.Persistence.Mongo
             }
         }
 
-        public void SaveResponse(StoredResponse response)
+        public void SaveResponse(ProfiledResponse response)
         {
             using (MongoSession session = MongoSession.Connect(StoredResponseDatabaseName, _configuration.Server, _configuration.Port))
             {
@@ -103,11 +103,11 @@ namespace ProductionProfiler.Persistence.Mongo
             }
         }
 
-        public StoredResponse GetResponseById(Guid id)
+        public ProfiledResponse GetResponseById(Guid id)
         {
             using (MongoSession session = MongoSession.Connect(StoredResponseDatabaseName, _configuration.Server, _configuration.Port))
             {
-                return session.Single<StoredResponse>(r => r.Id == id);
+                return session.Single<ProfiledResponse>(r => r.Id == id);
             }
         }
 
@@ -115,7 +115,7 @@ namespace ProductionProfiler.Persistence.Mongo
         {
             using (MongoSession session = MongoSession.Connect(StoredResponseDatabaseName, _configuration.Server, _configuration.Port))
             {
-                session.Delete<StoredResponse, object>(new { Id = id });
+                session.Delete<ProfiledResponse, object>(new { Id = id });
             }
         }
 
@@ -123,20 +123,20 @@ namespace ProductionProfiler.Persistence.Mongo
         {
             using (MongoSession session = MongoSession.Connect(StoredResponseDatabaseName, _configuration.Server, _configuration.Port))
             {
-                session.Delete<StoredResponse, object>(new { Url = url });
+                session.Delete<ProfiledResponse, object>(new { Url = url });
             }
         }
 
-        public Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo)
+        public Page<ProfiledRequestPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo)
         {
             using (MongoSession session = MongoSession.Connect(ProfiledRequestDataDatabaseName, _configuration.Server, _configuration.Port))
             {
-                return session.Page<ProfiledRequestData, DateTime, ProfiledRequestDataPreview>(
+                return session.Page<ProfiledRequestData, DateTime, ProfiledRequestPreview>(
                     pagingInfo,
                     app => app.Url == url,
                     app => app.CapturedOnUtc,
                     false,
-                    t => new ProfiledRequestDataPreview
+                    t => new ProfiledRequestPreview
                     {
                         CapturedOnUtc = t.CapturedOnUtc,
                         ElapsedMilliseconds = t.ElapsedMilliseconds,

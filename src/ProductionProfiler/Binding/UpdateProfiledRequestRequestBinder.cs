@@ -2,8 +2,6 @@
 using System.Collections.Specialized;
 using System.Linq;
 using ProductionProfiler.Core.Handlers.Entities;
-using ProductionProfiler.Core.Profiling;
-using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Core.Binding
 {
@@ -11,9 +9,9 @@ namespace ProductionProfiler.Core.Binding
     {
         private readonly List<ModelValidationError> _errors = new List<ModelValidationError>();
 
-        public ProfiledRequestUpdate Bind(NameValueCollection formParams)
+        public ProfiledRequestUpdateModel Bind(NameValueCollection formParams)
         {
-            var profiledRequest = new ProfiledRequestUpdate
+            var profiledRequest = new ProfiledRequestUpdateModel
             {
                 Delete = formParams.AllKeys.Where(k => k == "Delete").FirstOrDefault() != null,
                 Url = formParams.Get("Url")

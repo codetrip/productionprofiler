@@ -5,6 +5,7 @@ namespace ProductionProfiler.Core.Resources
     {
         public const string RequestProfileContextKey = "RequestProfiler";
         public const string ProfilingAppender = "ProfilingAppender";
+        public const string Stopwatch = "Stopwatch";
 
         public static class HttpMethods
         {
@@ -14,6 +15,14 @@ namespace ProductionProfiler.Core.Resources
         public static class RequestEncoding
         {
             public const string GZip = "gzip";
+        }
+
+        public static class CacheKeys
+        {
+            /// <summary>
+            /// The cache key used to hold the requests (urls effectively) that should currently be profiled
+            /// </summary>
+            public const string CurrentRequestsToProfile = "profiler->current-requests-to-profile";
         }
 
         public static class HttpHeaders

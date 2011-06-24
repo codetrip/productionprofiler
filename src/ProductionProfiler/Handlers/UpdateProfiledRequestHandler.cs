@@ -55,7 +55,8 @@ namespace ProductionProfiler.Core.Handlers
                 }
             }
 
-            _profilerCacheEngine.Remove(Constants.Handlers.ViewProfiledRequests, true);
+            //ensure we remove the current set of requests to profile form the cache
+            _profilerCacheEngine.Remove(Constants.CacheKeys.CurrentRequestsToProfile);
 
             return new JsonResponse
             {

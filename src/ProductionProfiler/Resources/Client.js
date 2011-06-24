@@ -31,6 +31,95 @@ b[0] && b[0].ownerDocument || c); var h = [], i; for (var j = 0, k; (k = a[j]) !
     }); var bo = /alpha\([^)]*\)/i, bp = /opacity=([^)]*)/, bq = /-([a-z])/ig, br = /([A-Z]|^ms)/g, bs = /^-?\d+(?:px)?$/i, bt = /^-?\d/, bu = /^[+\-]=/, bv = /[^+\-\.\de]+/g, bw = { position: "absolute", visibility: "hidden", display: "block" }, bx = ["Left", "Right"], by = ["Top", "Bottom"], bz, bA, bB, bC = function (a, b) { return b.toUpperCase() }; f.fn.css = function (a, c) { if (arguments.length === 2 && c === b) return this; return f.access(this, a, c, !0, function (a, c, d) { return d !== b ? f.style(a, c, d) : f.css(a, c) }) }, f.extend({ cssHooks: { opacity: { get: function (a, b) { if (b) { var c = bz(a, "opacity", "opacity"); return c === "" ? "1" : c } return a.style.opacity } } }, cssNumber: { zIndex: !0, fontWeight: !0, opacity: !0, zoom: !0, lineHeight: !0, widows: !0, orphans: !0 }, cssProps: { "float": f.support.cssFloat ? "cssFloat" : "styleFloat" }, style: function (a, c, d, e) { if (!!a && a.nodeType !== 3 && a.nodeType !== 8 && !!a.style) { var g, h, i = f.camelCase(c), j = a.style, k = f.cssHooks[i]; c = f.cssProps[i] || i; if (d === b) { if (k && "get" in k && (g = k.get(a, !1, e)) !== b) return g; return j[c] } h = typeof d; if (h === "number" && isNaN(d) || d == null) return; h === "string" && bu.test(d) && (d = +d.replace(bv, "") + parseFloat(f.css(a, c))), h === "number" && !f.cssNumber[i] && (d += "px"); if (!k || !("set" in k) || (d = k.set(a, d)) !== b) try { j[c] = d } catch (l) { } } }, css: function (a, c, d) { var e, g; c = f.camelCase(c), g = f.cssHooks[c], c = f.cssProps[c] || c, c === "cssFloat" && (c = "float"); if (g && "get" in g && (e = g.get(a, !0, d)) !== b) return e; if (bz) return bz(a, c) }, swap: function (a, b, c) { var d = {}; for (var e in b) d[e] = a.style[e], a.style[e] = b[e]; c.call(a); for (e in b) a.style[e] = d[e] }, camelCase: function (a) { return a.replace(bq, bC) } }), f.curCSS = f.css, f.each(["height", "width"], function (a, b) { f.cssHooks[b] = { get: function (a, c, d) { var e; if (c) { a.offsetWidth !== 0 ? e = bD(a, b, d) : f.swap(a, bw, function () { e = bD(a, b, d) }); if (e <= 0) { e = bz(a, b, b), e === "0px" && bB && (e = bB(a, b, b)); if (e != null) return e === "" || e === "auto" ? "0px" : e } if (e < 0 || e == null) { e = a.style[b]; return e === "" || e === "auto" ? "0px" : e } return typeof e == "string" ? e : e + "px" } }, set: function (a, b) { if (!bs.test(b)) return b; b = parseFloat(b); if (b >= 0) return b + "px" } } }), f.support.opacity || (f.cssHooks.opacity = { get: function (a, b) { return bp.test((b && a.currentStyle ? a.currentStyle.filter : a.style.filter) || "") ? parseFloat(RegExp.$1) / 100 + "" : b ? "1" : "" }, set: function (a, b) { var c = a.style, d = a.currentStyle; c.zoom = 1; var e = f.isNaN(b) ? "" : "alpha(opacity=" + b * 100 + ")", g = d && d.filter || c.filter || ""; c.filter = bo.test(g) ? g.replace(bo, e) : g + " " + e } }), f(function () { f.support.reliableMarginRight || (f.cssHooks.marginRight = { get: function (a, b) { var c; f.swap(a, { display: "inline-block" }, function () { b ? c = bz(a, "margin-right", "marginRight") : c = a.style.marginRight }); return c } }) }), c.defaultView && c.defaultView.getComputedStyle && (bA = function (a, c) { var d, e, g; c = c.replace(br, "-$1").toLowerCase(); if (!(e = a.ownerDocument.defaultView)) return b; if (g = e.getComputedStyle(a, null)) d = g.getPropertyValue(c), d === "" && !f.contains(a.ownerDocument.documentElement, a) && (d = f.style(a, c)); return d }), c.documentElement.currentStyle && (bB = function (a, b) { var c, d = a.currentStyle && a.currentStyle[b], e = a.runtimeStyle && a.runtimeStyle[b], f = a.style; !bs.test(d) && bt.test(d) && (c = f.left, e && (a.runtimeStyle.left = a.currentStyle.left), f.left = b === "fontSize" ? "1em" : d || 0, d = f.pixelLeft + "px", f.left = c, e && (a.runtimeStyle.left = e)); return d === "" ? "auto" : d }), bz = bA || bB, f.expr && f.expr.filters && (f.expr.filters.hidden = function (a) { var b = a.offsetWidth, c = a.offsetHeight; return b === 0 && c === 0 || !f.support.reliableHiddenOffsets && (a.style.display || f.css(a, "display")) === "none" }, f.expr.filters.visible = function (a) { return !f.expr.filters.hidden(a) }); var bE = /%20/g, bF = /\[\]$/, bG = /\r?\n/g, bH = /#.*$/, bI = /^(.*?):[ \t]*([^\r\n]*)\r?$/mg, bJ = /^(?:color|date|datetime|email|hidden|month|number|password|range|search|tel|text|time|url|week)$/i, bK = /^(?:about|app|app\-storage|.+\-extension|file|widget):$/, bL = /^(?:GET|HEAD)$/, bM = /^\/\//, bN = /\?/, bO = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, bP = /^(?:select|textarea)/i, bQ = /\s+/, bR = /([?&])_=[^&]*/, bS = /^([\w\+\.\-]+:)(?:\/\/([^\/?#:]*)(?::(\d+))?)?/, bT = f.fn.load, bU = {}, bV = {}, bW, bX; try { bW = e.href } catch (bY) { bW = c.createElement("a"), bW.href = "", bW = bW.href } bX = bS.exec(bW.toLowerCase()) || [], f.fn.extend({ load: function (a, c, d) { if (typeof a != "string" && bT) return bT.apply(this, arguments); if (!this.length) return this; var e = a.indexOf(" "); if (e >= 0) { var g = a.slice(e, a.length); a = a.slice(0, e) } var h = "GET"; c && (f.isFunction(c) ? (d = c, c = b) : typeof c == "object" && (c = f.param(c, f.ajaxSettings.traditional), h = "POST")); var i = this; f.ajax({ url: a, type: h, dataType: "html", data: c, complete: function (a, b, c) { c = a.responseText, a.isResolved() && (a.done(function (a) { c = a }), i.html(g ? f("<div>").append(c.replace(bO, "")).find(g) : c)), d && i.each(d, [c, b, a]) } }); return this }, serialize: function () { return f.param(this.serializeArray()) }, serializeArray: function () { return this.map(function () { return this.elements ? f.makeArray(this.elements) : this }).filter(function () { return this.name && !this.disabled && (this.checked || bP.test(this.nodeName) || bJ.test(this.type)) }).map(function (a, b) { var c = f(this).val(); return c == null ? null : f.isArray(c) ? f.map(c, function (a, c) { return { name: b.name, value: a.replace(bG, "\r\n")} }) : { name: b.name, value: c.replace(bG, "\r\n")} }).get() } }), f.each("ajaxStart ajaxStop ajaxComplete ajaxError ajaxSuccess ajaxSend".split(" "), function (a, b) { f.fn[b] = function (a) { return this.bind(b, a) } }), f.each(["get", "post"], function (a, c) { f[c] = function (a, d, e, g) { f.isFunction(d) && (g = g || e, e = d, d = b); return f.ajax({ type: c, url: a, data: d, success: e, dataType: g }) } }), f.extend({ getScript: function (a, c) { return f.get(a, b, c, "script") }, getJSON: function (a, b, c) { return f.get(a, b, c, "json") }, ajaxSetup: function (a, b) { b ? f.extend(!0, a, f.ajaxSettings, b) : (b = a, a = f.extend(!0, f.ajaxSettings, b)); for (var c in { context: 1, url: 1 }) c in b ? a[c] = b[c] : c in f.ajaxSettings && (a[c] = f.ajaxSettings[c]); return a }, ajaxSettings: { url: bW, isLocal: bK.test(bX[1]), global: !0, type: "GET", contentType: "application/x-www-form-urlencoded", processData: !0, async: !0, accepts: { xml: "application/xml, text/xml", html: "text/html", text: "text/plain", json: "application/json, text/javascript", "*": "*/*" }, contents: { xml: /xml/, html: /html/, json: /json/ }, responseFields: { xml: "responseXML", text: "responseText" }, converters: { "* text": a.String, "text html": !0, "text json": f.parseJSON, "text xml": f.parseXML} }, ajaxPrefilter: bZ(bU), ajaxTransport: bZ(bV), ajax: function (a, c) { function w(a, c, l, m) { if (s !== 2) { s = 2, q && clearTimeout(q), p = b, n = m || "", v.readyState = a ? 4 : 0; var o, r, u, w = l ? ca(d, v, l) : b, x, y; if (a >= 200 && a < 300 || a === 304) { if (d.ifModified) { if (x = v.getResponseHeader("Last-Modified")) f.lastModified[k] = x; if (y = v.getResponseHeader("Etag")) f.etag[k] = y } if (a === 304) c = "notmodified", o = !0; else try { r = cb(d, w), c = "success", o = !0 } catch (z) { c = "parsererror", u = z } } else { u = c; if (!c || a) c = "error", a < 0 && (a = 0) } v.status = a, v.statusText = c, o ? h.resolveWith(e, [r, c, v]) : h.rejectWith(e, [v, c, u]), v.statusCode(j), j = b, t && g.trigger("ajax" + (o ? "Success" : "Error"), [v, d, o ? r : u]), i.resolveWith(e, [v, c]), t && (g.trigger("ajaxComplete", [v, d]), --f.active || f.event.trigger("ajaxStop")) } } typeof a == "object" && (c = a, a = b), c = c || {}; var d = f.ajaxSetup({}, c), e = d.context || d, g = e !== d && (e.nodeType || e instanceof f) ? f(e) : f.event, h = f.Deferred(), i = f._Deferred(), j = d.statusCode || {}, k, l = {}, m = {}, n, o, p, q, r, s = 0, t, u, v = { readyState: 0, setRequestHeader: function (a, b) { if (!s) { var c = a.toLowerCase(); a = m[c] = m[c] || a, l[a] = b } return this }, getAllResponseHeaders: function () { return s === 2 ? n : null }, getResponseHeader: function (a) { var c; if (s === 2) { if (!o) { o = {}; while (c = bI.exec(n)) o[c[1].toLowerCase()] = c[2] } c = o[a.toLowerCase()] } return c === b ? null : c }, overrideMimeType: function (a) { s || (d.mimeType = a); return this }, abort: function (a) { a = a || "abort", p && p.abort(a), w(0, a); return this } }; h.promise(v), v.success = v.done, v.error = v.fail, v.complete = i.done, v.statusCode = function (a) { if (a) { var b; if (s < 2) for (b in a) j[b] = [j[b], a[b]]; else b = a[v.status], v.then(b, b) } return this }, d.url = ((a || d.url) + "").replace(bH, "").replace(bM, bX[1] + "//"), d.dataTypes = f.trim(d.dataType || "*").toLowerCase().split(bQ), d.crossDomain == null && (r = bS.exec(d.url.toLowerCase()), d.crossDomain = !(!r || r[1] == bX[1] && r[2] == bX[2] && (r[3] || (r[1] === "http:" ? 80 : 443)) == (bX[3] || (bX[1] === "http:" ? 80 : 443)))), d.data && d.processData && typeof d.data != "string" && (d.data = f.param(d.data, d.traditional)), b$(bU, d, c, v); if (s === 2) return !1; t = d.global, d.type = d.type.toUpperCase(), d.hasContent = !bL.test(d.type), t && f.active++ === 0 && f.event.trigger("ajaxStart"); if (!d.hasContent) { d.data && (d.url += (bN.test(d.url) ? "&" : "?") + d.data), k = d.url; if (d.cache === !1) { var x = f.now(), y = d.url.replace(bR, "$1_=" + x); d.url = y + (y === d.url ? (bN.test(d.url) ? "&" : "?") + "_=" + x : "") } } (d.data && d.hasContent && d.contentType !== !1 || c.contentType) && v.setRequestHeader("Content-Type", d.contentType), d.ifModified && (k = k || d.url, f.lastModified[k] && v.setRequestHeader("If-Modified-Since", f.lastModified[k]), f.etag[k] && v.setRequestHeader("If-None-Match", f.etag[k])), v.setRequestHeader("Accept", d.dataTypes[0] && d.accepts[d.dataTypes[0]] ? d.accepts[d.dataTypes[0]] + (d.dataTypes[0] !== "*" ? ", */*; q=0.01" : "") : d.accepts["*"]); for (u in d.headers) v.setRequestHeader(u, d.headers[u]); if (d.beforeSend && (d.beforeSend.call(e, v, d) === !1 || s === 2)) { v.abort(); return !1 } for (u in { success: 1, error: 1, complete: 1 }) v[u](d[u]); p = b$(bV, d, c, v); if (!p) w(-1, "No Transport"); else { v.readyState = 1, t && g.trigger("ajaxSend", [v, d]), d.async && d.timeout > 0 && (q = setTimeout(function () { v.abort("timeout") }, d.timeout)); try { s = 1, p.send(l, w) } catch (z) { status < 2 ? w(-1, z) : f.error(z) } } return v }, param: function (a, c) { var d = [], e = function (a, b) { b = f.isFunction(b) ? b() : b, d[d.length] = encodeURIComponent(a) + "=" + encodeURIComponent(b) }; c === b && (c = f.ajaxSettings.traditional); if (f.isArray(a) || a.jquery && !f.isPlainObject(a)) f.each(a, function () { e(this.name, this.value) }); else for (var g in a) b_(g, a[g], c, e); return d.join("&").replace(bE, "+") } }), f.extend({ active: 0, lastModified: {}, etag: {} }); var cc = f.now(), cd = /(\=)\?(&|$)|\?\?/i; f.ajaxSetup({ jsonp: "callback", jsonpCallback: function () { return f.expando + "_" + cc++ } }), f.ajaxPrefilter("json jsonp", function (b, c, d) { var e = b.contentType === "application/x-www-form-urlencoded" && typeof b.data == "string"; if (b.dataTypes[0] === "jsonp" || b.jsonp !== !1 && (cd.test(b.url) || e && cd.test(b.data))) { var g, h = b.jsonpCallback = f.isFunction(b.jsonpCallback) ? b.jsonpCallback() : b.jsonpCallback, i = a[h], j = b.url, k = b.data, l = "$1" + h + "$2"; b.jsonp !== !1 && (j = j.replace(cd, l), b.url === j && (e && (k = k.replace(cd, l)), b.data === k && (j += (/\?/.test(j) ? "&" : "?") + b.jsonp + "=" + h))), b.url = j, b.data = k, a[h] = function (a) { g = [a] }, d.always(function () { a[h] = i, g && f.isFunction(i) && a[h](g[0]) }), b.converters["script json"] = function () { g || f.error(h + " was not called"); return g[0] }, b.dataTypes[0] = "json"; return "script" } }), f.ajaxSetup({ accepts: { script: "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript" }, contents: { script: /javascript|ecmascript/ }, converters: { "text script": function (a) { f.globalEval(a); return a } } }), f.ajaxPrefilter("script", function (a) { a.cache === b && (a.cache = !1), a.crossDomain && (a.type = "GET", a.global = !1) }), f.ajaxTransport("script", function (a) { if (a.crossDomain) { var d, e = c.head || c.getElementsByTagName("head")[0] || c.documentElement; return { send: function (f, g) { d = c.createElement("script"), d.async = "async", a.scriptCharset && (d.charset = a.scriptCharset), d.src = a.url, d.onload = d.onreadystatechange = function (a, c) { if (c || !d.readyState || /loaded|complete/.test(d.readyState)) d.onload = d.onreadystatechange = null, e && d.parentNode && e.removeChild(d), d = b, c || g(200, "success") }, e.insertBefore(d, e.firstChild) }, abort: function () { d && d.onload(0, 1) } } } }); var ce = a.ActiveXObject ? function () { for (var a in cg) cg[a](0, 1) } : !1, cf = 0, cg; f.ajaxSettings.xhr = a.ActiveXObject ? function () { return !this.isLocal && ch() || ci() } : ch, function (a) { f.extend(f.support, { ajax: !!a, cors: !!a && "withCredentials" in a }) } (f.ajaxSettings.xhr()), f.support.ajax && f.ajaxTransport(function (c) { if (!c.crossDomain || f.support.cors) { var d; return { send: function (e, g) { var h = c.xhr(), i, j; c.username ? h.open(c.type, c.url, c.async, c.username, c.password) : h.open(c.type, c.url, c.async); if (c.xhrFields) for (j in c.xhrFields) h[j] = c.xhrFields[j]; c.mimeType && h.overrideMimeType && h.overrideMimeType(c.mimeType), !c.crossDomain && !e["X-Requested-With"] && (e["X-Requested-With"] = "XMLHttpRequest"); try { for (j in e) h.setRequestHeader(j, e[j]) } catch (k) { } h.send(c.hasContent && c.data || null), d = function (a, e) { var j, k, l, m, n; try { if (d && (e || h.readyState === 4)) { d = b, i && (h.onreadystatechange = f.noop, ce && delete cg[i]); if (e) h.readyState !== 4 && h.abort(); else { j = h.status, l = h.getAllResponseHeaders(), m = {}, n = h.responseXML, n && n.documentElement && (m.xml = n), m.text = h.responseText; try { k = h.statusText } catch (o) { k = "" } !j && c.isLocal && !c.crossDomain ? j = m.text ? 200 : 404 : j === 1223 && (j = 204) } } } catch (p) { e || g(-1, p) } m && g(j, k, m, l) }, !c.async || h.readyState === 4 ? d() : (i = ++cf, ce && (cg || (cg = {}, f(a).unload(ce)), cg[i] = d), h.onreadystatechange = d) }, abort: function () { d && d(0, 1) } } } }); var cj = {}, ck, cl, cm = /^(?:toggle|show|hide)$/, cn = /^([+\-]=)?([\d+.\-]+)([a-z%]*)$/i, co, cp = [["height", "marginTop", "marginBottom", "paddingTop", "paddingBottom"], ["width", "marginLeft", "marginRight", "paddingLeft", "paddingRight"], ["opacity"]], cq, cr = a.webkitRequestAnimationFrame || a.mozRequestAnimationFrame || a.oRequestAnimationFrame; f.fn.extend({ show: function (a, b, c) { var d, e; if (a || a === 0) return this.animate(cu("show", 3), a, b, c); for (var g = 0, h = this.length; g < h; g++) d = this[g], d.style && (e = d.style.display, !f._data(d, "olddisplay") && e === "none" && (e = d.style.display = ""), e === "" && f.css(d, "display") === "none" && f._data(d, "olddisplay", cv(d.nodeName))); for (g = 0; g < h; g++) { d = this[g]; if (d.style) { e = d.style.display; if (e === "" || e === "none") d.style.display = f._data(d, "olddisplay") || "" } } return this }, hide: function (a, b, c) { if (a || a === 0) return this.animate(cu("hide", 3), a, b, c); for (var d = 0, e = this.length; d < e; d++) if (this[d].style) { var g = f.css(this[d], "display"); g !== "none" && !f._data(this[d], "olddisplay") && f._data(this[d], "olddisplay", g) } for (d = 0; d < e; d++) this[d].style && (this[d].style.display = "none"); return this }, _toggle: f.fn.toggle, toggle: function (a, b, c) { var d = typeof a == "boolean"; f.isFunction(a) && f.isFunction(b) ? this._toggle.apply(this, arguments) : a == null || d ? this.each(function () { var b = d ? a : f(this).is(":hidden"); f(this)[b ? "show" : "hide"]() }) : this.animate(cu("toggle", 3), a, b, c); return this }, fadeTo: function (a, b, c, d) { return this.filter(":hidden").css("opacity", 0).show().end().animate({ opacity: b }, a, c, d) }, animate: function (a, b, c, d) { var e = f.speed(b, c, d); if (f.isEmptyObject(a)) return this.each(e.complete, [!1]); a = f.extend({}, a); return this[e.queue === !1 ? "each" : "queue"](function () { e.queue === !1 && f._mark(this); var b = f.extend({}, e), c = this.nodeType === 1, d = c && f(this).is(":hidden"), g, h, i, j, k, l, m, n, o; b.animatedProperties = {}; for (i in a) { g = f.camelCase(i), i !== g && (a[g] = a[i], delete a[i]), h = a[g], f.isArray(h) ? (b.animatedProperties[g] = h[1], h = a[g] = h[0]) : b.animatedProperties[g] = b.specialEasing && b.specialEasing[g] || b.easing || "swing"; if (h === "hide" && d || h === "show" && !d) return b.complete.call(this); c && (g === "height" || g === "width") && (b.overflow = [this.style.overflow, this.style.overflowX, this.style.overflowY], f.css(this, "display") === "inline" && f.css(this, "float") === "none" && (f.support.inlineBlockNeedsLayout ? (j = cv(this.nodeName), j === "inline" ? this.style.display = "inline-block" : (this.style.display = "inline", this.style.zoom = 1)) : this.style.display = "inline-block")) } b.overflow != null && (this.style.overflow = "hidden"); for (i in a) k = new f.fx(this, b, i), h = a[i], cm.test(h) ? k[h === "toggle" ? d ? "show" : "hide" : h]() : (l = cn.exec(h), m = k.cur(), l ? (n = parseFloat(l[2]), o = l[3] || (f.cssNumber[i] ? "" : "px"), o !== "px" && (f.style(this, i, (n || 1) + o), m = (n || 1) / k.cur() * m, f.style(this, i, m + o)), l[1] && (n = (l[1] === "-=" ? -1 : 1) * n + m), k.custom(m, n, o)) : k.custom(m, h, "")); return !0 }) }, stop: function (a, b) { a && this.queue([]), this.each(function () { var a = f.timers, c = a.length; b || f._unmark(!0, this); while (c--) a[c].elem === this && (b && a[c](!0), a.splice(c, 1)) }), b || this.dequeue(); return this } }), f.each({ slideDown: cu("show", 1), slideUp: cu("hide", 1), slideToggle: cu("toggle", 1), fadeIn: { opacity: "show" }, fadeOut: { opacity: "hide" }, fadeToggle: { opacity: "toggle"} }, function (a, b) { f.fn[a] = function (a, c, d) { return this.animate(b, a, c, d) } }), f.extend({ speed: function (a, b, c) { var d = a && typeof a == "object" ? f.extend({}, a) : { complete: c || !c && b || f.isFunction(a) && a, duration: a, easing: c && b || b && !f.isFunction(b) && b }; d.duration = f.fx.off ? 0 : typeof d.duration == "number" ? d.duration : d.duration in f.fx.speeds ? f.fx.speeds[d.duration] : f.fx.speeds._default, d.old = d.complete, d.complete = function (a) { d.queue !== !1 ? f.dequeue(this) : a !== !1 && f._unmark(this), f.isFunction(d.old) && d.old.call(this) }; return d }, easing: { linear: function (a, b, c, d) { return c + d * a }, swing: function (a, b, c, d) { return (-Math.cos(a * Math.PI) / 2 + .5) * d + c } }, timers: [], fx: function (a, b, c) { this.options = b, this.elem = a, this.prop = c, b.orig = b.orig || {} } }), f.fx.prototype = { update: function () { this.options.step && this.options.step.call(this.elem, this.now, this), (f.fx.step[this.prop] || f.fx.step._default)(this) }, cur: function () { if (this.elem[this.prop] != null && (!this.elem.style || this.elem.style[this.prop] == null)) return this.elem[this.prop]; var a, b = f.css(this.elem, this.prop); return isNaN(a = parseFloat(b)) ? !b || b === "auto" ? 0 : b : a }, custom: function (a, b, c) { function h(a) { return d.step(a) } var d = this, e = f.fx, g; this.startTime = cq || cs(), this.start = a, this.end = b, this.unit = c || this.unit || (f.cssNumber[this.prop] ? "" : "px"), this.now = this.start, this.pos = this.state = 0, h.elem = this.elem, h() && f.timers.push(h) && !co && (cr ? (co = 1, g = function () { co && (cr(g), e.tick()) }, cr(g)) : co = setInterval(e.tick, e.interval)) }, show: function () { this.options.orig[this.prop] = f.style(this.elem, this.prop), this.options.show = !0, this.custom(this.prop === "width" || this.prop === "height" ? 1 : 0, this.cur()), f(this.elem).show() }, hide: function () { this.options.orig[this.prop] = f.style(this.elem, this.prop), this.options.hide = !0, this.custom(this.cur(), 0) }, step: function (a) { var b = cq || cs(), c = !0, d = this.elem, e = this.options, g, h; if (a || b >= e.duration + this.startTime) { this.now = this.end, this.pos = this.state = 1, this.update(), e.animatedProperties[this.prop] = !0; for (g in e.animatedProperties) e.animatedProperties[g] !== !0 && (c = !1); if (c) { e.overflow != null && !f.support.shrinkWrapBlocks && f.each(["", "X", "Y"], function (a, b) { d.style["overflow" + b] = e.overflow[a] }), e.hide && f(d).hide(); if (e.hide || e.show) for (var i in e.animatedProperties) f.style(d, i, e.orig[i]); e.complete.call(d) } return !1 } e.duration == Infinity ? this.now = b : (h = b - this.startTime, this.state = h / e.duration, this.pos = f.easing[e.animatedProperties[this.prop]](this.state, h, 0, 1, e.duration), this.now = this.start + (this.end - this.start) * this.pos), this.update(); return !0 } }, f.extend(f.fx, { tick: function () { for (var a = f.timers, b = 0; b < a.length; ++b) a[b]() || a.splice(b--, 1); a.length || f.fx.stop() }, interval: 13, stop: function () { clearInterval(co), co = null }, speeds: { slow: 600, fast: 200, _default: 400 }, step: { opacity: function (a) { f.style(a.elem, "opacity", a.now) }, _default: function (a) { a.elem.style && a.elem.style[a.prop] != null ? a.elem.style[a.prop] = (a.prop === "width" || a.prop === "height" ? Math.max(0, a.now) : a.now) + a.unit : a.elem[a.prop] = a.now } } }), f.expr && f.expr.filters && (f.expr.filters.animated = function (a) { return f.grep(f.timers, function (b) { return a === b.elem }).length }); var cw = /^t(?:able|d|h)$/i, cx = /^(?:body|html)$/i; "getBoundingClientRect" in c.documentElement ? f.fn.offset = function (a) { var b = this[0], c; if (a) return this.each(function (b) { f.offset.setOffset(this, a, b) }); if (!b || !b.ownerDocument) return null; if (b === b.ownerDocument.body) return f.offset.bodyOffset(b); try { c = b.getBoundingClientRect() } catch (d) { } var e = b.ownerDocument, g = e.documentElement; if (!c || !f.contains(g, b)) return c ? { top: c.top, left: c.left} : { top: 0, left: 0 }; var h = e.body, i = cy(e), j = g.clientTop || h.clientTop || 0, k = g.clientLeft || h.clientLeft || 0, l = i.pageYOffset || f.support.boxModel && g.scrollTop || h.scrollTop, m = i.pageXOffset || f.support.boxModel && g.scrollLeft || h.scrollLeft, n = c.top + l - j, o = c.left + m - k; return { top: n, left: o} } : f.fn.offset = function (a) { var b = this[0]; if (a) return this.each(function (b) { f.offset.setOffset(this, a, b) }); if (!b || !b.ownerDocument) return null; if (b === b.ownerDocument.body) return f.offset.bodyOffset(b); f.offset.initialize(); var c, d = b.offsetParent, e = b, g = b.ownerDocument, h = g.documentElement, i = g.body, j = g.defaultView, k = j ? j.getComputedStyle(b, null) : b.currentStyle, l = b.offsetTop, m = b.offsetLeft; while ((b = b.parentNode) && b !== i && b !== h) { if (f.offset.supportsFixedPosition && k.position === "fixed") break; c = j ? j.getComputedStyle(b, null) : b.currentStyle, l -= b.scrollTop, m -= b.scrollLeft, b === d && (l += b.offsetTop, m += b.offsetLeft, f.offset.doesNotAddBorder && (!f.offset.doesAddBorderForTableAndCells || !cw.test(b.nodeName)) && (l += parseFloat(c.borderTopWidth) || 0, m += parseFloat(c.borderLeftWidth) || 0), e = d, d = b.offsetParent), f.offset.subtractsBorderForOverflowNotVisible && c.overflow !== "visible" && (l += parseFloat(c.borderTopWidth) || 0, m += parseFloat(c.borderLeftWidth) || 0), k = c } if (k.position === "relative" || k.position === "static") l += i.offsetTop, m += i.offsetLeft; f.offset.supportsFixedPosition && k.position === "fixed" && (l += Math.max(h.scrollTop, i.scrollTop), m += Math.max(h.scrollLeft, i.scrollLeft)); return { top: l, left: m} }, f.offset = { initialize: function () { var a = c.body, b = c.createElement("div"), d, e, g, h, i = parseFloat(f.css(a, "marginTop")) || 0, j = "<div style='position:absolute;top:0;left:0;margin:0;border:5px solid #000;padding:0;width:1px;height:1px;'><div></div></div><table style='position:absolute;top:0;left:0;margin:0;border:5px solid #000;padding:0;width:1px;height:1px;' cellpadding='0' cellspacing='0'><tr><td></td></tr></table>"; f.extend(b.style, { position: "absolute", top: 0, left: 0, margin: 0, border: 0, width: "1px", height: "1px", visibility: "hidden" }), b.innerHTML = j, a.insertBefore(b, a.firstChild), d = b.firstChild, e = d.firstChild, h = d.nextSibling.firstChild.firstChild, this.doesNotAddBorder = e.offsetTop !== 5, this.doesAddBorderForTableAndCells = h.offsetTop === 5, e.style.position = "fixed", e.style.top = "20px", this.supportsFixedPosition = e.offsetTop === 20 || e.offsetTop === 15, e.style.position = e.style.top = "", d.style.overflow = "hidden", d.style.position = "relative", this.subtractsBorderForOverflowNotVisible = e.offsetTop === -5, this.doesNotIncludeMarginInBodyOffset = a.offsetTop !== i, a.removeChild(b), f.offset.initialize = f.noop }, bodyOffset: function (a) { var b = a.offsetTop, c = a.offsetLeft; f.offset.initialize(), f.offset.doesNotIncludeMarginInBodyOffset && (b += parseFloat(f.css(a, "marginTop")) || 0, c += parseFloat(f.css(a, "marginLeft")) || 0); return { top: b, left: c} }, setOffset: function (a, b, c) { var d = f.css(a, "position"); d === "static" && (a.style.position = "relative"); var e = f(a), g = e.offset(), h = f.css(a, "top"), i = f.css(a, "left"), j = (d === "absolute" || d === "fixed") && f.inArray("auto", [h, i]) > -1, k = {}, l = {}, m, n; j ? (l = e.position(), m = l.top, n = l.left) : (m = parseFloat(h) || 0, n = parseFloat(i) || 0), f.isFunction(b) && (b = b.call(a, c, g)), b.top != null && (k.top = b.top - g.top + m), b.left != null && (k.left = b.left - g.left + n), "using" in b ? b.using.call(a, k) : e.css(k) } }, f.fn.extend({ position: function () { if (!this[0]) return null; var a = this[0], b = this.offsetParent(), c = this.offset(), d = cx.test(b[0].nodeName) ? { top: 0, left: 0} : b.offset(); c.top -= parseFloat(f.css(a, "marginTop")) || 0, c.left -= parseFloat(f.css(a, "marginLeft")) || 0, d.top += parseFloat(f.css(b[0], "borderTopWidth")) || 0, d.left += parseFloat(f.css(b[0], "borderLeftWidth")) || 0; return { top: c.top - d.top, left: c.left - d.left} }, offsetParent: function () { return this.map(function () { var a = this.offsetParent || c.body; while (a && !cx.test(a.nodeName) && f.css(a, "position") === "static") a = a.offsetParent; return a }) } }), f.each(["Left", "Top"], function (a, c) { var d = "scroll" + c; f.fn[d] = function (c) { var e, g; if (c === b) { e = this[0]; if (!e) return null; g = cy(e); return g ? "pageXOffset" in g ? g[a ? "pageYOffset" : "pageXOffset"] : f.support.boxModel && g.document.documentElement[d] || g.document.body[d] : e[d] } return this.each(function () { g = cy(this), g ? g.scrollTo(a ? f(g).scrollLeft() : c, a ? c : f(g).scrollTop()) : this[d] = c }) } }), f.each(["Height", "Width"], function (a, c) { var d = c.toLowerCase(); f.fn["inner" + c] = function () { return this[0] ? parseFloat(f.css(this[0], d, "padding")) : null }, f.fn["outer" + c] = function (a) { return this[0] ? parseFloat(f.css(this[0], d, a ? "margin" : "border")) : null }, f.fn[d] = function (a) { var e = this[0]; if (!e) return a == null ? null : this; if (f.isFunction(a)) return this.each(function (b) { var c = f(this); c[d](a.call(this, b, c[d]())) }); if (f.isWindow(e)) { var g = e.document.documentElement["client" + c]; return e.document.compatMode === "CSS1Compat" && g || e.document.body["client" + c] || g } if (e.nodeType === 9) return Math.max(e.documentElement["client" + c], e.body["scroll" + c], e.documentElement["scroll" + c], e.body["offset" + c], e.documentElement["offset" + c]); if (a === b) { var h = f.css(e, d), i = parseFloat(h); return f.isNaN(i) ? h : i } return this.css(d, typeof a == "string" ? a : a + "px") } }), a.jQuery = a.$ = f
 })(window);
 
+(function ($) { $.fn.CenterIt = function (options) { var defaults = { ignorechildren: true }; var settings = $.extend({}, defaults, options); var control = $(this); control.show(); $(document).ready(function () { CenterItem(); }); $(window).resize(function () { CenterItem(); }); function CenterItem() { var controlHeight = 0; var controlWidth = 0; if (settings.ignorechildren) { controlHeight = control.height(); controlWidth = control.width(); } else { var children = control.children(); for (var i = 0; i < children.length; i++) { if (children[i].style.display != 'none') { controlHeight = children[i].clientHeight; controlWidth = children[i].clientWidth; } } } var controlMarginCSS = control.css("margin"); var controlPaddingCSS = control.css("padding"); if (controlMarginCSS != null) { controlMarginCSS = controlMarginCSS.replace(/auto/gi, '0'); controlMarginCSS = controlMarginCSS.replace(/px/gi, ''); controlMarginCSS = controlMarginCSS.replace(/pt/gi, ''); } var totalMargin = ""; if (controlMarginCSS != "" && controlMarginCSS != null) { totalMargin = controlMarginCSS.split(' '); } var horizontalMargin = 0; var verticalMargin = 0; if (totalMargin != "NaN") { if (totalMargin.length > 0) { horizontalMargin = parseInt(totalMargin[1]) + parseInt(totalMargin[3]); verticalMargin = parseInt(totalMargin[2]) + parseInt(totalMargin[2]); } } if (controlPaddingCSS != null) { controlPaddingCSS = controlPaddingCSS.replace(/auto/gi, '0'); controlPaddingCSS = controlPaddingCSS.replace(/px/gi, ''); controlPaddingCSS = controlPaddingCSS.replace(/pt/gi, ''); } var totalPadding = ""; if (controlPaddingCSS != "" && controlPaddingCSS != null) { totalPadding = controlPaddingCSS.split(' '); } var horizontalPadding = 0; var verticalPadding = 0; if (totalPadding != "NaN") { if (totalPadding.length > 0) { horizontalPadding = parseInt(totalPadding[1]) + parseInt(totalPadding[3]); verticalPadding = parseInt(totalPadding[2]) + parseInt(totalPadding[2]); } } if (verticalMargin == "NaN" || isNaN(verticalMargin)) { verticalMargin = 0; } if (verticalPadding == "NaN" || isNaN(verticalPadding)) { verticalPadding = 0; } var windowHeight = $(window).height(); var windowWidth = $(window).width(); if ($.browser.msie && $.browser.version.substr(0, 1) < 7) { control.css("position", "absolute"); } else { control.css("position", "fixed"); } control.css("height", controlHeight + "px"); control.css("width", controlWidth + "px"); control.css("top", ((windowHeight - (controlHeight + verticalMargin + verticalPadding)) / 2) + "px"); control.css("left", ((windowWidth - (controlWidth + horizontalMargin + horizontalPadding)) / 2) + "px"); } } })(jQuery);
+
+
+(function ($) {
+
+    $.fn.jsonviewer = function (settings) {
+
+        var config =
+        {
+            'type_prefix': false,
+            'json_name': 'unknown',
+            'json_data': null,
+            'ident': '12px',
+            'inner-padding': '2px',
+            'outer-padding': '4px',
+            'debug': false
+        };
+
+        if (settings) $.extend(config, settings);
+
+        this.each(function (key, element) {
+            format_value(element, config['json_name'], config['json_data'], config, true);
+        });
+
+        return this;
+
+    };
+
+    function format_value(element, name, data, config, init) {
+        var v = new TypeHandler(data);
+        var type_prefix = v.type().charAt(0);
+        var container = $('<div/>');
+        container.appendTo(element);
+        container.addClass('ui-widget').css({ 'padding': config['outer-padding'], 'padding-left': config['ident'] });
+        var header = $('<div/>');
+        header.appendTo(container);
+        header.addClass('ui-widget-header').css({ 'text-align': 'left', 'white-space': 'nowrap', 'overflow': 'hidden' });
+
+        if(init)
+            header.append('<a style="font-size:10px;" href="javascript:$.viewengine.hideJsonObject();">CLOSE WINDOW</a>');
+        else
+            header.text('' + name);
+
+        if (v.type() === "object" || v.type() === "array") {
+            var content = $('<div/>');
+            content.appendTo(container);
+            content.addClass('ui-widget-content').css({ 'overflow': 'hidden', 'white-space': 'nowrap', 'padding': config['inner-padding'] });
+            for (name in data) { 
+                format_value(content, name, data[name], config, false); 
+            }
+        }
+        else {
+            var content = $('<div/>');
+            content.appendTo(container);
+            content.addClass('ui-widget-content').css({ 'overflow': 'hidden', 'white-space': 'nowrap' });
+            
+            if(data !== null && v.type() === "string" && data.indexOf("Date") > -1)
+                content.text('' + new Date(parseInt(data.substr(6))).toUTCString());
+            else
+                content.text('' + data);
+        }
+    };
+
+
+    // number, boolean, string, object, array, date
+    function TypeHandler(value) {
+        this._type = this.get_type(value);
+    };
+
+    TypeHandler.prototype.type = function () { return this._type; }
+
+    TypeHandler.prototype.get_type = function (value) {
+        var base_type = typeof value;
+        var result = "unsupported"
+        switch (base_type) {
+            case "number": result = base_type; break;
+            case "string": result = base_type; break;
+            case "boolean": result = base_type; break;
+            case "object":
+                if (Number.prototype.isPrototypeOf(value)) { result = "number"; break; }
+                if (String.prototype.isPrototypeOf(value)) { result = "string"; break; }
+                if (Date.prototype.isPrototypeOf(value)) { result = "date"; break; }
+                if (Array.prototype.isPrototypeOf(value)) { result = "array"; break; }
+                if (Object.prototype.isPrototypeOf(value)) { result = "object"; break; }
+        }
+        return result;
+    };
+})(jQuery);
+
 var jQueryProfiler = {};
 
 if (window.jQueryProfiler) {
@@ -89,14 +178,14 @@ if (window.jQueryProfiler) {
 
                     table.toggleClass("hidden");
 
-                    if(div.hasClass("rh") || div.hasClass("rh-selected")){
+                    if (div.hasClass("rh") || div.hasClass("rh-selected")) {
                         css = "rh";
                         cssSelected = "rh-selected";
                     } else {
-                         css = "rh-nested";
-                         cssSelected = "rh-nested-selected";
+                        css = "rh-nested";
+                        cssSelected = "rh-nested-selected";
                     }
-                    
+
                     if (table.hasClass("hidden")) {
                         div.removeClass(cssSelected);
                         div.addClass(css);
@@ -105,6 +194,30 @@ if (window.jQueryProfiler) {
                         div.addClass(cssSelected);
                     }
                 });
+                this.container.find("div.dataitemvalue a").click(function () {
+                    var data = $.parseJSON($(this).next('input').val());
+                    $.viewengine.showJsonObject(data)
+                });
+            },
+            showJsonObject: function (data) {
+                var wrapper = this.container.find('div#itemcontainer');
+                wrapper.jsonviewer({json_name: '', json_data: data});
+                wrapper.toggle();
+                wrapper.CenterIt();
+            },
+            hideJsonObject: function (data) {
+                var wrapper = this.container.find('div#itemcontainer');
+                wrapper.empty();
+                wrapper.toggle();
+            },
+            renderDataItem: function (item) {
+                if (item.Format === 1) { //json
+                    return "<div class='dataitemvalue'><a class='dataitemjson' href='#'>view item</a><input type='hidden' value='" + item.Value.replace(new RegExp("'", 'g'), "") + "' /></div>";
+                } else if (item.Format === 2) { //xml
+                    return item.Value;
+                } else {
+                    return item.Value;
+                }
             },
             renderProfiledRequests: function (data) {
                 var html = '<form action="/profiler?handler=apr" method="post">' +
@@ -116,7 +229,7 @@ if (window.jQueryProfiler) {
                 '<td><input type="submit" value="Add" class="btn" /></td></tr>' +
                 '</table></form>';
 
-                if(data.Data.length > 0){
+                if (data.Data.length > 0) {
                     html += '<table><tr><th>Enable</th><th>Url</th><th>Profiled On</th><th>Elapsed</th><th>Server</th><th>Http Method</th><th>Profile Count</th><th>Delete</th><th>Update</th></tr>';
 
                     $.each(data.Data, function (idx, itm) {
@@ -126,7 +239,7 @@ if (window.jQueryProfiler) {
                         html += '<tr ' + bgcolor + '><form action="/profiler?handler=upr" method="post">' +
                         '<input name="Url" type="hidden" value="' + itm.Url + '" />' +
                         '<td><input name="Enabled" type="checkbox" ' + checked + ' value="true" /><input name="Enabled" type="hidden" value="false" /></td>' +
-                        '<td><a href="/profiler?handler=results&action=previewresults&url=' + itm.Url + '">' + itm.Url + '</a></td>' +
+                        '<td>' + itm.Url + '</td>' +
                         '<td>' + $.profiler.formatDate(itm.ProfiledOnUtc) + '</td>' +
                         '<td>' + $.profiler.emptyIfNull(itm.ElapsedMilliseconds, 'ms') + '</td>' +
                         '<td><input name="Server" style="width:150px" type="text" value="' + $.profiler.emptyIfNull(itm.Server, '') + '" /></td>' +
@@ -141,7 +254,7 @@ if (window.jQueryProfiler) {
                 } else {
                     html += '<div class="noresults">No URLs are currently being profiled, either turn on automatic monitoring in the profiler configuration or manually add URLs you want to profile using the form above.</div>';
                 }
-                
+
                 this.container.html(html);
                 this.renderHeading("Profiled URLs");
                 this.attachEvents();
@@ -150,7 +263,7 @@ if (window.jQueryProfiler) {
                 var html = '<table class="w800"><tr><th>Url</th><th>Delete</th></tr>'
 
                 $.each(data.Data, function (idx, itm) {
-                    html += '<form action="/profiler?handler=dprurl" method="post"><input type="hidden" name="Url" value="' + itm + '" />' + 
+                    html += '<form action="/profiler?handler=dprurl" method="post"><input type="hidden" name="Url" value="' + itm + '" />' +
                     '<tr><td><a href="/profiler?handler=results&action=previewresults&url=' + itm + '">' + itm + '</a></td>' +
                     '<td width="75px"><input type="submit" class="btn delete" value="Delete" /></td></tr></form>';
                 });
@@ -177,40 +290,36 @@ if (window.jQueryProfiler) {
             },
             renderResultsDetail: function (data) {
                 var responseUrl = data.CapturedResponse ? '<a target="_blank" href="/profiler?handler=response&id=' + data.Id + '">view response</a>' : 'not captured';
-                this.html = '<table class="heading"><tr><th>Url</th><th>Request Id</th><th>Response</th><th>Captured On</th><th>Server</th><th>Elapsed Milliseconds</th><th>Client IP</th><th>Ajax</th></tr>' +
+                this.html = '<div id="itemcontainer" class="itemcontainer"></div><table class="heading"><tr><th>Url</th><th>Request Id</th><th>Response</th><th>Captured On</th><th>Server</th><th>Elapsed Milliseconds</th><th>Client IP</th><th>Ajax</th></tr>' +
                 '<tr><td><a href="/profiler?handler=results&action=previewresults&url=' + data.Url + '">' + data.Url + '</a></td><td>' + data.Id + '</td><td>' + responseUrl + '</td><td>' + $.profiler.formatDate(data.CapturedOnUtc) + '</td><td>' + data.Server + '</td><td>' + data.ElapsedMilliseconds + 'ms</td><td>' + data.ClientIpAddress + '</td><td>' + data.Ajax + '</td></tr></table>';
 
-                if (data.Methods.length > 0)
-                {
-                    this.renderTable(["Method", "Elapsed", "Started", "Stopped", "Errors", "Messages"], "Method Info", data.Methods, "rh", "heading hidden", function(method) {
+                if (data.Methods.length > 0) {
+                    this.renderTable(["Method", "Elapsed", "Started", "Stopped", "Errors", "Messages"], "Method Info", data.Methods, "rh", "heading hidden", function (method) {
                         this.renderMethodInfo(method, 0);
-                    }.bind(this));
-                } 
-
-                if (data.ProfilerErrors.length > 0)
-                {
-                    this.renderTable(["Type", "Error"], "Profiler Errors", data.ProfilerErrors, "rh", "heading hidden", function(error) {
-                            this.html += '<tr><td>' + error.TypeAsString + '</td><td>' + error.Message + '</td></tr>';
-                    }.bind(this));
-                }  
-                
-                if (data.RequestData.length > 0)
-                {
-                    $.each(data.RequestData, function(idx, itm){
-                        this.renderTable(["Name", "Value"], itm.Name, itm.Data, "rh", "heading hidden", function(dataItem) {
-                            this.html += '<tr><td>' + dataItem.Name + '</td><td>' + dataItem.Value + '</td></tr>';
-                        }.bind(this));
-                    }.bind(this));
+                    } .bind(this));
                 }
-                
-                if (data.ResponseData.length > 0)
-                {
-                    $.each(data.ResponseData, function(idx, itm){
-                        this.renderTable(["Name", "Value"], itm.Name, itm.Data, "rh", "heading hidden", function(dataItem) {
+
+                if (data.ProfilerErrors.length > 0) {
+                    this.renderTable(["Type", "Error"], "Profiler Errors", data.ProfilerErrors, "rh", "heading hidden", function (error) {
+                        this.html += '<tr><td>' + error.TypeAsString + '</td><td>' + error.Message + '</td></tr>';
+                    } .bind(this));
+                }
+
+                if (data.RequestData.length > 0) {
+                    $.each(data.RequestData, function (idx, itm) {
+                        this.renderTable(["Name", "Value"], itm.Name, itm.Data, "rh", "heading hidden", function (dataItem) {
                             this.html += '<tr><td>' + dataItem.Name + '</td><td>' + dataItem.Value + '</td></tr>';
-                        }.bind(this));
-                    }.bind(this));
-                }                  
+                        } .bind(this));
+                    } .bind(this));
+                }
+
+                if (data.ResponseData.length > 0) {
+                    $.each(data.ResponseData, function (idx, itm) {
+                        this.renderTable(["Name", "Value"], itm.Name, itm.Data, "rh", "heading hidden", function (dataItem) {
+                            this.html += '<tr><td>' + dataItem.Name + '</td><td>' + dataItem.Value + '</td></tr>';
+                        } .bind(this));
+                    } .bind(this));
+                }
 
                 this.container.html(this.html);
                 this.renderHeading("Profiled Request Details");
@@ -230,24 +339,24 @@ if (window.jQueryProfiler) {
                 if (hasLogMessages || hasExceptions || hasData) {
                     this.html += '<tr class="hidden"><td style="padding-left:' + (padding + 5) + 'px" colspan="6">';
 
-                    if(hasLogMessages){
-                        this.renderTable(["Logged at", "Level", "Error"], "Messages", method.Messages, "rh-nested", "nested hidden", function(message) {
+                    if (hasLogMessages) {
+                        this.renderTable(["Logged at", "Level", "Error"], "Messages", method.Messages, "rh-nested", "nested hidden", function (message) {
                             this.html += '<tr><td style="width:80px">' + message.Milliseconds + 'ms</td><td style="width:100px">' + message.Level + '</td><td>' + message.Message + '</td></tr>';
-                        }.bind(this));
+                        } .bind(this));
                     }
 
-                    if(hasExceptions){
-                        this.renderTable(["Logged at", "Exception Type", "Message"], "Exceptions", method.Exceptions, "rh-nested", "nested hidden", function(exception) {
+                    if (hasExceptions) {
+                        this.renderTable(["Logged at", "Exception Type", "Message"], "Exceptions", method.Exceptions, "rh-nested", "nested hidden", function (exception) {
                             this.html += '<tr><td style="width:80px">' + exception.Milliseconds + 'ms</td><td style="width:250px">' + exception.Type + '</td><td>' + exception.Message.replace(new RegExp('\n', 'g'), '<br />') + '</td></tr>';
-                        }.bind(this));
+                        } .bind(this));
                     }
 
-                    if(hasData){
-                        $.each(method.Data, function(idx, itm){
-                            this.renderTable(["Name", "Value"], itm.Name, itm.Data, "rh-nested", "nested hidden", function(dataItem) {
-                                this.html += '<tr><td>' + dataItem.Name + '</td><td>' + dataItem.Value.replace(new RegExp('\n', 'g'), '<br />').replace(new RegExp('\t', 'g'), '&nbsp;&nbsp;&nbsp;&nbsp;') + '</td></tr>';
-                            }.bind(this));
-                        }.bind(this));
+                    if (hasData) {
+                        $.each(method.Data, function (idx, itm) {
+                            this.renderTable(["Name", "Value"], itm.Name, itm.Data, "rh-nested", "nested hidden", function (dataItem) {
+                                this.html += '<tr><td>' + dataItem.Name + '</td><td>' + this.renderDataItem(dataItem) + '</td></tr>';
+                            } .bind(this));
+                        } .bind(this));
                     }
 
                     this.html += '</td></tr>';
@@ -256,7 +365,7 @@ if (window.jQueryProfiler) {
                 if (method.Methods.length > 0) {
                     $.each(method.Methods, function (idx, innerMethod) {
                         this.renderMethodInfo(innerMethod, level + 1);
-                    }.bind(this));
+                    } .bind(this));
                 }
             },
             renderHeading: function (title) {
@@ -264,20 +373,20 @@ if (window.jQueryProfiler) {
                 this.title.html(html);
             },
             renderTable: function (layout, heading, data, divCss, tableCss, render) {
-                if(data.length > 0){
+                if (data.length > 0) {
                     this.html += '<div class="' + divCss + '">' + heading + '</div><table class="' + tableCss + '"><tr>';
-                    for(var heading in layout){
+                    for (var heading in layout) {
                         this.html += '<th>' + layout[heading] + '</th>'
                     }
                     this.html += '</tr>';
 
-                    $.each(data, function(idx, itm) {
+                    $.each(data, function (idx, itm) {
                         render(itm);
                     });
 
                     this.html += '</table>';
                 }
-            },
+            }
         });
 
         $(document).ready(function () {

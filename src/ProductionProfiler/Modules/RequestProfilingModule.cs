@@ -33,11 +33,9 @@ namespace ProductionProfiler.Core.Modules
         {
             try
             {
-                var httpContext = ((HttpApplication)sender).Context;
-
-                if (RequestProfilerContext.Current.ProfilingCurrentRequest() && RequestProfilerContext.Current.ShouldProfile(httpContext.Request))
+                if (RequestProfilerContext.Current.ProfilingCurrentRequest())
                 {
-                   RequestProfilerContext.Current.Container.Resolve<IRequestProfilingCoordinator>().EndRequest(httpContext);
+                    RequestProfilerContext.Current.Container.Resolve<IRequestProfilingCoordinator>().EndRequest(((HttpApplication)sender).Context);
                 }
             }
             catch (Exception)

@@ -34,8 +34,17 @@ namespace ProductionProfiler.Core.Handlers
                 };
             }
 
-            _profiledRequestsRepository.SaveProfiledRequest(_addProfiledRequestRequestBinder.Bind(requestInfo.Form));
-            _profilerCacheEngine.Remove(Constants.Handlers.ViewProfiledRequests, true);
+            var profiledRequest = _addProfiledRequestRequestBinder.Bind(requestInfo.Form);
+
+            //store the new request
+            _profiledRequestsRepository.SaveProfiledRequest(profiledRequest);
+
+            //if the request being added is enabled and has a profiling count > 0 then its active, 
+            //so invalidate the current requests to profile cache key
+            if (profiledRequest.Enabled && profiledRequest.ProfilingCount > 0)
+            {
+                _profilerCacheEngine.Remove(Constants.CacheKeys.CurrentRequestsToProfile);    
+            }
 
             return new JsonResponse
             {

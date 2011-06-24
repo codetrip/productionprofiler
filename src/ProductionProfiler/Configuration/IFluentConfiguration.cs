@@ -65,9 +65,9 @@ namespace ProductionProfiler.Core.Configuration
         /// If set the supplied logger will have a profiler appender attached to it which will log all LoggingEvents to profiled method data
         /// The supplied logger should have Debug level applied to so we capture all available LoggingEvents.
         /// </summary>
-        /// <param name="loggerName">The name of the logger to attach the profiler appender to.</param>
+        /// <param name="loggerNames">The name of the loggers to attach the profiler appender to.</param>
         /// <returns></returns>
-        IFluentConfiguration Log4Net(string loggerName);
+        IFluentConfiguration Log4Net(IEnumerable<string> loggerNames);
         /// <summary>
         /// 
         /// </summary>

@@ -1,10 +1,10 @@
 ﻿
 using System;
 
-namespace ProductionProfiler.Core.Profiling.Entities
+namespace ProductionProfiler.Core.Handlers.Entities
 {
     [Serializable]
-    public class ProfiledRequestUpdate
+    public class ProfiledRequestUpdateModel
     {
         public string Url { get; set; }
         public int? ProfilingCount { get; set; }

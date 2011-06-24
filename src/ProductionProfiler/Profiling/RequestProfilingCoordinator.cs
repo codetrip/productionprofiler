@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -35,29 +36,46 @@ namespace ProductionProfiler.Core.Profiling
         {
             try
             {
-                context.Items["Stopwatch"] = Stopwatch.StartNew();
-                string currentUrl = context.Request.RawUrl.ToLowerInvariant();
-
-                var requestsToProfile = _repository.GetRequestsToProfile(Environment.MachineName);
-
-                if(requestsToProfile != null && requestsToProfile.Count > 0)
+                if (_configuration.MonitoringEnabled)
                 {
-                    var requestToProfile = requestsToProfile.FirstOrDefault(req => req.ProfilingCount > 0 && Regex.IsMatch(currentUrl, string.Format("^{0}$", req.Url)));
+                    context.Items[Constants.Stopwatch] = Stopwatch.StartNew();
+                }
+
+                List<ProfiledRequest> requestsToProfile = _profilerCacheEngine.Get<List<ProfiledRequest>>(Constants.CacheKeys.CurrentRequestsToProfile);
+
+                if(requestsToProfile == null)
+                {
+                    //if we did not find the requests to profile for this machine
+                    requestsToProfile = _repository.GetCurrentRequestsToProfile() ?? new List<ProfiledRequest>();
+                    _profilerCacheEngine.Put(requestsToProfile, Constants.CacheKeys.CurrentRequestsToProfile);
+                }
+
+                if(requestsToProfile.Count > 0)
+                {
+                    string currentUrl = context.Request.RawUrl.ToLowerInvariant();
+
+                    //profile this request if the server name is empty (indicates profile on any machine)
+                    //and the current request URL matches the ProfiledRequest.Url regex
+                    var requestToProfile = requestsToProfile.FirstOrDefault(
+                        req => (req.Server.IsNullOrEmpty() || req.Server == Environment.MachineName) && Regex.IsMatch(currentUrl, string.Format("^{0}$", req.Url)));
 
                     if (requestToProfile != null)
                     {
                         requestToProfile.ProfilingCount--;
 
                         if (requestToProfile.ProfilingCount <= 0)
-                        {
                             requestToProfile.ProfilingCount = 0;
-                        }
 
+                        //store the updated ProfiledRequest instance
                         _repository.SaveProfiledRequest(requestToProfile);
 
                         //indicate we are profiling the current request
                         RequestProfilerContext.Current.StartProfiling();
 
+                        //remove the CurrentRequestsToProfile cache item as it has been updated here
+                        _profilerCacheEngine.Remove(Constants.CacheKeys.CurrentRequestsToProfile);
+
+                        //start profiling the current request
                         _requestProfiler.StartProfiling(context);
                     }
                 }
@@ -80,7 +98,7 @@ namespace ProductionProfiler.Core.Profiling
             {
                 if(_configuration.MonitoringEnabled)
                 {
-                    Stopwatch stopwatch = context.Items["Stopwatch"] as Stopwatch;
+                    Stopwatch stopwatch = context.Items[Constants.Stopwatch] as Stopwatch;
 
                     if (stopwatch != null)
                     {
@@ -93,14 +111,13 @@ namespace ProductionProfiler.Core.Profiling
                         //if the request took over maxRequestLength and the profiler was not enabled for this request flag the URL for analysis
                         if (stopwatch.ElapsedMilliseconds >= maxRequestLength && !RequestProfilerContext.Current.ProfilingCurrentRequest())
                         {
-                            _profilerCacheEngine.Remove(Constants.Handlers.ViewProfiledRequests, true);
                             _repository.SaveProfiledRequestWhenNotFound(new ProfiledRequest
                             {
                                 Url = context.Request.RawUrl.ToLowerInvariant(),
                                 ProfiledOnUtc = DateTime.UtcNow,
                                 Server = Environment.MachineName,
                                 ElapsedMilliseconds = stopwatch.ElapsedMilliseconds,
-                                ProfilingCount = 0, //indicates we should not be monitoring this URL until its been validated via the admin console
+                                ProfilingCount = 0,
                                 HttpMethod = context.Request.HttpMethod,
                                 Enabled = false
                             });
@@ -112,9 +129,6 @@ namespace ProductionProfiler.Core.Profiling
                 if (RequestProfilerContext.Current.ProfilingCurrentRequest())
                 {
                     RequestProfilerContext.Current.StopProfiling();
-
-                    _profilerCacheEngine.Remove(Constants.Actions.Results, true);
-                    _profilerCacheEngine.Remove("{0}-{1}".FormatWith(Constants.Actions.PreviewResults, context.Request.RawUrl.ToLowerInvariant()), true);
                     _repository.SaveProfiledRequestData(_requestProfiler.StopProfiling(context.Response));
                 }
             }

@@ -60,7 +60,7 @@ namespace ProductionProfiler.Core.Profiling
 
         public bool Authorised(HttpContext context)
         {
-            return _authorizedForManagement(context);
+            return _authorizedForManagement == null ? true : _authorizedForManagement(context);
         }
 
         public IRequestHandler GetRequestHandler(string name)

@@ -12,6 +12,7 @@
     <AssemblyName>ProductionProfiler.Core</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -71,6 +72,7 @@
     <Compile Include="Configuration\MethodDataCollectorMappingConfiguration.cs" />
     <Compile Include="Configuration\IFluentCollectorConfiguration.cs" />
     <Compile Include="Configuration\IFluentConfiguration.cs" />
+    <Compile Include="Profiling\Entities\DataCollectionItem.cs" />
     <Compile Include="Profiling\IDoNotWantToBeProfiled.cs" />
     <Compile Include="Profiling\StoreResponseFilter.cs" />
     <Compile Include="Configuration\Configure.cs" />
@@ -93,11 +95,11 @@
     <Compile Include="Handlers\RequestInfoParser.cs" />
     <Compile Include="Handlers\ResourceRequestHandler.cs" />
     <Compile Include="Handlers\Entities\JsonResponse.cs" />
-    <Compile Include="Profiling\Entities\StoredResponse.cs" />
+    <Compile Include="Profiling\Entities\ProfiledResponse.cs" />
     <Compile Include="Collectors\IHttpResponseDataCollector.cs" />
     <Compile Include="Profiling\Entities\DataCollection.cs" />
     <Compile Include="Profiling\Entities\ProfiledRequestPreview.cs" />
-    <Compile Include="Profiling\Entities\ProfiledRequestUpdate.cs" />
+    <Compile Include="Handlers\Entities\ProfiledRequestUpdateModel.cs" />
     <Compile Include="Profiling\Entities\ProfilerError.cs" />
     <Compile Include="Handlers\Entities\RequestInfo.cs" />
     <Compile Include="Profiling\Entities\ThrownException.cs" />
@@ -114,7 +116,7 @@
     <Compile Include="Extensions\HttpRequestExtensions.cs" />
     <Compile Include="Extensions\LoggingEventExtensions.cs" />
     <Compile Include="Profiling\Entities\ProfilerMessage.cs" />
-    <Compile Include="Profiling\Entities\ProfiledMethodData.cs" />
+    <Compile Include="Profiling\Entities\MethodData.cs" />
     <Compile Include="Profiling\Entities\ProfiledRequestData.cs" />
     <Compile Include="Persistence\IProfilerRepository.cs" />
     <Compile Include="Collectors\IHttpRequestDataCollector.cs" />
@@ -144,6 +146,10 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Minus.gif" />
     <EmbeddedResource Include="Resources\Plus.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\treeview-default-line.gif" />
+    <EmbeddedResource Include="Resources\treeview-default.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

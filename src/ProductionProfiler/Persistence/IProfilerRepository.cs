@@ -21,11 +21,10 @@ namespace ProductionProfiler.Core.Persistence
         /// <returns></returns>
         ProfiledRequest GetProfiledRequestByUrl(string url);
         /// <summary>
-        /// Returns a list of all ProfiledRequests that are active for the specified server. Active means, Enabled and with a ProfilingCount > 0
+        /// Returns a list of all ProfiledRequests that are active. Active means, Enabled and with a ProfilingCount > 0
         /// </summary>
-        /// <param name="serverName"></param>
         /// <returns></returns>
-        IList<ProfiledRequest> GetRequestsToProfile(string serverName);
+        List<ProfiledRequest> GetCurrentRequestsToProfile();
         /// <summary>
         /// Saves ProfiledRequest if an only if an instance with the ProfiledRequest.Url does not already exist
         /// </summary>
@@ -48,7 +47,7 @@ namespace ProductionProfiler.Core.Persistence
         /// <param name="url"></param>
         /// <param name="pagingInfo"></param>
         /// <returns></returns>
-        Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo);
+        Page<ProfiledRequestPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo);
         /// <summary>
         /// Returns a ProfiledRequestData instance matching the specified Id
         /// </summary>
@@ -78,22 +77,22 @@ namespace ProductionProfiler.Core.Persistence
         void SaveProfiledRequestData(ProfiledRequestData profiledRequestData);
 
         /// <summary>
-        /// Saves the StoredResponse instance to the data store
+        /// Saves the ProfiledResponse instance to the data store
         /// </summary>
         /// <param name="response"></param>
-        void SaveResponse(StoredResponse response);
+        void SaveResponse(ProfiledResponse response);
         /// <summary>
-        /// Retrieves a StoredResponse instance from the data store
+        /// Retrieves a ProfiledResponse instance from the data store
         /// </summary>
         /// <param name="id"></param>
-        StoredResponse GetResponseById(Guid id);
+        ProfiledResponse GetResponseById(Guid id);
         /// <summary>
-        /// Deletes a StoredResponse instance from the data store
+        /// Deletes a ProfiledResponse instance from the data store
         /// </summary>
         /// <param name="id"></param>
         void DeleteResponseById(Guid id);
         /// <summary>
-        /// Deletes a StoredResponse instance from the data store using the URL
+        /// Deletes a ProfiledResponse instance from the data store using the URL
         /// </summary>
         /// <param name="url"></param>
         void DeleteResponseByUrl(string url);

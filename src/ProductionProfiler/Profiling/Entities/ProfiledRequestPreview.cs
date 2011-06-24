@@ -2,7 +2,7 @@
 
 namespace ProductionProfiler.Core.Profiling.Entities
 {
-    public class ProfiledRequestDataPreview
+    public class ProfiledRequestPreview
     {
         public Guid Id { get; set; }
         public string Url { get; set; }

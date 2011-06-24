@@ -15,7 +15,7 @@ namespace ProductionProfiler.Core.Serialization
             }
             catch (Exception e)
             {
-                return "Failed to serialize type:={0}, Message:={1}".FormatWith(obj.GetType(), e.Message);
+                return "{\"Error\":\"" + "Failed to serialize type:={0}, Message:={1}".FormatWith(obj.GetType(), e.Message) + "\"}";
             }
         }
 
