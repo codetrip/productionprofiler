@@ -3,15 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Web;
-using log4net;
-using log4net.Core;
-using log4net.Repository.Hierarchy;
 using ProductionProfiler.Core.Binding;
 using ProductionProfiler.Core.Caching;
 using ProductionProfiler.Core.Collectors;
 using ProductionProfiler.Core.Handlers;
 using ProductionProfiler.Core.IoC;
-using ProductionProfiler.Core.Log4Net;
+using ProductionProfiler.Core.Logging;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Profiling.Entities;
@@ -27,6 +24,7 @@ namespace ProductionProfiler.Core.Configuration
         private bool _responseDataCollectorSet;
         private bool _cacheEngineSet;
         private bool _serializerSet;
+        private bool _loggerSet;
         private IEnumerable<Type> _typesToIntercept;
         private IEnumerable<Type> _typesToIgnore;
         private Func<HttpRequest, bool> _requestFilter;
@@ -129,8 +127,29 @@ namespace ProductionProfiler.Core.Configuration
 
         IFluentConfiguration IFluentConfiguration.DataProvider(IPersistenceProvider persistenceProvider)
         {
-            _container.RegisterTransient<IProfilerRepository>(persistenceProvider.RepositoryType);
-            persistenceProvider.RegisterDependentComponents(_container);
+            try
+            {
+                _container.RegisterTransient<IProfilerRepository>(persistenceProvider.RepositoryType);
+                persistenceProvider.RegisterDependentComponents(_container);
+                persistenceProvider.Initialise();
+            }
+            catch (Exception e)
+            {
+                _profilerErrors.Add(new ProfilerError
+                {
+                    Message = string.Format("Failed to initialise the specified persistence provider, message:={0} type:={1}", e.Message, e.GetType()),
+                    Type = ProfilerErrorType.Configuration,
+                });
+            }
+            
+            return this;
+        }
+
+        IFluentConfiguration IFluentConfiguration.Logger(ILogger logger)
+        {
+            logger.Initialise();
+            _loggerSet = true;
+            _container.RegisterTransient<ILogger>(logger.GetType());
             return this;
         }
 
@@ -181,55 +200,6 @@ namespace ProductionProfiler.Core.Configuration
 
         #endregion
 
-        #region Log4Net
-
-        IFluentConfiguration IFluentConfiguration.Log4Net(IEnumerable<string> loggerNames)
-        {
-            foreach(string loggerName in loggerNames)
-            {
-                var profilingLogger = LogManager.Exists(loggerName);
-
-                if (profilingLogger == null)
-                {
-                    _profilerErrors.Add(new ProfilerError
-                    {
-                        Message = string.Format("No log4net logger named {0} was found in the log4net configuration", loggerName),
-                        Type = ProfilerErrorType.Configuration,
-                    });
-
-                    continue;
-                }
-
-                var logger = profilingLogger.Logger as Logger;
-
-                if (logger != null)
-                {
-                    var profilingAppender = new Log4NetProfilingAppender
-                    {
-                        Threshold = Level.Debug,
-                        Name = "{0}-{1}".FormatWith(loggerName, Constants.ProfilingAppender)
-                    };
-
-                    logger.AddAppender(profilingAppender);
-                    _profilerConfiguration.ProfilingAppenders.Add(profilingAppender);
-                }
-            }
-
-            Hierarchy repository = LogManager.GetRepository() as Hierarchy;
-
-            if (repository != null)
-            {
-                repository.Configured = true;
-                repository.RaiseConfigurationChanged(EventArgs.Empty);
-            }
-
-            _profilerConfiguration.Log4NetEnabled = true;
-
-            return this;
-        }
-
-        #endregion
-
         #region Initialise & Dependencies
 
         void IFluentConfiguration.Initialise()
@@ -261,6 +231,8 @@ namespace ProductionProfiler.Core.Configuration
                 _container.RegisterTransient<IProfilerCacheEngine>(typeof(HttpRuntimeCacheEngine));
             if (!_serializerSet)
                 _container.RegisterTransient<ISerializer>(typeof(JsonSerializer));
+            if (!_loggerSet)
+                _container.RegisterTransient<ILogger>(typeof(DefaultLogger));
 
             _container.InitialiseForProxyInterception(_typesToIntercept,
                 new List<Type>(_typesToIgnore ?? new Type[0])

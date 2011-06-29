@@ -9,9 +9,9 @@ namespace ProductionProfiler.Persistence.Mongo
 {
     public class MongoProfilerRepository : IProfilerRepository
     {
-        private const string ProfiledRequestDatabaseName = "profiledrequests";
-        private const string StoredResponseDatabaseName = "profiledresponses";
-        private const string ProfiledRequestDataDatabaseName = "profiledrequestdata";
+        public const string ProfiledRequestDatabaseName = "profiledrequests";
+        public const string StoredResponseDatabaseName = "profiledresponses";
+        public const string ProfiledRequestDataDatabaseName = "profiledrequestdata";
 
         private readonly MongoConfiguration _configuration;
 
@@ -40,7 +40,7 @@ namespace ProductionProfiler.Persistence.Mongo
         {
             using (MongoSession session = MongoSession.Connect(ProfiledRequestDatabaseName, _configuration.Server, _configuration.Port))
             {
-                return session.Items<ProfiledRequest>().Where(req => req.Enabled).Where(req => req.ProfilingCount > 0).ToList();
+                return session.Items<ProfiledRequest>().Where(req => req.Enabled).Where(req => req.ProfilingCount == null || req.ProfilingCount > 0).ToList();
             }
         }
 

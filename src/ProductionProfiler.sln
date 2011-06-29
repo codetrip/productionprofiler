@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.Persiste
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.Persistence.SqlServer", "ProductionProfiler.Persistence.SqlServer\ProductionProfiler.Persistence.SqlServer.csproj", "{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.Logging.Log4Net", "ProductionProfiler.Logging.Log4Net\ProductionProfiler.Logging.Log4Net.csproj", "{6D09BFE2-8FB6-44EA-BB25-92D560446F5D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D09BFE2-8FB6-44EA-BB25-92D560446F5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D09BFE2-8FB6-44EA-BB25-92D560446F5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D09BFE2-8FB6-44EA-BB25-92D560446F5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D09BFE2-8FB6-44EA-BB25-92D560446F5D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

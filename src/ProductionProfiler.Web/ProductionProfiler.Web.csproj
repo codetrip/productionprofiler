@@ -120,6 +120,10 @@
       <Project>{95469EAB-02B7-4F27-B542-F7F17F55F362}</Project>
       <Name>ProductionProfiler.IoC.Windsor</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ProductionProfiler.Logging.Log4Net\ProductionProfiler.Logging.Log4Net.csproj">
+      <Project>{6D09BFE2-8FB6-44EA-BB25-92D560446F5D}</Project>
+      <Name>ProductionProfiler.Logging.Log4Net</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ProductionProfiler.Mongo\ProductionProfiler.Persistence.Mongo.csproj">
       <Project>{3B04FCA1-FEF7-472E-AAF4-70CBCC18453A}</Project>
       <Name>ProductionProfiler.Persistence.Mongo</Name>

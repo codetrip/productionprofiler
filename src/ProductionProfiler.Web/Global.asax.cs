@@ -13,6 +13,7 @@ using ProductionProfiler.Core.Caching;
 using ProductionProfiler.Core.Collectors;
 using ProductionProfiler.Core.Configuration;
 using ProductionProfiler.IoC.Windsor;
+using ProductionProfiler.Logging.Log4Net;
 using ProductionProfiler.Persistence.Mongo;
 using ProductionProfiler.Web.Controllers;
 using ProductionProfiler.Web.Models;
@@ -73,7 +74,7 @@ namespace ProductionProfiler.Web
 
             //set up profiler
             Configure.With(new WindsorProfilerContainer(Container))
-                .Log4Net(new [] {"Profiler"})
+                .Logger(new Log4NetLogger())
                 .DataProvider(new MongoPersistenceProvider("127.0.0.1", 27017))
                 .HttpRequestDataCollector<BasicHttpRequestDataCollector>()
                 .HttpResponseDataCollector<BasicHttpResponseDataCollector>()

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Norm;
+using Norm.BSON;
 using Norm.Collections;
 using Norm.Linq;
+using Norm.Protocol.Messages;
 using Norm.Responses;
 using ProductionProfiler.Core.Extensions;
 using E = ProductionProfiler.Core.Persistence.Entities;
@@ -223,6 +225,22 @@ namespace ProductionProfiler.Persistence.Mongo
             MapReduceResult<T> r = coll.Find().FirstOrDefault();
 
             return r.Value;
+        }
+
+        #endregion
+
+        #region indexing
+
+        public void CreateIndex<TDocument, TField>(Expression<Func<TDocument, TField>> index, string indexName, bool unique, IndexOption option)
+        {
+            _mongo.GetCollection<TDocument>().CreateIndex(index, indexName, unique, option);
+        }
+
+        public int DeleteIndex<T>(string indexName)
+        {
+            int numDeleted;
+            _mongo.GetCollection<T>().DeleteIndex(indexName, out numDeleted);
+            return numDeleted;
         }
 
         #endregion

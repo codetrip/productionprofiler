@@ -39,12 +39,8 @@ namespace ProductionProfiler.Core.Handlers
             //store the new request
             _profiledRequestsRepository.SaveProfiledRequest(profiledRequest);
 
-            //if the request being added is enabled and has a profiling count > 0 then its active, 
-            //so invalidate the current requests to profile cache key
-            if (profiledRequest.Enabled && profiledRequest.ProfilingCount > 0)
-            {
-                _profilerCacheEngine.Remove(Constants.CacheKeys.CurrentRequestsToProfile);    
-            }
+            //invalidate the current requests to profile cache key
+            _profilerCacheEngine.Remove(Constants.CacheKeys.CurrentRequestsToProfile);   
 
             return new JsonResponse
             {

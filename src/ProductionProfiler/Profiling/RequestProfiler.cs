@@ -7,7 +7,7 @@ using System.Web;
 using ProductionProfiler.Core.Collectors;
 using ProductionProfiler.Core.Configuration;
 using ProductionProfiler.Core.Extensions;
-using ProductionProfiler.Core.Log4Net;
+using ProductionProfiler.Core.Logging;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Profiling.Entities;
 
@@ -19,6 +19,7 @@ namespace ProductionProfiler.Core.Profiling
         private readonly IHttpRequestDataCollector _httpRequestDataCollector;
         private readonly IHttpResponseDataCollector _httpResponseDataCollector;
         private readonly IProfilerRepository _repository;
+        private readonly ILogger _logger;
         private readonly int _threadId;
         private ProfiledRequestData _profileData;
         private MethodData _currentMethod;
@@ -27,9 +28,11 @@ namespace ProductionProfiler.Core.Profiling
         public RequestProfiler(ProfilerConfiguration configuration, 
             IHttpRequestDataCollector httpRequestDataCollector, 
             IHttpResponseDataCollector httpResponseDataCollector, 
-            IProfilerRepository repository)
+            IProfilerRepository repository, 
+            ILogger logger)
         {
             _configuration = configuration;
+            _logger = logger;
             _repository = repository;
             _httpResponseDataCollector = httpResponseDataCollector;
             _httpRequestDataCollector = httpRequestDataCollector;
@@ -41,12 +44,7 @@ namespace ProductionProfiler.Core.Profiling
 
         public void StartProfiling(HttpContext context)
         {
-            if (_configuration.Log4NetEnabled)
-            {
-                //add the logging event handler for this profiler instance
-                foreach(var appender in _configuration.ProfilingAppenders)
-                    appender.AppendLoggingEvent += ProfilingAppenderAppendLoggingEvent;
-            }
+            _logger.StartProfiling();
 
             _profileData = new ProfiledRequestData
             {
@@ -93,28 +91,14 @@ namespace ProductionProfiler.Core.Profiling
             }
         }
 
-        private void ProfilingAppenderAppendLoggingEvent(object sender, AppendLoggingEventEventArgs e)
-        {
-            if (_currentMethod != null)
-            {
-                _currentMethod.Messages.Add(e.LoggingEvent.ToLogMessage(_currentMethod.Elapsed()));
-            }  
-        }
-
         public ProfiledRequestData StopProfiling(HttpResponse response)
         {
+            _logger.StartProfiling();
             _watch.Stop();
             _profileData.ElapsedMilliseconds = _watch.ElapsedMilliseconds;
 
             //add data from the configured IHttpRequestDataCollector
             _profileData.ResponseData.AddRangeIfNotNull(_httpResponseDataCollector.Collect(response));
-
-            if (_configuration.Log4NetEnabled)
-            {
-                //remove the logging event handlers for this profiler instance
-                foreach (var appender in _configuration.ProfilingAppenders)
-                    appender.AppendLoggingEvent -= ProfilingAppenderAppendLoggingEvent;
-            }
 
             if (_configuration.CaptureExceptions)
                 AppDomain.CurrentDomain.FirstChanceException -= CaptureException;
@@ -172,6 +156,7 @@ namespace ProductionProfiler.Core.Profiling
 
             _currentMethod.StartedAtMilliseconds = _watch.ElapsedMilliseconds;
             _currentMethod.Start();
+            _logger.CurrentMethod = _currentMethod;
         }
 
         public void MethodExit(MethodInvocation invocation)
@@ -186,6 +171,7 @@ namespace ProductionProfiler.Core.Profiling
 
             _currentMethod.Data = invocation.MethodData;
             _currentMethod = _currentMethod.GetParentMethod();
+            _logger.CurrentMethod = _currentMethod;
         }
     }
 }

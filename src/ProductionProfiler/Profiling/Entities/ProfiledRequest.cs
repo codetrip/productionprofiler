@@ -17,7 +17,7 @@ namespace ProductionProfiler.Core.Profiling.Entities
         /// <summary>
         /// The number of times remaining to profile this request
         /// </summary>
-        public int ProfilingCount { get; set; }
+        public int? ProfilingCount { get; set; }
         /// <summary>
         /// The date/time this URL was profiled
         /// </summary>

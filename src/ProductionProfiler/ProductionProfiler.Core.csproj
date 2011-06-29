@@ -38,9 +38,6 @@
     <AssemblyOriginatorKeyFile>..\..\tools\profiler.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net">
-      <HintPath>..\..\lib\Log4net\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json.Net35">
       <HintPath>..\..\lib\Json.NET\Newtonsoft.Json.Net35.dll</HintPath>
     </Reference>
@@ -72,6 +69,9 @@
     <Compile Include="Configuration\MethodDataCollectorMappingConfiguration.cs" />
     <Compile Include="Configuration\IFluentCollectorConfiguration.cs" />
     <Compile Include="Configuration\IFluentConfiguration.cs" />
+    <Compile Include="Configuration\ProfilerConfigurationException.cs" />
+    <Compile Include="Logging\DefaultLogger.cs" />
+    <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Profiling\Entities\DataCollectionItem.cs" />
     <Compile Include="Profiling\IDoNotWantToBeProfiled.cs" />
     <Compile Include="Profiling\StoreResponseFilter.cs" />
@@ -114,7 +114,6 @@
     <Compile Include="Profiling\IResponseFilter.cs" />
     <Compile Include="Profiling\RequestProfilerContext.cs" />
     <Compile Include="Extensions\HttpRequestExtensions.cs" />
-    <Compile Include="Extensions\LoggingEventExtensions.cs" />
     <Compile Include="Profiling\Entities\ProfilerMessage.cs" />
     <Compile Include="Profiling\Entities\MethodData.cs" />
     <Compile Include="Profiling\Entities\ProfiledRequestData.cs" />
@@ -125,8 +124,6 @@
     <Compile Include="Handlers\Entities\ModelValidationError.cs" />
     <Compile Include="Profiling\Entities\MethodInvocation.cs" />
     <Compile Include="Resources\Constants.cs" />
-    <Compile Include="Log4Net\AppendLoggingEventEventArgs.cs" />
-    <Compile Include="Log4Net\Log4NetProfilingAppender.cs" />
     <Compile Include="Profiling\IRequestProfilingCoordinator.cs" />
     <Compile Include="Profiling\RequestProfiler.cs" />
     <Compile Include="Modules\RequestProfilingModule.cs" />

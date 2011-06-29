@@ -4,6 +4,7 @@ using System.IO;
 using System.Web;
 using ProductionProfiler.Core.Caching;
 using ProductionProfiler.Core.Collectors;
+using ProductionProfiler.Core.Logging;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Serialization;
@@ -61,18 +62,7 @@ namespace ProductionProfiler.Core.Configuration
         /// </summary>
         /// <returns></returns>
         IFluentConfiguration CaptureResponse();
-        /// <summary>
-        /// If set the supplied logger will have a profiler appender attached to it which will log all LoggingEvents to profiled method data
-        /// The supplied logger should have Debug level applied to so we capture all available LoggingEvents.
-        /// </summary>
-        /// <param name="loggerNames">The name of the loggers to attach the profiler appender to.</param>
-        /// <returns></returns>
-        IFluentConfiguration Log4Net(IEnumerable<string> loggerNames);
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="persistenceProvider"></param>
-        /// <returns></returns>
+        IFluentConfiguration Logger(ILogger logger);
         IFluentConfiguration DataProvider(IPersistenceProvider persistenceProvider);
         IFluentConfiguration CacheEngine<T>() where T : IProfilerCacheEngine;
         IFluentConfiguration Serializer<T>() where T : ISerializer;

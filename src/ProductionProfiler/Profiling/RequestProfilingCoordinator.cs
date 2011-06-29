@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Web;
-using log4net;
 using ProductionProfiler.Core.Caching;
 using ProductionProfiler.Core.Configuration;
 using System.Linq;
@@ -61,34 +60,32 @@ namespace ProductionProfiler.Core.Profiling
 
                     if (requestToProfile != null)
                     {
-                        requestToProfile.ProfilingCount--;
+                        //if there is a ProfilingCount then decrement it, update the ProfiledRequest and invalidate the cache
+                        if (requestToProfile.ProfilingCount.HasValue)
+                        {
+                            requestToProfile.ProfilingCount--;
 
-                        if (requestToProfile.ProfilingCount <= 0)
-                            requestToProfile.ProfilingCount = 0;
+                            if (requestToProfile.ProfilingCount <= 0)
+                                requestToProfile.ProfilingCount = 0;
 
-                        //store the updated ProfiledRequest instance
-                        _repository.SaveProfiledRequest(requestToProfile);
+                            //store the updated ProfiledRequest instance
+                            _repository.SaveProfiledRequest(requestToProfile); 
+                            
+                            //remove the CurrentRequestsToProfile cache item as it has been updated here
+                            _profilerCacheEngine.Remove(Constants.CacheKeys.CurrentRequestsToProfile);
+                        }
 
                         //indicate we are profiling the current request
                         RequestProfilerContext.Current.StartProfiling();
-
-                        //remove the CurrentRequestsToProfile cache item as it has been updated here
-                        _profilerCacheEngine.Remove(Constants.CacheKeys.CurrentRequestsToProfile);
 
                         //start profiling the current request
                         _requestProfiler.StartProfiling(context);
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 RequestProfilerContext.Current.StopProfiling();
-
-                if(_configuration.Log4NetEnabled)
-                {
-                    foreach (var log in LogManager.GetCurrentLoggers())
-                        log.Error(e);
-                }
             }
         }
 
@@ -132,15 +129,9 @@ namespace ProductionProfiler.Core.Profiling
                     _repository.SaveProfiledRequestData(_requestProfiler.StopProfiling(context.Response));
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 RequestProfilerContext.Current.StopProfiling();
-
-                if (_configuration.Log4NetEnabled)
-                {
-                    foreach (var log in LogManager.GetCurrentLoggers())
-                        log.Error(e);
-                }
             }
         }
     }

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using ProductionProfiler.Core.Handlers.Entities;
-using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Profiling.Entities;
+using ProductionProfiler.Core.Extensions;
 
 namespace ProductionProfiler.Core.Binding
 {
@@ -15,7 +15,7 @@ namespace ProductionProfiler.Core.Binding
             ProfiledRequest profiledRequest = new ProfiledRequest
             {
                 Url = formParams.Get("Url"),
-                ProfilingCount = int.Parse(formParams.Get("ProfilingCount")),
+                ProfilingCount = formParams.Get("ProfilingCount").IsNullOrEmpty() ? (int?)null : int.Parse(formParams.Get("ProfilingCount")),
                 Server = formParams.Get("Server"),
                 Enabled = true
             };
@@ -25,20 +25,6 @@ namespace ProductionProfiler.Core.Binding
 
         public bool IsValid(NameValueCollection formParams)
         {
-            bool valid = true;
-            int profileCount;
-
-            if (!int.TryParse(formParams.Get("ProfilingCount"), out profileCount))
-            {
-                _errors.Add(new ModelValidationError
-                {
-                    Field = "ProfilingCount",
-                    Message = "ProfileCount was not supplied"
-                });
-
-                valid = false;
-            }
-
             if (string.IsNullOrEmpty(formParams.Get("Url")))
             {
                 _errors.Add(new ModelValidationError
@@ -47,10 +33,10 @@ namespace ProductionProfiler.Core.Binding
                     Message = "Url was not supplied"
                 });
 
-                valid = false;
+                return false;
             }
 
-            return valid;
+            return true;
         }
 
         public List<ModelValidationError> Errors
