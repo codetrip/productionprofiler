@@ -12,6 +12,9 @@ namespace ProductionProfiler.Core.Configuration
         private readonly IDictionary<Type, IEnumerable<string>> _mappedCollectors = new Dictionary<Type, IEnumerable<string>>();
         private readonly IList<Type> _mappedTypes = new List<Type>();
         private readonly IList<CollectorMapping> _collectorMappings = new List<CollectorMapping>();
+        private readonly IDictionary<Type, bool> _cachedInputOutputDataCollectorTypes = new Dictionary<Type, bool>();
+
+        public IList<Type> InputOutputMethodDataTypes { get; set; }
 
         public IEnumerable<IMethodDataCollector> GetMethodDataCollectorsForType(Type methodTargetType, IContainer container)
         {
@@ -37,6 +40,25 @@ namespace ProductionProfiler.Core.Configuration
             }
         }
 
+        public bool ShouldCollectInputOutputDataForType(Type methodTargetType)
+        {
+            if (InputOutputMethodDataTypes == null || InputOutputMethodDataTypes.Count == 0)
+                return false;
+
+            if (!_cachedInputOutputDataCollectorTypes.ContainsKey(methodTargetType))
+            {
+                lock (_syncLock)
+                {
+                    if (!_cachedInputOutputDataCollectorTypes.ContainsKey(methodTargetType))
+                    {
+                        _cachedInputOutputDataCollectorTypes.Add(methodTargetType, ShouldCollectForType(methodTargetType));
+                    }
+                }
+            }
+
+            return _cachedInputOutputDataCollectorTypes[methodTargetType];
+        }
+
         public void AddMapping(CollectorMapping mapping)
         {
             _collectorMappings.Add(mapping);
@@ -54,6 +76,16 @@ namespace ProductionProfiler.Core.Configuration
         public bool IsCollectorTypeMapped(Type collectorType)
         {
             return _collectorMappings.Any(m => m.CollectorType == collectorType);
+        }
+
+        public bool AnyMappedTypes()
+        {
+            return _collectorMappings.Count > 0;
+        }
+
+        private bool ShouldCollectForType(Type targetType)
+        {
+            return InputOutputMethodDataTypes.Where(t => t.IsAssignableFrom(targetType)).Any();
         }
 
         private IEnumerable<string> MapTargetType(Type targetType)

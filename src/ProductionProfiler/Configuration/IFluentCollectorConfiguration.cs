@@ -9,4 +9,9 @@ namespace ProductionProfiler.Core.Configuration
         IFluentConfiguration ForAnyType();
         IFluentConfiguration ForAnyUnmappedType();
     }
+
+    public interface IFluentExceptionConfiguration
+    {
+        IFluentConfiguration HandleExceptionsVia(Action<Exception> exceptionHandler);
+    }
 }

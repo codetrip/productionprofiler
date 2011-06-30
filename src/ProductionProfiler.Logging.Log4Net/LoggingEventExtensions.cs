@@ -1,8 +1,7 @@
-﻿
-using log4net.Core;
+﻿using log4net.Core;
 using ProductionProfiler.Core.Profiling.Entities;
 
-namespace ProductionProfiler.Core.Extensions
+namespace ProductionProfiler.Logging.Log4Net
 {
     public static class LoggingEventExtensions
     {

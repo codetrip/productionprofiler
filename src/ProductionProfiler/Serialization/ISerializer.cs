@@ -1,4 +1,5 @@
 ﻿
+using System;
 using ProductionProfiler.Core.Profiling;
 
 namespace ProductionProfiler.Core.Serialization
@@ -9,6 +10,7 @@ namespace ProductionProfiler.Core.Serialization
         DataFormat Format { get; }
     }
 
+    [Serializable]
     public enum DataFormat
     {
         Xml,

@@ -23,8 +23,9 @@ namespace ProductionProfiler.Core.Modules
                     RequestProfilerContext.Current.Container.Resolve<IRequestProfilingCoordinator>().BeginRequest(httpContext);
                 }
             }
-            catch(Exception)
+            catch(Exception ex)
             {
+                RequestProfilerContext.Current.Exception(ex);
                 RequestProfilerContext.Current.StopProfiling();
             }
         }
@@ -38,8 +39,9 @@ namespace ProductionProfiler.Core.Modules
                     RequestProfilerContext.Current.Container.Resolve<IRequestProfilingCoordinator>().EndRequest(((HttpApplication)sender).Context);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                RequestProfilerContext.Current.Exception(ex);
                 RequestProfilerContext.Current.StopProfiling();
             }
         }

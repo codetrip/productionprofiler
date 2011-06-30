@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataModelBuilder.cs" />
+    <Compile Include="Entities\ProfiledRequestDataWrapper.cs" />
     <Compile Include="SqlConfiguration.cs" />
     <Compile Include="SqlPersistenceProvider.cs" />
     <Compile Include="PetaPoco.cs" />

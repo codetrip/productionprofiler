@@ -1,6 +1,10 @@
-﻿using ProductionProfiler.Core.Handlers.Entities;
+﻿using ProductionProfiler.Core.Dynamic;
+using ProductionProfiler.Core.Extensions;
+using ProductionProfiler.Core.Handlers.Entities;
 using ProductionProfiler.Core.Persistence;
+using ProductionProfiler.Core.Profiling.Entities;
 using ProductionProfiler.Core.Resources;
+using System.Linq;
 
 namespace ProductionProfiler.Core.Handlers
 {
@@ -23,17 +27,25 @@ namespace ProductionProfiler.Core.Handlers
 
                         return new JsonResponse
                         {
-                            Data = data,
+                            Data = data.Select(item => new { Url = item, EncodedUrl = item.Encode() }),
                             Paging = data.Pagination
                         };
                     }
                 case Constants.Actions.PreviewResults:
                     {
-                        var data = _repository.GetProfiledRequestDataPreviewByUrl(requestInfo.Url, requestInfo.Paging);
+                        var data = _repository.GetProfiledRequestDataPreviewByUrl(requestInfo.Url.Decode(), requestInfo.Paging);
 
                         return new JsonResponse
                         {
-                            Data = data,
+                            Data = data.Select(item =>
+                            {
+                                EncodedProfiledRequestPreview encodedItem = new EncodedProfiledRequestPreview
+                                {
+                                    EncodedUrl = item.Url.Encode()
+                                };
+                                PropertyMapper.Map(item, encodedItem);
+                                return encodedItem;
+                            }),
                             Paging = data.Pagination
                         };
                     }
@@ -41,9 +53,16 @@ namespace ProductionProfiler.Core.Handlers
                     {
                         var data = _repository.GetProfiledRequestDataById(requestInfo.Id);
 
+                        EncodedProfiledRequestData encodedItem = new EncodedProfiledRequestData
+                        {
+                            EncodedUrl = data.Url.Encode()
+                        };
+
+                        PropertyMapper.Map(data, encodedItem);
+
                         return new JsonResponse
                         {
-                            Data = data
+                            Data = encodedItem
                         };
                     }
                 default:

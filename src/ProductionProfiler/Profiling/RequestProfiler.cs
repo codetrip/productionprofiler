@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using System.Runtime.ExceptionServices;
@@ -19,19 +20,22 @@ namespace ProductionProfiler.Core.Profiling
         private readonly IHttpRequestDataCollector _httpRequestDataCollector;
         private readonly IHttpResponseDataCollector _httpResponseDataCollector;
         private readonly IProfilerRepository _repository;
+        private readonly IMethodInputOutputDataCollector _methodInputOutputDataCollector;
+        private readonly Stack<MethodData> _methods = new Stack<MethodData>(); 
         private readonly ILogger _logger;
         private readonly int _threadId;
         private ProfiledRequestData _profileData;
-        private MethodData _currentMethod;
         private Stopwatch _watch;
 
         public RequestProfiler(ProfilerConfiguration configuration, 
             IHttpRequestDataCollector httpRequestDataCollector, 
             IHttpResponseDataCollector httpResponseDataCollector, 
             IProfilerRepository repository, 
+            IMethodInputOutputDataCollector methodInputOutputDataCollector,
             ILogger logger)
         {
             _configuration = configuration;
+            _methodInputOutputDataCollector = methodInputOutputDataCollector;
             _logger = logger;
             _repository = repository;
             _httpResponseDataCollector = httpResponseDataCollector;
@@ -53,8 +57,7 @@ namespace ProductionProfiler.Core.Profiling
                 Server = Environment.MachineName,
                 ClientIpAddress = context.Request.ClientIpAddress(),
                 Ajax = context.Request.IsAjaxRequest(),
-                Id = RequestId,
-                ProfilerErrors = RequestProfilerContext.Current.PersistentProfilerErrors.ToList()
+                Id = RequestId
             };
 
             //add data from the configured IHttpRequestDataCollector
@@ -78,16 +81,25 @@ namespace ProductionProfiler.Core.Profiling
 
         private void CaptureException(object sender, FirstChanceExceptionEventArgs e)
         {
-            //we check the thread id to check its not an exception from some other web request.
-            //pretty sure this isn't a problem....
-            if (_currentMethod != null && _threadId == Thread.CurrentThread.ManagedThreadId && !_currentMethod.Exceptions.Any(ex => ex.Type == e.Exception.GetType().FullName))
+            try
             {
-                _currentMethod.Exceptions.Add(new ThrownException
+                var currentMethod = _methods.PeekIfItems();
+
+                //we check the thread id to check its not an exception from some other web request.
+                //pretty sure this isn't a problem....
+                if (currentMethod != null && _threadId == Thread.CurrentThread.ManagedThreadId && !currentMethod.Exceptions.Any(ex => ex.Type == e.Exception.GetType().FullName))
                 {
-                    Message = e.Exception.Format(true, true),
-                    Milliseconds = _watch.ElapsedMilliseconds,
-                    Type = e.Exception.GetType().FullName
-                });
+                    currentMethod.Exceptions.Add(new ThrownException
+                    {
+                        Message = e.Exception.Format(true, true),
+                        Milliseconds = _watch.ElapsedMilliseconds,
+                        Type = e.Exception.GetType().FullName
+                    });
+                }
+            }
+            catch
+            {
+                //get a stack overflow if an exceptions is thrown by this method
             }
         }
 
@@ -120,16 +132,6 @@ namespace ProductionProfiler.Core.Profiling
             return _profileData;
         }
 
-        public void ProfilerError(string message)
-        {
-            _profileData.ProfilerErrors.Add(new ProfilerError
-            {
-                ErrorAtMilliseconds = _watch.ElapsedMilliseconds, 
-                Message = message, 
-                Type = ProfilerErrorType.Runtime
-            });
-        }
-
         public void MethodEntry(MethodInvocation invocation)
         {
             MethodData method = new MethodData
@@ -137,41 +139,72 @@ namespace ProductionProfiler.Core.Profiling
                 MethodName = string.Format("{0}.{1}", invocation.TargetType.FullName, invocation.MethodName)
             };
 
-            if (_currentMethod == null)
+            var currentMethod = _methods.PeekIfItems();
+
+            if (currentMethod == null)
             {
-                _profileData.Methods.Add(method);
+                currentMethod = method;
+                _profileData.Methods.Add(currentMethod);
             }
             else
             {
-                _currentMethod.Methods.Add(method);
-                method.SetParentMethod(_currentMethod);
+                currentMethod.Methods.Add(method);
             }
 
-            _currentMethod = method;
-
-            foreach (var collector in _configuration.MethodDataCollectorMappings.GetMethodDataCollectorsForType(invocation.TargetType, RequestProfilerContext.Current.Container))
+            try
             {
-                collector.Entry(invocation);
+                if (_configuration.MethodDataCollectorMappings.AnyMappedTypes())
+                {
+                    foreach (var collector in _configuration.MethodDataCollectorMappings.GetMethodDataCollectorsForType(invocation.TargetType, RequestProfilerContext.Current.Container))
+                    {
+                        collector.Entry(invocation);
+                    }
+                }
+
+                if(_configuration.MethodDataCollectorMappings.ShouldCollectInputOutputDataForType(invocation.TargetType))
+                {
+                    method.Arguments = _methodInputOutputDataCollector.GetArguments(invocation).ToList();
+                }
+            }
+            catch (Exception e)
+            {
+                RequestProfilerContext.Current.Exception(e);
             }
 
-            _currentMethod.StartedAtMilliseconds = _watch.ElapsedMilliseconds;
-            _currentMethod.Start();
-            _logger.CurrentMethod = _currentMethod;
+            method.StartedAtMilliseconds = _watch.ElapsedMilliseconds;
+            method.Start();
+            _logger.CurrentMethod = method;
+            _methods.Push(method);
         }
 
         public void MethodExit(MethodInvocation invocation)
         {
-            _currentMethod.StoppedAtMilliseconds = _watch.ElapsedMilliseconds;
-            _currentMethod.ElapsedMilliseconds = _currentMethod.Stop();
+            var currentMethod = _methods.Pop();
+            currentMethod.StoppedAtMilliseconds = _watch.ElapsedMilliseconds;
+            currentMethod.ElapsedMilliseconds = currentMethod.Stop();
 
-            foreach (var collector in _configuration.MethodDataCollectorMappings.GetMethodDataCollectorsForType(invocation.TargetType, RequestProfilerContext.Current.Container))
+            try
             {
-                collector.Exit(invocation);
+                if (_configuration.MethodDataCollectorMappings.AnyMappedTypes())
+                {
+                    foreach (var collector in _configuration.MethodDataCollectorMappings.GetMethodDataCollectorsForType(invocation.TargetType, RequestProfilerContext.Current.Container))
+                    {
+                        collector.Exit(invocation);
+                    }
+                }
+
+                if (_configuration.MethodDataCollectorMappings.ShouldCollectInputOutputDataForType(invocation.TargetType))
+                {
+                    currentMethod.ReturnValue = _methodInputOutputDataCollector.GetReturnValue(invocation);
+                }
+            }
+            catch (Exception e)
+            {
+                RequestProfilerContext.Current.Exception(e);
             }
 
-            _currentMethod.Data = invocation.MethodData;
-            _currentMethod = _currentMethod.GetParentMethod();
-            _logger.CurrentMethod = _currentMethod;
+            currentMethod.Data = invocation.MethodData;
+            _logger.CurrentMethod = _methods.PeekIfItems();
         }
     }
 }

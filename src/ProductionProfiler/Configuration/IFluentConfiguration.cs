@@ -69,6 +69,7 @@ namespace ProductionProfiler.Core.Configuration
         IFluentConfiguration HttpRequestDataCollector<T>() where T : IHttpRequestDataCollector;
         IFluentConfiguration HttpResponseDataCollector<T>() where T : IHttpResponseDataCollector;
         IFluentConfiguration Authorize(Func<HttpContext, bool> authorisedForManagement);
+        IFluentConfiguration CollectInputOutputMethodDataForTypes(IEnumerable<Type> typesToCollectInputOutputDataFor);
         IFluentCollectorConfiguration AddMethodDataCollector<T>() where T : IMethodDataCollector;
         void Initialise();
     }

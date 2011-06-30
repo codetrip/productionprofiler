@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Transactions;
@@ -13,28 +14,45 @@ namespace ProductionProfiler.Persistence.SqlServer
     {
         public static void BuildDataModel(SqlConfiguration configuration)
         {
-            using (TransactionScope transaction = new TransactionScope(TransactionScopeOption.Required, TimeSpan.Zero))
+            string scriptContents = GetScript(configuration);
+
+            if(configuration.OutputScriptPath.IsNotNullOrEmpty())
             {
-                string[] scripts = Regex.Split(GetScript(configuration), @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-                foreach (string script in scripts)
+                File.WriteAllText(configuration.OutputScriptPath, scriptContents);
+            }
+            else
+            {
+                using (TransactionScope transaction = new TransactionScope(TransactionScopeOption.Required, TimeSpan.Zero))
                 {
-                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings[configuration.ConnectionStringName].ConnectionString))
-                    {
-                        connection.Open();
+                    string[] scripts = Regex.Split(scriptContents, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-                        using (SqlCommand command = new SqlCommand())
+                    foreach (string script in scripts)
+                    {
+                        if (script.Trim().IsNullOrEmpty())
+                            continue;
+
+                        System.Diagnostics.Debug.WriteLine("SCRIPT");
+                        System.Diagnostics.Debug.WriteLine("============================================================================================================");
+                        System.Diagnostics.Debug.Write(script);
+                        System.Diagnostics.Debug.WriteLine("============================================================================================================");
+
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings[configuration.ConnectionStringName].ConnectionString))
                         {
-                            command.CommandTimeout = 36000;
-                            command.Connection = connection;
-                            command.CommandType = CommandType.Text;
-                            command.CommandText = script;
-                            command.ExecuteNonQuery();
+                            connection.Open();
+
+                            using (SqlCommand command = new SqlCommand())
+                            {
+                                command.CommandTimeout = 36000;
+                                command.Connection = connection;
+                                command.CommandType = CommandType.Text;
+                                command.CommandText = script;
+                                command.ExecuteNonQuery();
+                            }
                         }
                     }
-                }
 
-                transaction.Complete();
+                    transaction.Complete();
+                }
             }
         }
 
@@ -45,7 +63,7 @@ namespace ProductionProfiler.Persistence.SqlServer
             if(configuration.SchemaName.IsNotNullOrEmpty())
             {
                 script.AppendLine("IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'{0}')".FormatWith(configuration.SchemaName));
-                script.AppendLine("CREATE SCHEMA [{0}] AUTHORIZATION [dbo]".FormatWith(configuration.SchemaName));
+                script.AppendLine("EXEC ('CREATE SCHEMA {0} AUTHORIZATION [dbo]');".FormatWith(configuration.SchemaName));
                 script.AppendLine("GO");
             }
 
@@ -57,14 +75,14 @@ namespace ProductionProfiler.Persistence.SqlServer
                 BEGIN
                     CREATE TABLE [{0}].[ProfiledRequest](
 	                    [Id] [uniqueidentifier] NOT NULL,
-	                    [Url] [nvarchar](1024) NOT NULL UNIQUE,
-	                    [ElapsedMilliseconds] [bigint] NOT NULL,
-	                    [ProfilingCount] [int] NOT NULL,
+	                    [Url] [varchar](900) NOT NULL CONSTRAINT UQ_ProfiledRequest_Url UNIQUE,
+	                    [ElapsedMilliseconds] [bigint] NULL,
+	                    [ProfilingCount] [int] NULL,
 	                    [ProfiledOnUtc] [datetime] NULL,
-	                    [Server] [nvarchar](128) NOT NULL,
-	                    [HttpMethod] [nvarchar](8) NOT NULL,
+	                    [Server] [nvarchar](128) NULL,
+	                    [HttpMethod] [nvarchar](8) NULL,
 	                    [Enabled] [bit] NOT NULL DEFAULT 0
-                    PRIMARY KEY NONCLUSTERED 
+                    CONSTRAINT PK_ProfiledRequest PRIMARY KEY NONCLUSTERED 
                     (
 	                    [Id] ASC
                     )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
@@ -74,10 +92,16 @@ namespace ProductionProfiler.Persistence.SqlServer
 
                 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[{0}].[ProfiledRequest]') AND name = N'IX_ProfiledRequest_Url')
                 BEGIN
-                    CREATE CLUSTERED INDEX [IX_ProfiledRequest_Url] ON [{0}].[ProfiledRequest]
+                    CREATE UNIQUE CLUSTERED INDEX [IX_ProfiledRequest_Url] ON [{0}].[ProfiledRequest]
                     (
 	                    [Url] ASC
                     )
+                END
+                GO
+
+                IF NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE name = N'DF_ProfiledRequest_Id')
+                BEGIN
+                    ALTER TABLE [{0}].[ProfiledRequest] ADD CONSTRAINT [DF_ProfiledRequest_Id]  DEFAULT (newid()) FOR [Id]
                 END
                 GO
             ".FormatWith(schema));
@@ -88,9 +112,9 @@ namespace ProductionProfiler.Persistence.SqlServer
                 BEGIN
                     CREATE TABLE [{0}].[ProfiledRequestData](
 	                    [Id] [uniqueidentifier] NOT NULL,
-	                    [Url] [nvarchar](1024) NOT NULL,
+	                    [Url] [varchar](900) NOT NULL,
 	                    [Data] [varbinary](max) NOT NULL
-                    PRIMARY KEY NONCLUSTERED 
+                    CONSTRAINT PK_ProfiledRequestData PRIMARY KEY NONCLUSTERED 
                     (
 	                    [Id] ASC
                     )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
@@ -114,9 +138,9 @@ namespace ProductionProfiler.Persistence.SqlServer
                 BEGIN
                     CREATE TABLE [{0}].[ProfiledResponse](
 	                    [Id] [uniqueidentifier] NOT NULL,
-	                    [Url] [nvarchar](1024) NOT NULL,
-	                    [Data] [nvarchar](max) NOT NULL
-                    PRIMARY KEY NONCLUSTERED 
+	                    [Url] [varchar](900) NOT NULL,
+	                    [Body] [nvarchar](max) NOT NULL
+                    CONSTRAINT PK_ProfiledResponse PRIMARY KEY NONCLUSTERED 
                     (
 	                    [Id] ASC
                     )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]

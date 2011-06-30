@@ -52,3 +52,5 @@ select { width: 200px; border: 1px solid #CCC; }
 .ui-widget-content a { color: #696969; }
 .ui-widget-header { border-top: 1px solid #BDBDBD; border-right: 1px solid #BDBDBD;border-left: 1px solid #BDBDBD; background-color: #e8eef4; font-weight: bold;  padding:3px;}
 .ui-widget-header a { color: #696969; }
+
+a.ret, a.arg {font-style:italic; }

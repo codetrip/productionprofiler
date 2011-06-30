@@ -34,11 +34,11 @@ namespace ProductionProfiler.Persistence.SqlServer
         /// </summary>
         public void Initialise()
         {
-            //first validate the schema name is a-z 0-9 characters only, this is injected into queries 
-            //so need to ensure it cant cause a sql injection security risk.
-            if (!Regex.IsMatch(_configuration.SchemaName, "^([0-9]+|[a-z]+|[A-Z]+)$"))
+            //first validate the schema name is A-Z a-z 0-9 characters only, this is injected into queries 
+            //so need to ensure it cant cause a sql injection security risk, however unlikely
+            if (!Regex.IsMatch(_configuration.SchemaName, @"^[a-zA-Z0-9]+$"))
             {
-                throw new ProfilerConfigurationException("SchemaName for SqlPersistenceProvider must contain only a-z and 0-9 characters.");
+                throw new ProfilerConfigurationException("SchemaName for SqlPersistenceProvider must contain only a-z, A-Z and 0-9 characters.");
             }
 
             //ensure the database has all required objects

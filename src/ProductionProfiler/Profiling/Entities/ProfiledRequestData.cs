@@ -15,7 +15,6 @@ namespace ProductionProfiler.Core.Profiling.Entities
         public bool Ajax { get; set; }
         public bool CapturedResponse { get; set; }
         public List<MethodData> Methods { get; set; }
-        public List<ProfilerError> ProfilerErrors { get; set; }
         public List<DataCollection> RequestData { get; set; }
         public List<DataCollection> ResponseData { get; set; }
 
@@ -25,5 +24,11 @@ namespace ProductionProfiler.Core.Profiling.Entities
             ResponseData = new List<DataCollection>();
             Methods = new List<MethodData>();
         }
+    }
+
+    [Serializable]
+    public class EncodedProfiledRequestData : ProfiledRequestData
+    {
+        public string EncodedUrl { get; set; }
     }
 }

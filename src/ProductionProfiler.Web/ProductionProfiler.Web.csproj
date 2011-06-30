@@ -128,6 +128,10 @@
       <Project>{3B04FCA1-FEF7-472E-AAF4-70CBCC18453A}</Project>
       <Name>ProductionProfiler.Persistence.Mongo</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ProductionProfiler.Persistence.SqlServer\ProductionProfiler.Persistence.SqlServer.csproj">
+      <Project>{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}</Project>
+      <Name>ProductionProfiler.Persistence.SqlServer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ProductionProfiler\ProductionProfiler.Core.csproj">
       <Project>{767A9F14-9537-48A1-95B6-A1D753E1DA4E}</Project>
       <Name>ProductionProfiler.Core</Name>

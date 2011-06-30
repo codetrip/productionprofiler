@@ -11,6 +11,5 @@ namespace ProductionProfiler.Core.Profiling
         void MethodExit(MethodInvocation invocation);
         void StartProfiling(HttpContext context);
         ProfiledRequestData StopProfiling(HttpResponse response);
-        void ProfilerError(string message);
     }
 }

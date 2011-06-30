@@ -1,4 +1,7 @@
 ﻿
+using System;
+using System.Text;
+
 namespace ProductionProfiler.Core.Extensions
 {
     public static class StringExtensions
@@ -16,6 +19,16 @@ namespace ProductionProfiler.Core.Extensions
         public static bool IsNotNullOrEmpty(this string str)
         {
             return !string.IsNullOrEmpty(str);
+        }
+
+        public static string Encode(this string str)
+        {
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(str));
+        }
+
+        public static string Decode(this string str)
+        {
+            return Encoding.UTF8.GetString(Convert.FromBase64String(str));
         }
     }
 }

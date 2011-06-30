@@ -61,7 +61,8 @@
     <Compile Include="Caching\HttpRuntimeCacheEngine.cs" />
     <Compile Include="Caching\IProfilerCacheEngine.cs" />
     <Compile Include="Collectors\BasicHttpResponseDataCollector.cs" />
-    <Compile Include="Collectors\BasicMethodDataCollector.cs" />
+    <Compile Include="Collectors\MethodInputOutputDataCollector.cs" />
+    <Compile Include="Collectors\IMethodInputOutputDataCollector.cs" />
     <Compile Include="Collectors\NullHttpResponseDataCollector.cs" />
     <Compile Include="Collectors\BasicHttpRequestDataCollector.cs" />
     <Compile Include="Collectors\NullHttpRequestDataCollector.cs" />
@@ -70,8 +71,14 @@
     <Compile Include="Configuration\IFluentCollectorConfiguration.cs" />
     <Compile Include="Configuration\IFluentConfiguration.cs" />
     <Compile Include="Configuration\ProfilerConfigurationException.cs" />
+    <Compile Include="Dynamic\AssembliesInBinDirectoryLocator.cs" />
+    <Compile Include="Dynamic\DynamicCodeGeneratorHelper.cs" />
+    <Compile Include="Dynamic\PropertyMapper.cs" />
+    <Compile Include="Extensions\ObjectReflectionExtensions.cs" />
+    <Compile Include="Extensions\StackExtensions.cs" />
     <Compile Include="Logging\DefaultLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />
+    <Compile Include="Profiling\RequestProfiler.cs" />
     <Compile Include="Profiling\Entities\DataCollectionItem.cs" />
     <Compile Include="Profiling\IDoNotWantToBeProfiled.cs" />
     <Compile Include="Profiling\StoreResponseFilter.cs" />
@@ -100,7 +107,6 @@
     <Compile Include="Profiling\Entities\DataCollection.cs" />
     <Compile Include="Profiling\Entities\ProfiledRequestPreview.cs" />
     <Compile Include="Handlers\Entities\ProfiledRequestUpdateModel.cs" />
-    <Compile Include="Profiling\Entities\ProfilerError.cs" />
     <Compile Include="Handlers\Entities\RequestInfo.cs" />
     <Compile Include="Profiling\Entities\ThrownException.cs" />
     <Compile Include="IoC\IContainer.cs" />
@@ -125,7 +131,6 @@
     <Compile Include="Profiling\Entities\MethodInvocation.cs" />
     <Compile Include="Resources\Constants.cs" />
     <Compile Include="Profiling\IRequestProfilingCoordinator.cs" />
-    <Compile Include="Profiling\RequestProfiler.cs" />
     <Compile Include="Modules\RequestProfilingModule.cs" />
     <Compile Include="Profiling\RequestProfilingCoordinator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

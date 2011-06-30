@@ -8,28 +8,18 @@ namespace ProductionProfiler.Core.Profiling.Entities
     public class MethodData
     {
         [NonSerialized]
-        private MethodData _parentMethod;
-        [NonSerialized]
         private Stopwatch _watch;
 
         public List<ProfilerMessage> Messages { get; set; }
         public List<MethodData> Methods { get; set; }
         public List<ThrownException> Exceptions { get; set; }
         public List<DataCollection> Data { get; set; }
+        public List<DataCollectionItem> Arguments { get; set; }
+        public DataCollectionItem ReturnValue { get; set; }
         public long ElapsedMilliseconds { get; set; }
         public long StartedAtMilliseconds { get; set; }
         public long StoppedAtMilliseconds { get; set; }
         public string MethodName { get; set; }
-
-        public MethodData GetParentMethod()
-        {
-            return _parentMethod;
-        }
-
-        public void SetParentMethod(MethodData parentMethod)
-        {
-            _parentMethod = parentMethod;
-        }
 
         public void Start()
         {

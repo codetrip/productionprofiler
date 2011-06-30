@@ -30,18 +30,6 @@ namespace ProductionProfiler.Core.Binding
         public bool IsValid(NameValueCollection formParams)
         {
             bool valid = true;
-            int profileCount;
-
-            if(!int.TryParse(formParams.Get("ProfilingCount"), out profileCount))
-            {
-                _errors.Add(new ModelValidationError
-                {
-                    Field = "ProfilingCount",
-                    Message = "ProfileCount was not supplied"
-                });
-
-                valid = false;
-            }
 
             if (string.IsNullOrEmpty(formParams.Get("Url")))
             {

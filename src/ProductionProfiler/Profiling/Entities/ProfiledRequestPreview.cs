@@ -10,4 +10,10 @@ namespace ProductionProfiler.Core.Profiling.Entities
         public long ElapsedMilliseconds { get; set; }
         public string Server { get; set; }
     }
+
+    [Serializable]
+    public class EncodedProfiledRequestPreview : ProfiledRequestPreview
+    {
+        public string EncodedUrl { get; set; }
+    }
 }

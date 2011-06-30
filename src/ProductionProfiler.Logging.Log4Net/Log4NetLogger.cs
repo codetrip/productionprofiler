@@ -4,7 +4,6 @@ using log4net;
 using log4net.Core;
 using log4net.Repository.Hierarchy;
 using ProductionProfiler.Core.Extensions;
-using ProductionProfiler.Core.Log4Net;
 using ProductionProfiler.Core.Profiling.Entities;
 using ProductionProfiler.Core.Resources;
 using ILogger = ProductionProfiler.Core.Logging.ILogger;

@@ -1,10 +1,12 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 
 namespace ProductionProfiler.Core.Profiling.Entities
 {
+    [Serializable]
     public class DataCollection
     {
         public string Name { get; set; }

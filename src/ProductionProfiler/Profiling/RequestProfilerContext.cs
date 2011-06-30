@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Web;
-using System.Linq;
 using ProductionProfiler.Core.Handlers;
 using ProductionProfiler.Core.IoC;
-using ProductionProfiler.Core.Profiling.Entities;
 using ProductionProfiler.Core.Resources;
+using ProductionProfiler.Core.Extensions;
 
 namespace ProductionProfiler.Core.Profiling
 {
@@ -14,22 +12,14 @@ namespace ProductionProfiler.Core.Profiling
         private IContainer _container;
         private Func<HttpRequest, bool> _shouldProfile;
         private static RequestProfilerContext _current = new RequestProfilerContext();
-        private List<ProfilerError> _persistentProfilerErrors;
         private Func<HttpContext, bool> _authorizedForManagement;
+        private Action<Exception> _reportException;
 
         public static RequestProfilerContext Current
         {
             get
             {
                 return _current;
-            }
-        }
-
-        public List<ProfilerError> PersistentProfilerErrors
-        {
-            get
-            {
-                return _persistentProfilerErrors;
             }
         }
 
@@ -46,6 +36,15 @@ namespace ProductionProfiler.Core.Profiling
         public void StopProfiling()
         {
             HttpContext.Current.Items.Remove(Constants.RequestProfileContextKey);
+        }
+
+        public void Exception(Exception e)
+        {
+            if(_reportException != null)
+            {
+                System.Diagnostics.Trace.Write(e.Format());
+                _reportException(e);
+            }
         }
 
         public bool ProfilingCurrentRequest()
@@ -70,15 +69,15 @@ namespace ProductionProfiler.Core.Profiling
 
         internal static void Initialise(Func<HttpRequest, bool> shouldProfileRequest, 
             IContainer container, 
-            IEnumerable<ProfilerError> profilerErrors,
-            Func<HttpContext, bool> authorizedForManagement)
+            Func<HttpContext, bool> authorizedForManagement,
+            Action<Exception> reportException)
         {
             _current = new RequestProfilerContext
             {
                 _container = container,
                 _shouldProfile = shouldProfileRequest,
-                _persistentProfilerErrors = profilerErrors.ToList(),
-                _authorizedForManagement = authorizedForManagement
+                _authorizedForManagement = authorizedForManagement,
+                _reportException = reportException
             };
         }
 
