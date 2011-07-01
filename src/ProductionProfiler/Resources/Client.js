@@ -274,6 +274,7 @@ if (window.jQueryProfiler) {
                         '</form></tr>';
                     });
 
+                    html += this.renderPaging(data.Paging, 9, '/profiler?handler=vpr');
                     html += '</table>';
                 } else {
                     html += '<div class="noresults">No URLs are currently being profiled, either turn on automatic monitoring in the profiler configuration or manually add URLs you want to profile using the form above.</div>';
@@ -292,6 +293,7 @@ if (window.jQueryProfiler) {
                     '<td width="75px"><input type="submit" class="btn delete" value="Delete" /></td></tr></form>';
                 });
 
+                html += this.renderPaging(data.Paging, 2, '/profiler?handler=results&action=results');
                 html += '</table>';
                 this.container.html(html);
                 this.renderHeading("Profiled Requests Results");
@@ -307,6 +309,7 @@ if (window.jQueryProfiler) {
                     '<td><input type="submit" class="btn delete" value="Delete" /></td></tr></form>';
                 });
 
+                html += this.renderPaging(data.Paging, 5, '/profiler?handler=results&action=previewresults&url=' + data.EncodedUrl);
                 html += '</table>';
                 this.container.html(html);
                 this.renderHeading("Profiled Requests Results");
@@ -435,6 +438,15 @@ if (window.jQueryProfiler) {
 
                     this.html += '</table>';
                 }
+            },
+            renderPaging: function (pagingInfo, colspan, url) {
+                var html = '<tr><td class="pagingcell" colspan="' + colspan + '"><div class="paging"><div class="prevpage">';
+                html += pagingInfo.HasPreviousPage ? '<a href="' + url + '&pgno=' + (pagingInfo.PageNumber - 1) + '">previous</a>' : 'previous';
+                html += '</div><div class="items">showing ' + pagingInfo.FirstItem + ' to ' + pagingInfo.LastItem + ' of ' + pagingInfo.TotalItems + ' items</div>';
+                html += '<div class="pages">page ' + pagingInfo.PageNumber + ' of ' + pagingInfo.TotalPages + '</div><div class="nextpage">';
+                html += pagingInfo.HasNextPage ? '<a href="' + url + '&pgno=' + (pagingInfo.PageNumber + 1) + '">next</a>' : 'next';
+                html += '</div></div></td></tr>';
+                return html;
             }
         });
 

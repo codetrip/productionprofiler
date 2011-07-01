@@ -2,23 +2,16 @@
 using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Profiling.Entities;
 
-namespace ProductionProfiler.IoC.Windsor
+namespace ProductionProfiler.Core.IoC
 {
     public interface IRequestProfilingInterceptor : IInterceptor, IDoNotWantToBeProfiled
     { }
 
     public class RequestProfilingInterceptor : IRequestProfilingInterceptor
     {
-        private readonly IRequestProfiler _requestProfiler;
-
-        public RequestProfilingInterceptor(IRequestProfiler requestProfiler)
-        {
-            _requestProfiler = requestProfiler;
-        }
-
         public void Intercept(IInvocation invocation)
         {
-            if (!RequestProfilerContext.Current.ProfilingCurrentRequest())
+            if (!ProfilerContext.Current.ProfilingCurrentRequest())
             {
                 invocation.Proceed();
             }
@@ -32,13 +25,13 @@ namespace ProductionProfiler.IoC.Windsor
                     MethodName = invocation.Method.Name
                 };
 
-                _requestProfiler.MethodEntry(methodInvocation);
+                ProfilerContext.Current.Profiler.MethodEntry(methodInvocation);
 
                 invocation.Proceed();
 
                 methodInvocation.ReturnValue = invocation.ReturnValue;
 
-                _requestProfiler.MethodExit(methodInvocation);
+                ProfilerContext.Current.Profiler.MethodExit(methodInvocation);
             }
         }
     }

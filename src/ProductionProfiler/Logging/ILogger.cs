@@ -1,4 +1,5 @@
 ﻿
+using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Core.Logging
@@ -6,7 +7,7 @@ namespace ProductionProfiler.Core.Logging
     /// <summary>
     /// Interface to allow logging events to be captured by the profiler
     /// </summary>
-    public interface ILogger
+    public interface ILogger : IDoNotWantToBeProfiled
     {
         /// <summary>
         /// Method invoked when we start profiling a request

@@ -55,6 +55,9 @@
     <Reference Include="log4net">
       <HintPath>..\..\lib\Log4net\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="StructureMap">
+      <HintPath>..\..\lib\StructureMap\StructureMap.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.WebPages" />
     <Reference Include="System.Web.Helpers" />
@@ -79,6 +82,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\StructureMapControllerFactory.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\WindsorControllerFactory.cs" />
     <Compile Include="Global.asax.cs">
@@ -116,6 +120,10 @@
     <Content Include="Views\Home\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ProductionProfiler.IoC.StructureMap\ProductionProfiler.IoC.StructureMap.csproj">
+      <Project>{DF7CFB48-88BE-461D-953E-76CA7BB05E6C}</Project>
+      <Name>ProductionProfiler.IoC.StructureMap</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ProductionProfiler.IoC.Windsor\ProductionProfiler.IoC.Windsor.csproj">
       <Project>{95469EAB-02B7-4F27-B542-F7F17F55F362}</Project>
       <Name>ProductionProfiler.IoC.Windsor</Name>

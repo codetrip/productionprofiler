@@ -38,6 +38,9 @@
     <AssemblyOriginatorKeyFile>..\..\tools\profiler.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Castle.Core">
+      <HintPath>..\..\lib\Castle\Castle.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json.Net35">
       <HintPath>..\..\lib\Json.NET\Newtonsoft.Json.Net35.dll</HintPath>
     </Reference>
@@ -67,7 +70,7 @@
     <Compile Include="Collectors\BasicHttpRequestDataCollector.cs" />
     <Compile Include="Collectors\NullHttpRequestDataCollector.cs" />
     <Compile Include="Configuration\CollectorMapping.cs" />
-    <Compile Include="Configuration\MethodDataCollectorMappingConfiguration.cs" />
+    <Compile Include="Configuration\MethodDataCollectorMappings.cs" />
     <Compile Include="Configuration\IFluentCollectorConfiguration.cs" />
     <Compile Include="Configuration\IFluentConfiguration.cs" />
     <Compile Include="Configuration\ProfilerConfigurationException.cs" />
@@ -76,6 +79,7 @@
     <Compile Include="Dynamic\PropertyMapper.cs" />
     <Compile Include="Extensions\ObjectReflectionExtensions.cs" />
     <Compile Include="Extensions\StackExtensions.cs" />
+    <Compile Include="IoC\RequestProfilingInterceptor.cs" />
     <Compile Include="Logging\DefaultLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Profiling\RequestProfiler.cs" />
@@ -118,7 +122,7 @@
     <Compile Include="Persistence\Entities\PagingInfo.cs" />
     <Compile Include="Profiling\Entities\ProfiledRequest.cs" />
     <Compile Include="Profiling\IResponseFilter.cs" />
-    <Compile Include="Profiling\RequestProfilerContext.cs" />
+    <Compile Include="Profiling\ProfilerContext.cs" />
     <Compile Include="Extensions\HttpRequestExtensions.cs" />
     <Compile Include="Profiling\Entities\ProfilerMessage.cs" />
     <Compile Include="Profiling\Entities\MethodData.cs" />
@@ -148,10 +152,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Minus.gif" />
     <EmbeddedResource Include="Resources\Plus.gif" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\treeview-default-line.gif" />
-    <EmbeddedResource Include="Resources\treeview-default.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

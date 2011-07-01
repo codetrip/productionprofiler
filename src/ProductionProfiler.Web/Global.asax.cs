@@ -12,6 +12,7 @@ using log4net.Config;
 using ProductionProfiler.Core.Caching;
 using ProductionProfiler.Core.Collectors;
 using ProductionProfiler.Core.Configuration;
+using ProductionProfiler.IoC.StructureMap;
 using ProductionProfiler.IoC.Windsor;
 using ProductionProfiler.Logging.Log4Net;
 using ProductionProfiler.Persistence.SqlServer;
@@ -19,6 +20,7 @@ using ProductionProfiler.Web.Controllers;
 using ProductionProfiler.Web.Models;
 using ProductionProfiler.Web.Profilng;
 using ProductionProfiler.Core.Extensions;
+using StructureMap;
 
 namespace ProductionProfiler.Web
 {
@@ -55,26 +57,37 @@ namespace ProductionProfiler.Web
 
             XmlConfigurator.ConfigureAndWatch(new FileInfo(Server.MapPath("~/bin/Config/log4net.config")));
 
-            try
-            {
-                _container = new WindsorContainer(new XmlInterpreter());
-                _container.AddFacility<FactorySupportFacility>();
-                _container.Kernel.ReleasePolicy = new NoTrackingReleasePolicy();
-            }
-            catch (ConfigurationErrorsException ex)
-            {
-                if (ex.Message == "Could not find section 'castle' in the configuration file associated with this domain.")
-                    _container = new WindsorContainer();
-                else
-                    throw;
-            }
+            Core.IoC.IContainer container;
 
-            ControllerBuilder.Current.SetControllerFactory(typeof(WindsorControllerFactory));
+            if (ConfigurationManager.AppSettings["IoCContainer"].ToLowerInvariant() == "castle")
+            {
+                try
+                {
+                    _container = new WindsorContainer(new XmlInterpreter());
+                    _container.AddFacility<FactorySupportFacility>();
+                    _container.Kernel.ReleasePolicy = new NoTrackingReleasePolicy();
+                }
+                catch (ConfigurationErrorsException ex)
+                {
+                    if (ex.Message == "Could not find section 'castle' in the configuration file associated with this domain.")
+                        _container = new WindsorContainer();
+                    else
+                        throw;
+                }
 
-            RegisterDependencies();
+                ControllerBuilder.Current.SetControllerFactory(typeof(WindsorControllerFactory));
+                RegisterCastleDependencies();
+                container = new WindsorProfilerContainer(_container);
+            }
+            else
+            {
+                ControllerBuilder.Current.SetControllerFactory(typeof(StructureMapControllerFactory));
+                RegisterStructureMapDependencies();
+                container = new StructureMapProfilerContainer(ObjectFactory.Container);
+            }
 
             //set up profiler
-            Configure.With(new WindsorProfilerContainer(Container))
+            Configure.With(container)
                 .HandleExceptionsVia(e => System.Diagnostics.Trace.Write(e.Format()))
                 .Logger(new Log4NetLogger())
                 .DataProvider(new SqlPersistenceProvider(new SqlConfiguration("profiler", "profiler", "Profiler")))
@@ -96,7 +109,22 @@ namespace ProductionProfiler.Web
             get { return _container; }
         }
 
-        private static void RegisterDependencies()
+        private static void RegisterStructureMapDependencies()
+        {
+            ObjectFactory.Configure(c => c.Scan(a =>
+            {
+                a.TheCallingAssembly();
+                a.With(new DerivedOpenGenericInterfaceConnectionScanner(typeof(IWorkflow<,>)));
+            }));
+
+            ObjectFactory.Configure(c => c.Scan(a =>
+            {
+                a.TheCallingAssembly();
+                a.AddAllTypesOf(typeof(IController));
+            }));
+        }
+
+        private static void RegisterCastleDependencies()
         {
             _container.Register(
                 AllTypes.FromAssembly(Assembly.GetExecutingAssembly())

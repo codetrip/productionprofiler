@@ -6,7 +6,7 @@ using ProductionProfiler.Core.IoC;
 
 namespace ProductionProfiler.Core.Configuration
 {
-    public class MethodDataCollectorMappingConfiguration
+    public class MethodDataCollectorMappings
     {
         private readonly object _syncLock = new object();
         private readonly IDictionary<Type, IEnumerable<string>> _mappedCollectors = new Dictionary<Type, IEnumerable<string>>();
@@ -51,7 +51,7 @@ namespace ProductionProfiler.Core.Configuration
                 {
                     if (!_cachedInputOutputDataCollectorTypes.ContainsKey(methodTargetType))
                     {
-                        _cachedInputOutputDataCollectorTypes.Add(methodTargetType, ShouldCollectForType(methodTargetType));
+                        _cachedInputOutputDataCollectorTypes.Add(methodTargetType, InputOutputMethodDataTypes.Where(t => t.IsAssignableFrom(methodTargetType)).Any());
                     }
                 }
             }
@@ -81,11 +81,6 @@ namespace ProductionProfiler.Core.Configuration
         public bool AnyMappedTypes()
         {
             return _collectorMappings.Count > 0;
-        }
-
-        private bool ShouldCollectForType(Type targetType)
-        {
-            return InputOutputMethodDataTypes.Where(t => t.IsAssignableFrom(targetType)).Any();
         }
 
         private IEnumerable<string> MapTargetType(Type targetType)

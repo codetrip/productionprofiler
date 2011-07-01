@@ -14,19 +14,27 @@ namespace ProductionProfiler.Core.Modules
 
         void BeginRequest(object sender, EventArgs e)
         {
+            var httpContext = ((HttpApplication)sender).Context;
+
             try
             {
-                var httpContext = ((HttpApplication)sender).Context;
-
-                if (RequestProfilerContext.Current.ShouldProfile(httpContext.Request))
+                if (ProfilerContext.Current.ShouldProfile(httpContext.Request))
                 {
-                    RequestProfilerContext.Current.Container.Resolve<IRequestProfilingCoordinator>().BeginRequest(httpContext);
+                    ProfilerContext.Current.BeginRequest(httpContext);
                 }
             }
             catch(Exception ex)
             {
-                RequestProfilerContext.Current.Exception(ex);
-                RequestProfilerContext.Current.StopProfiling();
+                ProfilerContext.Current.Exception(ex);
+
+                try
+                {
+                    ProfilerContext.Current.StopProfiling(((HttpApplication)sender).Context.Response);
+                }
+                catch (Exception innerEx)
+                {
+                    ProfilerContext.Current.Exception(innerEx);
+                }
             }
         }
 
@@ -34,15 +42,23 @@ namespace ProductionProfiler.Core.Modules
         {
             try
             {
-                if (RequestProfilerContext.Current.ProfilingCurrentRequest())
+                if (ProfilerContext.Current.ProfilingCurrentRequest())
                 {
-                    RequestProfilerContext.Current.Container.Resolve<IRequestProfilingCoordinator>().EndRequest(((HttpApplication)sender).Context);
+                    ProfilerContext.Current.EndRequest(((HttpApplication)sender).Context);
                 }
             }
             catch (Exception ex)
             {
-                RequestProfilerContext.Current.Exception(ex);
-                RequestProfilerContext.Current.StopProfiling();
+                ProfilerContext.Current.Exception(ex);
+
+                try
+                {
+                    ProfilerContext.Current.StopProfiling(((HttpApplication)sender).Context.Response);
+                }
+                catch (Exception innerEx)
+                {
+                    ProfilerContext.Current.Exception(innerEx);
+                }
             }
         }
 

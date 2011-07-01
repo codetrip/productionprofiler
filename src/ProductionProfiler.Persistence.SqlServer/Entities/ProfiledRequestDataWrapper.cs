@@ -7,6 +7,7 @@ namespace ProductionProfiler.Persistence.SqlServer.Entities
     {
         public Guid Id { get; set; }
         public string Url { get; set; }
+        public DateTime CapturedOnUtc { get; set; }
         public byte[] Data { get; set; }
     }
 }

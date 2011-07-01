@@ -21,7 +21,7 @@ namespace ProductionProfiler.Core.Profiling
         private readonly IHttpResponseDataCollector _httpResponseDataCollector;
         private readonly IProfilerRepository _repository;
         private readonly IMethodInputOutputDataCollector _methodInputOutputDataCollector;
-        private readonly Stack<MethodData> _methods = new Stack<MethodData>(); 
+        private readonly Stack<MethodData> _methodStack = new Stack<MethodData>(); 
         private readonly ILogger _logger;
         private readonly int _threadId;
         private ProfiledRequestData _profileData;
@@ -72,7 +72,7 @@ namespace ProductionProfiler.Core.Profiling
             {
                 //bug in asp.net 3.5 requires you to read the response Filter before you set it!
                 var f = context.Response.Filter;
-                context.Response.Filter = _configuration.GetResponseFilter(context);
+                context.Response.Filter = _configuration.ResponseFilter(context);
                 _profileData.CapturedResponse = true;
             }
 
@@ -83,7 +83,7 @@ namespace ProductionProfiler.Core.Profiling
         {
             try
             {
-                var currentMethod = _methods.PeekIfItems();
+                var currentMethod = _methodStack.PeekIfItems();
 
                 //we check the thread id to check its not an exception from some other web request.
                 //pretty sure this isn't a problem....
@@ -103,7 +103,7 @@ namespace ProductionProfiler.Core.Profiling
             }
         }
 
-        public ProfiledRequestData StopProfiling(HttpResponse response)
+        public void StopProfiling(HttpResponse response)
         {
             _logger.StartProfiling();
             _watch.Stop();
@@ -129,7 +129,7 @@ namespace ProductionProfiler.Core.Profiling
                 }
             }
 
-            return _profileData;
+            _repository.SaveProfiledRequestData(_profileData);
         }
 
         public void MethodEntry(MethodInvocation invocation)
@@ -139,7 +139,7 @@ namespace ProductionProfiler.Core.Profiling
                 MethodName = string.Format("{0}.{1}", invocation.TargetType.FullName, invocation.MethodName)
             };
 
-            var currentMethod = _methods.PeekIfItems();
+            var currentMethod = _methodStack.PeekIfItems();
 
             if (currentMethod == null)
             {
@@ -155,7 +155,7 @@ namespace ProductionProfiler.Core.Profiling
             {
                 if (_configuration.MethodDataCollectorMappings.AnyMappedTypes())
                 {
-                    foreach (var collector in _configuration.MethodDataCollectorMappings.GetMethodDataCollectorsForType(invocation.TargetType, RequestProfilerContext.Current.Container))
+                    foreach (var collector in ProfilerContext.Current.GetMethodDataCollectorsForType(invocation.TargetType))
                     {
                         collector.Entry(invocation);
                     }
@@ -168,18 +168,18 @@ namespace ProductionProfiler.Core.Profiling
             }
             catch (Exception e)
             {
-                RequestProfilerContext.Current.Exception(e);
+                ProfilerContext.Current.Exception(e);
             }
 
             method.StartedAtMilliseconds = _watch.ElapsedMilliseconds;
             method.Start();
             _logger.CurrentMethod = method;
-            _methods.Push(method);
+            _methodStack.Push(method);
         }
 
         public void MethodExit(MethodInvocation invocation)
         {
-            var currentMethod = _methods.Pop();
+            var currentMethod = _methodStack.Pop();
             currentMethod.StoppedAtMilliseconds = _watch.ElapsedMilliseconds;
             currentMethod.ElapsedMilliseconds = currentMethod.Stop();
 
@@ -187,7 +187,7 @@ namespace ProductionProfiler.Core.Profiling
             {
                 if (_configuration.MethodDataCollectorMappings.AnyMappedTypes())
                 {
-                    foreach (var collector in _configuration.MethodDataCollectorMappings.GetMethodDataCollectorsForType(invocation.TargetType, RequestProfilerContext.Current.Container))
+                    foreach (var collector in ProfilerContext.Current.GetMethodDataCollectorsForType(invocation.TargetType))
                     {
                         collector.Exit(invocation);
                     }
@@ -200,11 +200,11 @@ namespace ProductionProfiler.Core.Profiling
             }
             catch (Exception e)
             {
-                RequestProfilerContext.Current.Exception(e);
+                ProfilerContext.Current.Exception(e);
             }
 
             currentMethod.Data = invocation.MethodData;
-            _logger.CurrentMethod = _methods.PeekIfItems();
+            _logger.CurrentMethod = _methodStack.PeekIfItems();
         }
     }
 }

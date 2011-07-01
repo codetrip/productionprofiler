@@ -61,7 +61,6 @@
   <ItemGroup>
     <Compile Include="ProfilingInterceptorSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RequestProfilingInterceptor.cs" />
     <Compile Include="WindsorProfilerContainer.cs" />
   </ItemGroup>
   <ItemGroup>

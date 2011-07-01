@@ -16,16 +16,11 @@ namespace ProductionProfiler.Core.Profiling
     public class RequestProfilingCoordinator : IRequestProfilingCoordinator
     {
         private readonly IProfilerRepository _repository;
-        private readonly IRequestProfiler _requestProfiler;
         private readonly ProfilerConfiguration _configuration;
         private readonly IProfilerCacheEngine _profilerCacheEngine;
 
-        public RequestProfilingCoordinator(IRequestProfiler requestProfiler,
-            IProfilerRepository repository, 
-            ProfilerConfiguration configuration, 
-            IProfilerCacheEngine profilerCacheEngine)
+        public RequestProfilingCoordinator(IProfilerRepository repository, ProfilerConfiguration configuration, IProfilerCacheEngine profilerCacheEngine)
         {
-            _requestProfiler = requestProfiler;
             _profilerCacheEngine = profilerCacheEngine;
             _configuration = configuration;
             _repository = repository;
@@ -73,11 +68,8 @@ namespace ProductionProfiler.Core.Profiling
                         _profilerCacheEngine.Remove(Constants.CacheKeys.CurrentRequestsToProfile);
                     }
 
-                    //indicate we are profiling the current request
-                    RequestProfilerContext.Current.StartProfiling();
-
-                    //start profiling the current request
-                    _requestProfiler.StartProfiling(context);
+                    //start profiling this request
+                    ProfilerContext.Current.StartProfiling(context);
                 }
             }
         }
@@ -97,7 +89,7 @@ namespace ProductionProfiler.Core.Profiling
                         : _configuration.PostRequestThreshold;
 
                     //if the request took over maxRequestLength and the profiler was not enabled for this request flag the URL for analysis
-                    if (stopwatch.ElapsedMilliseconds >= maxRequestLength && !RequestProfilerContext.Current.ProfilingCurrentRequest())
+                    if (stopwatch.ElapsedMilliseconds >= maxRequestLength && !ProfilerContext.Current.ProfilingCurrentRequest())
                     {
                         _repository.SaveProfiledRequestWhenNotFound(new ProfiledRequest
                         {
@@ -113,12 +105,7 @@ namespace ProductionProfiler.Core.Profiling
                 } 
             }
 
-            //if the IRequestProfiler was running for this request we need to persist the captured data into Mongo via nservicebus
-            if (RequestProfilerContext.Current.ProfilingCurrentRequest())
-            {
-                RequestProfilerContext.Current.StopProfiling();
-                _repository.SaveProfiledRequestData(_requestProfiler.StopProfiling(context.Response));
-            }
+            ProfilerContext.Current.StopProfiling(context.Response);
         }
     }
 }

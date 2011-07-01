@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Castle.Core;
-using Castle.DynamicProxy;
 using Castle.MicroKernel.Proxy;
-using ProductionProfiler.Core.Resources;
+using ProductionProfiler.Core.IoC;
+using ProductionProfiler.Core.Profiling;
 
 namespace ProductionProfiler.IoC.Windsor
 {
@@ -17,15 +16,12 @@ namespace ProductionProfiler.IoC.Windsor
         public ProfilingInterceptorSelector(IEnumerable<Type> typesToIntercept, IEnumerable<Type> typesToIgnore)
         {
             _typesToIntercept = typesToIntercept;
-            _typesToIgnore = new List<Type>(typesToIgnore ?? new Type[0])
-            {
-                typeof(IInterceptor)
-            };
+            _typesToIgnore = typesToIgnore;
         }
 
         public bool HasInterceptors(ComponentModel model)
         {
-            if (HttpContext.Current != null && HttpContext.Current.Items.Contains(Constants.RequestProfileContextKey))
+            if (ProfilerContext.Current.ProfilingCurrentRequest())
             {
                 return ShouldIntercept(model.Service);
             }
@@ -35,7 +31,7 @@ namespace ProductionProfiler.IoC.Windsor
 
         public InterceptorReference[] SelectInterceptors(ComponentModel model, InterceptorReference[] interceptors)
         {
-            if (HttpContext.Current != null && HttpContext.Current.Items.Contains(Constants.RequestProfileContextKey))
+            if (ProfilerContext.Current.ProfilingCurrentRequest())
             {
                 if (!ShouldIntercept(model.Service))
                     return interceptors;

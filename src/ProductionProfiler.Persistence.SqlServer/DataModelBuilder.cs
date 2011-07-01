@@ -113,7 +113,8 @@ namespace ProductionProfiler.Persistence.SqlServer
                     CREATE TABLE [{0}].[ProfiledRequestData](
 	                    [Id] [uniqueidentifier] NOT NULL,
 	                    [Url] [varchar](900) NOT NULL,
-	                    [Data] [varbinary](max) NOT NULL
+	                    [Data] [varbinary](max) NOT NULL,
+                        [CapturedOnUtc] [DATETIME] NOT NULL
                     CONSTRAINT PK_ProfiledRequestData PRIMARY KEY NONCLUSTERED 
                     (
 	                    [Id] ASC

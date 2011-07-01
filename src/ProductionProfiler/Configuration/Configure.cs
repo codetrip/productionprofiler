@@ -11,7 +11,6 @@ using ProductionProfiler.Core.IoC;
 using ProductionProfiler.Core.Logging;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Profiling;
-using ProductionProfiler.Core.Profiling.Entities;
 using ProductionProfiler.Core.Resources;
 using ProductionProfiler.Core.Extensions;
 using ProductionProfiler.Core.Serialization;
@@ -73,14 +72,14 @@ namespace ProductionProfiler.Core.Configuration
         IFluentConfiguration IFluentConfiguration.CaptureResponse<T>(Func<HttpContext, T> responseFilterConstructor)
         {
             _profilerConfiguration.CaptureResponse = true;
-            _profilerConfiguration.GetResponseFilter = responseFilterConstructor;
+            _profilerConfiguration.ResponseFilter = responseFilterConstructor;
             return this;
         }
 
         IFluentConfiguration IFluentConfiguration.CaptureResponse()
         {
             _profilerConfiguration.CaptureResponse = true;
-            _profilerConfiguration.GetResponseFilter = context => new StoreResponseFilter(context.Response.Filter);
+            _profilerConfiguration.ResponseFilter = context => new StoreResponseFilter(context.Response.Filter);
             return this;
         }
 
@@ -196,7 +195,7 @@ namespace ProductionProfiler.Core.Configuration
             try
             {
                 RegisterDependencies();
-                RequestProfilerContext.Initialise(_requestFilter, _container, _authorisedForManagement, _exceptionHandler);
+                ProfilerContext.Initialise(_requestFilter, _container, _authorisedForManagement, _exceptionHandler, _profilerConfiguration);
             }
             catch (Exception e)
             {
@@ -207,6 +206,7 @@ namespace ProductionProfiler.Core.Configuration
         private void RegisterDependencies()
         {
             _container.RegisterPerWebRequest<IRequestProfiler>(typeof(RequestProfiler));
+            _container.RegisterPerWebRequest<IRequestProfilingCoordinator>(typeof(RequestProfilingCoordinator));
             _container.RegisterSingletonInstance(_profilerConfiguration);
             _container.RegisterTransient<IRequestHandler>(typeof(UpdateProfiledRequestHandler), Constants.Handlers.UpdateProfiledRequest);
             _container.RegisterTransient<IRequestHandler>(typeof(ViewResultsRequestHandler), Constants.Handlers.Results);
@@ -217,7 +217,6 @@ namespace ProductionProfiler.Core.Configuration
             _container.RegisterTransient<IRequestHandler>(typeof(DeleteProfiledDataByUrlRequestHandler), Constants.Handlers.DeleteProfiledRequestDataByUrl);
             _container.RegisterTransient<IAddProfiledRequestRequestBinder>(typeof(AddProfiledRequestRequestBinder));
             _container.RegisterTransient<IUpdateProfiledRequestRequestBinder>(typeof(UpdateProfiledRequestRequestBinder));
-            _container.RegisterTransient<IRequestProfilingCoordinator>(typeof(RequestProfilingCoordinator));
             _container.RegisterTransient<IMethodInputOutputDataCollector>(typeof(MethodInputOutputDataCollector));
 
             if (!_requestDataCollectorSet)

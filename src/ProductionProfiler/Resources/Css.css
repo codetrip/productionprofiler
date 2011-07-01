@@ -54,3 +54,10 @@ select { width: 200px; border: 1px solid #CCC; }
 .ui-widget-header a { color: #696969; }
 
 a.ret, a.arg {font-style:italic; }
+
+.pagingcell  {margin: 0px auto; text-align:center; }
+.paging {width:450px; margin: 0px auto; text-align:center; text-transform:uppercase; display:inline-block; padding:5px 0px 5px 0px;}
+.items {display:inline-block; padding-right:35px;}
+.pages {display:inline-block;}
+.prevpage {float:left;display:inline-block;}
+.nextpage {float:right;display:inline-block;}

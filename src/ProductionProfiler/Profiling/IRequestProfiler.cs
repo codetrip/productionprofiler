@@ -10,6 +10,6 @@ namespace ProductionProfiler.Core.Profiling
         void MethodEntry(MethodInvocation invocation);
         void MethodExit(MethodInvocation invocation);
         void StartProfiling(HttpContext context);
-        ProfiledRequestData StopProfiling(HttpResponse response);
+        void StopProfiling(HttpResponse response);
     }
 }

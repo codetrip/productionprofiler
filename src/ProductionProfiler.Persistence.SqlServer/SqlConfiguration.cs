@@ -1,7 +1,9 @@
 ﻿
+using ProductionProfiler.Core.Profiling;
+
 namespace ProductionProfiler.Persistence.SqlServer
 {
-    public class SqlConfiguration
+    public class SqlConfiguration : IDoNotWantToBeProfiled
     {
         public string ConnectionStringName { get; set; }
         public string DatabaseName { get; set; }

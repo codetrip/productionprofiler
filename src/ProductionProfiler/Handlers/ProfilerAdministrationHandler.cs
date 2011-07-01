@@ -8,7 +8,7 @@ namespace ProductionProfiler.Core.Handlers
     {
         public void ProcessRequest(HttpContext context)
         {
-            if(RequestProfilerContext.Current.Authorised(context))
+            if(ProfilerContext.Current.AuthorisedForManagement(context))
             {
                 var requestInfo = RequestInfoParser.Parse(context.Request);
                 var requestHandler = RequestHandlerFactory.Create(requestInfo);

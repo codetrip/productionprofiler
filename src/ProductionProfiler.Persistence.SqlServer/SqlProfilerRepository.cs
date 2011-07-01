@@ -90,8 +90,8 @@ namespace ProductionProfiler.Persistence.SqlServer
             {
                 var results = database.Page<ProfiledRequestDataWrapper>(
                     pagingInfo.PageNumber, 
-                    pagingInfo.PageSize, 
-                    "SELECT * FROM {0}.ProfiledRequestData WHERE Url = @0".FormatWith(_configuration.SchemaName), url);
+                    pagingInfo.PageSize,
+                    "SELECT * FROM {0}.ProfiledRequestData WHERE Url = @0 ORDER BY CapturedOnUtc DESC".FormatWith(_configuration.SchemaName), url);
 
                 if (results != null)
                 {
@@ -162,7 +162,8 @@ namespace ProductionProfiler.Persistence.SqlServer
                 {
                     Id = profiledRequestData.Id,
                     Url = profiledRequestData.Url,
-                    Data = BinarySerializer<ProfiledRequestData>.Serialize(profiledRequestData)
+                    Data = BinarySerializer<ProfiledRequestData>.Serialize(profiledRequestData),
+                    CapturedOnUtc = profiledRequestData.CapturedOnUtc
                 };
 
                 database.Insert("{0}.ProfiledRequestData".FormatWith(_configuration.SchemaName), "Id", false, dataWrapper);
