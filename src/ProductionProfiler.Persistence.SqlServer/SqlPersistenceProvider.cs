@@ -5,7 +5,7 @@ using ProductionProfiler.Core.IoC;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Extensions;
 
-namespace ProductionProfiler.Persistence.SqlServer
+namespace ProductionProfiler.Persistence.Sql
 {
     public class SqlPersistenceProvider : IPersistenceProvider
     {

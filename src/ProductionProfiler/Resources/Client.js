@@ -302,14 +302,16 @@ if (window.jQueryProfiler) {
             renderResultsPreview: function (data) {
                 var html = '<table class="w1000"><tr><th>Url</th><th>CapturedOnUtc</th><th>ElapsedMilliseconds</th><th>Server</th><th>Delete</th></tr>'
 
+                var encodedUrl;
                 $.each(data.Data, function (idx, itm) {
+                    encodedUrl = itm.EncodedUrl;
                     html += '<form action="/profiler?handler=dprid&url=' + itm.EncodedUrl + '" method="post"><input type="hidden" name="Id" value="' + itm.Id + '" />' +
                     '<tr><td><a href="/profiler?handler=results&action=resultsdetail&id=' + itm.Id + '">' + itm.Url + '</a></td>' +
                     '<td>' + $.profiler.formatDate(itm.CapturedOnUtc) + '</td><td>' + itm.ElapsedMilliseconds + '</td><td>' + itm.Server + '</td>' +
                     '<td><input type="submit" class="btn delete" value="Delete" /></td></tr></form>';
                 });
 
-                html += this.renderPaging(data.Paging, 5, '/profiler?handler=results&action=previewresults&url=' + data.EncodedUrl);
+                html += this.renderPaging(data.Paging, 5, '/profiler?handler=results&action=previewresults&url=' + encodedUrl);
                 html += '</table>';
                 this.container.html(html);
                 this.renderHeading("Profiled Requests Results");

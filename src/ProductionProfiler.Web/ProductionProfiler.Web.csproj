@@ -58,6 +58,14 @@
     <Reference Include="StructureMap">
       <HintPath>..\..\lib\StructureMap\StructureMap.dll</HintPath>
     </Reference>
+    <Reference Include="System.Data.SQLite, Version=1.0.66.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\SQLite\System.Data.SQLite.DLL</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq, Version=2.0.38.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\SQLite\System.Data.SQLite.Linq.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.WebPages" />
     <Reference Include="System.Web.Helpers" />
@@ -102,7 +110,9 @@
     <Content Include="Content\Site.css" />
     <Content Include="Images\estuary.jpg" />
     <Content Include="Images\flower.jpg" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -136,9 +146,9 @@
       <Project>{3B04FCA1-FEF7-472E-AAF4-70CBCC18453A}</Project>
       <Name>ProductionProfiler.Persistence.Mongo</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ProductionProfiler.Persistence.SqlServer\ProductionProfiler.Persistence.SqlServer.csproj">
+    <ProjectReference Include="..\ProductionProfiler.Persistence.SqlServer\ProductionProfiler.Persistence.Sql.csproj">
       <Project>{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}</Project>
-      <Name>ProductionProfiler.Persistence.SqlServer</Name>
+      <Name>ProductionProfiler.Persistence.Sql</Name>
     </ProjectReference>
     <ProjectReference Include="..\ProductionProfiler\ProductionProfiler.Core.csproj">
       <Project>{767A9F14-9537-48A1-95B6-A1D753E1DA4E}</Project>

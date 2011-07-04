@@ -23,7 +23,7 @@ using System.Reflection.Emit;
 using System.Linq.Expressions;
 
 
-namespace ProductionProfiler.Persistence.SqlServer.PetaPoco
+namespace ProductionProfiler.Persistence.Sql.PetaPoco
 {
     // Poco's marked [Explicit] require all column properties to be marked
     [AttributeUsage(AttributeTargets.Class)]
@@ -188,6 +188,7 @@ namespace ProductionProfiler.Persistence.SqlServer.PetaPoco
             Oracle,
             SQLite
         }
+
         DBType _dbType = DBType.SqlServer;
 
         // Common initialization

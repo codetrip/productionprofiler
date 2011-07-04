@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Transactions;
 using ProductionProfiler.Core.Extensions;
 
-namespace ProductionProfiler.Persistence.SqlServer
+namespace ProductionProfiler.Persistence.Sql
 {
     public static class DataModelBuilder
     {

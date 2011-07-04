@@ -1,7 +1,7 @@
 ﻿
 using ProductionProfiler.Core.Profiling;
 
-namespace ProductionProfiler.Persistence.SqlServer
+namespace ProductionProfiler.Persistence.Sql
 {
     public class SqlConfiguration : IDoNotWantToBeProfiled
     {

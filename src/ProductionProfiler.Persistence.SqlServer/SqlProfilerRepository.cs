@@ -5,12 +5,12 @@ using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Persistence.Entities;
 using ProductionProfiler.Core.Profiling.Entities;
 using ProductionProfiler.Core.Serialization;
-using ProductionProfiler.Persistence.SqlServer.Entities;
-using ProductionProfiler.Persistence.SqlServer.PetaPoco;
+using ProductionProfiler.Persistence.Sql.Entities;
+using ProductionProfiler.Persistence.Sql.PetaPoco;
 using ProductionProfiler.Core.Extensions;
 using System.Linq;
 
-namespace ProductionProfiler.Persistence.SqlServer
+namespace ProductionProfiler.Persistence.Sql
 {
     public class SqlProfilerRepository : IProfilerRepository
     {
@@ -55,7 +55,7 @@ namespace ProductionProfiler.Persistence.SqlServer
                 sb.AppendLine("BEGIN");
                 sb.AppendLine(database.InsertSql("{0}.ProfiledRequest".FormatWith(_configuration.SchemaName), "Id", profiledRequest));
                 sb.AppendLine("END");
-                database.Execute(new Sql(sb.ToString(), profiledRequest.Url, profiledRequest.ElapsedMilliseconds, profiledRequest.ProfilingCount, profiledRequest.ProfiledOnUtc, profiledRequest.Server, profiledRequest.HttpMethod, profiledRequest.Enabled));
+                database.Execute(new PetaPoco.Sql(sb.ToString(), profiledRequest.Url, profiledRequest.ElapsedMilliseconds, profiledRequest.ProfilingCount, profiledRequest.ProfiledOnUtc, profiledRequest.Server, profiledRequest.HttpMethod, profiledRequest.Enabled));
             }
         }
 
@@ -72,7 +72,7 @@ namespace ProductionProfiler.Persistence.SqlServer
                 sb.AppendLine("BEGIN");
                 sb.AppendLine(database.UpdateSql("{0}.ProfiledRequest".FormatWith(_configuration.SchemaName), "Id", profiledRequest, profiledRequest.Id));
                 sb.AppendLine("END");
-                database.Execute(new Sql(sb.ToString(), profiledRequest.Url, profiledRequest.ElapsedMilliseconds, profiledRequest.ProfilingCount, profiledRequest.ProfiledOnUtc, profiledRequest.Server, profiledRequest.HttpMethod, profiledRequest.Enabled, profiledRequest.Id));
+                database.Execute(new PetaPoco.Sql(sb.ToString(), profiledRequest.Url, profiledRequest.ElapsedMilliseconds, profiledRequest.ProfilingCount, profiledRequest.ProfiledOnUtc, profiledRequest.Server, profiledRequest.HttpMethod, profiledRequest.Enabled, profiledRequest.Id));
             }
         }
 

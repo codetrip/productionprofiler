@@ -8,8 +8,8 @@
     <ProjectGuid>{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ProductionProfiler.Persistence.SqlServer</RootNamespace>
-    <AssemblyName>ProductionProfiler.Persistence.SqlServer</AssemblyName>
+    <RootNamespace>ProductionProfiler.Persistence.Sql</RootNamespace>
+    <AssemblyName>ProductionProfiler.Persistence.Sql</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -40,6 +40,12 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\..\lib\SQLite\System.Data.SQLite.DLL</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq">
+      <HintPath>..\..\lib\SQLite\System.Data.SQLite.Linq.dll</HintPath>
+    </Reference>
     <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />

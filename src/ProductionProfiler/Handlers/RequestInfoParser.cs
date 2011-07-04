@@ -18,7 +18,7 @@ namespace ProductionProfiler.Core.Handlers
 
             requestInfo.Paging = new PagingInfo(
                 string.IsNullOrEmpty(pageNumber) ? 1 : int.Parse(pageNumber),
-                string.IsNullOrEmpty(pageSize) ? 3 : int.Parse(pageSize));
+                string.IsNullOrEmpty(pageSize) ? 10 : int.Parse(pageSize));
 
             requestInfo.Handler = request.QueryString.Get(Constants.Querystring.Handler) ?? string.Empty;
             requestInfo.Action = request.QueryString.Get(Constants.Querystring.Action) ?? string.Empty;

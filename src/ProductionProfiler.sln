@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.IoC.Stru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.Persistence.Raven", "ProductionProfiler.Persistence.Raven\ProductionProfiler.Persistence.Raven.csproj", "{FBD23662-A373-4A87-8CA9-E94333F00071}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.Persistence.SqlServer", "ProductionProfiler.Persistence.SqlServer\ProductionProfiler.Persistence.SqlServer.csproj", "{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.Persistence.Sql", "ProductionProfiler.Persistence.SqlServer\ProductionProfiler.Persistence.Sql.csproj", "{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.Logging.Log4Net", "ProductionProfiler.Logging.Log4Net\ProductionProfiler.Logging.Log4Net.csproj", "{6D09BFE2-8FB6-44EA-BB25-92D560446F5D}"
 EndProject

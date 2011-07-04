@@ -15,7 +15,7 @@ using ProductionProfiler.Core.Configuration;
 using ProductionProfiler.IoC.StructureMap;
 using ProductionProfiler.IoC.Windsor;
 using ProductionProfiler.Logging.Log4Net;
-using ProductionProfiler.Persistence.SqlServer;
+using ProductionProfiler.Persistence.Sql;
 using ProductionProfiler.Web.Controllers;
 using ProductionProfiler.Web.Models;
 using ProductionProfiler.Web.Profilng;
@@ -90,7 +90,7 @@ namespace ProductionProfiler.Web
             Configure.With(container)
                 .HandleExceptionsVia(e => System.Diagnostics.Trace.Write(e.Format()))
                 .Logger(new Log4NetLogger())
-                .DataProvider(new SqlPersistenceProvider(new SqlConfiguration("profiler", "profiler", "Profiler")))
+                .DataProvider(new SqlPersistenceProvider(new SqlConfiguration("profiler-sqlite", "profiler", "Profiler")))
                 .HttpRequestDataCollector<BasicHttpRequestDataCollector>()
                 .HttpResponseDataCollector<BasicHttpResponseDataCollector>()
                 .CollectInputOutputMethodDataForTypes(new[] { typeof(IWorkflow) })
