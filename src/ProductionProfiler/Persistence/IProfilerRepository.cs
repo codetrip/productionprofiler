@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ProductionProfiler.Core.Persistence.Entities;
+using PE = ProductionProfiler.Core.Persistence.Entities;
 using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Profiling.Entities;
 
@@ -13,7 +14,7 @@ namespace ProductionProfiler.Core.Persistence
         /// </summary>
         /// <param name="pagingInfo"></param>
         /// <returns></returns>
-        Page<ProfiledRequest> GetProfiledRequests(PagingInfo pagingInfo);
+        PE.Page<ProfiledRequest> GetProfiledRequests(PagingInfo pagingInfo);
         /// <summary>
         /// Returns a ProfiledRequest instance matching the specified URL
         /// </summary>
@@ -47,7 +48,7 @@ namespace ProductionProfiler.Core.Persistence
         /// <param name="url"></param>
         /// <param name="pagingInfo"></param>
         /// <returns></returns>
-        Page<ProfiledRequestPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo);
+        PE.Page<ProfiledRequestPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo);
         /// <summary>
         /// Returns a ProfiledRequestData instance matching the specified Id
         /// </summary>
@@ -59,7 +60,7 @@ namespace ProductionProfiler.Core.Persistence
         /// </summary>
         /// <param name="pagingInfo"></param>
         /// <returns></returns>
-        Page<string> GetDistinctProfiledRequestUrls(PagingInfo pagingInfo);
+        PE.Page<string> GetDistinctProfiledRequestUrls(PagingInfo pagingInfo);
         /// <summary>
         /// Deletes all profiled request data captured for the specified URL
         /// </summary>

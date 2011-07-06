@@ -4,6 +4,7 @@ using System.Linq;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Persistence.Entities;
 using ProductionProfiler.Core.Profiling.Entities;
+using PE = ProductionProfiler.Core.Persistence.Entities;
 
 namespace ProductionProfiler.Persistence.Mongo
 {
@@ -20,7 +21,7 @@ namespace ProductionProfiler.Persistence.Mongo
             _configuration = configuration;
         }
 
-        public Page<ProfiledRequest> GetProfiledRequests(PagingInfo pagingInfo)
+        public PE.Page<ProfiledRequest> GetProfiledRequests(PagingInfo pagingInfo)
         {
             using (MongoSession session = MongoSession.Connect(ProfiledRequestDatabaseName, _configuration.Server, _configuration.Port))
             {
@@ -127,7 +128,7 @@ namespace ProductionProfiler.Persistence.Mongo
             }
         }
 
-        public Page<ProfiledRequestPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo)
+        public PE.Page<ProfiledRequestPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo)
         {
             using (MongoSession session = MongoSession.Connect(ProfiledRequestDataDatabaseName, _configuration.Server, _configuration.Port))
             {
@@ -147,7 +148,7 @@ namespace ProductionProfiler.Persistence.Mongo
             }
         }
 
-        public Page<string> GetDistinctProfiledRequestUrls(PagingInfo pagingInfo)
+        public PE.Page<string> GetDistinctProfiledRequestUrls(PagingInfo pagingInfo)
         {
             using (MongoSession session = MongoSession.Connect(ProfiledRequestDataDatabaseName, _configuration.Server, _configuration.Port))
             {

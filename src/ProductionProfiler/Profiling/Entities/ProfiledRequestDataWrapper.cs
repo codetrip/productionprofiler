@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-namespace ProductionProfiler.Persistence.Sql.Entities
+namespace ProductionProfiler.Core.Profiling.Entities
 {
     public class ProfiledRequestDataWrapper
     {

@@ -82,6 +82,8 @@
     <Compile Include="IoC\RequestProfilingInterceptor.cs" />
     <Compile Include="Logging\DefaultLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />
+    <Compile Include="Persistence\PetaPoco.cs" />
+    <Compile Include="Profiling\Entities\ProfiledRequestDataWrapper.cs" />
     <Compile Include="Profiling\RequestProfiler.cs" />
     <Compile Include="Profiling\Entities\DataCollectionItem.cs" />
     <Compile Include="Profiling\IDoNotWantToBeProfiled.cs" />

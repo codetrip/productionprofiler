@@ -22,8 +22,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Linq.Expressions;
 
-
-namespace ProductionProfiler.Persistence.Sql.PetaPoco
+namespace ProductionProfiler.Core.Persistence
 {
     // Poco's marked [Explicit] require all column properties to be marked
     [AttributeUsage(AttributeTargets.Class)]
@@ -200,7 +199,9 @@ namespace ProductionProfiler.Persistence.Sql.PetaPoco
             ForceDateTimesToUtc = true;
 
             if (_providerName != null)
+            {
                 _factory = DbProviderFactories.GetFactory(_providerName);
+            }
 
             string dbtype = (_factory == null ? _sharedConnection.GetType() : _factory.GetType()).Name;
             if (dbtype.StartsWith("MySql")) _dbType = DBType.MySql;

@@ -21,15 +21,17 @@ namespace ProductionProfiler.Core.Profiling.Entities
         public long StoppedAtMilliseconds { get; set; }
         public string MethodName { get; set; }
 
-        public void Start()
+        public void Start(long startedAtMilliseconds)
         {
+            StartedAtMilliseconds = startedAtMilliseconds;
             _watch = Stopwatch.StartNew();
         }
 
-        public long Stop()
+        public void Stop(long stoppedAtMilliseconds)
         {
+            StoppedAtMilliseconds = stoppedAtMilliseconds;
+            ElapsedMilliseconds = _watch.ElapsedMilliseconds;
             _watch.Stop();
-            return _watch.ElapsedMilliseconds;
         }
 
         public long Elapsed()

@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}</ProjectGuid>
+    <ProjectGuid>{3E7624E7-DD1C-41FF-BF02-52B7BE47F84F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ProductionProfiler.Persistence.Sql</RootNamespace>
-    <AssemblyName>ProductionProfiler.Persistence.Sql</AssemblyName>
+    <RootNamespace>ProductionProfiler.Persistence.SQLite</RootNamespace>
+    <AssemblyName>ProductionProfiler.Persistence.SQLite</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -54,13 +54,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SQLiteConfiguration.cs" />
     <Compile Include="SQLiteDataModelBuilder.cs" />
     <Compile Include="SQLitePersistenceProvider.cs" />
-    <Compile Include="SqlDataModelBuilder.cs" />
-    <Compile Include="SqlConfiguration.cs" />
-    <Compile Include="SqlPersistenceProvider.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SqlProfilerRepository.cs" />
+    <Compile Include="SQLiteProfilerRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ProductionProfiler\ProductionProfiler.Core.csproj">

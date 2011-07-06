@@ -9,6 +9,7 @@ namespace ProductionProfiler.Persistence.Sql
         public string DatabaseName { get; set; }
         public string SchemaName { get; set; }
         public string OutputScriptPath { get; set; }
+        public bool GenerateIds { get; set; }
 
         public SqlConfiguration(string connectionStringName, string databaseName)
             : this(connectionStringName, databaseName, "dbo")

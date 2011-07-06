@@ -42,7 +42,7 @@ namespace ProductionProfiler.Persistence.Sql
             }
 
             //ensure the database has all required objects
-            DataModelBuilder.BuildDataModel(_configuration);
+            SqlDataModelBuilder.BuildDataModel(_configuration);
         }
     }
 }

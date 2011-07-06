@@ -27,18 +27,17 @@ namespace ProductionProfiler.Core.Configuration
         private bool _loggerSet;
         private IEnumerable<Type> _typesToIntercept;
         private IEnumerable<Type> _typesToIgnore;
-        private Func<HttpRequest, bool> _requestFilter;
-        private Action<Exception> _exceptionHandler;
         private IContainer _container;
         private ProfilerConfiguration _profilerConfiguration;
-        private Func<HttpContext, bool> _authorisedForManagement;
 
         public static IFluentExceptionConfiguration With(IContainer container)
         {
             Configure config = new Configure
             {
-                _profilerConfiguration = new ProfilerConfiguration(),
-                _requestFilter = req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty,
+                _profilerConfiguration = new ProfilerConfiguration
+                {
+                    ShouldProfile = req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty
+                },
                 _container = container
             };
 
@@ -59,7 +58,7 @@ namespace ProductionProfiler.Core.Configuration
 
         IFluentConfiguration IFluentConfiguration.RequestFilter(Func<HttpRequest, bool> requestFilter)
         {
-            _requestFilter = requestFilter;
+            _profilerConfiguration.ShouldProfile = requestFilter;
             return this;
         }
 
@@ -87,7 +86,7 @@ namespace ProductionProfiler.Core.Configuration
         {
             if (_cacheEngineSet)
             {
-                _exceptionHandler(new ProfilerConfigurationException("IProfilerCacheEngine has already been specified, cache engine of type {0} was not registered".FormatWith(typeof(T).FullName)));
+                _profilerConfiguration.ReportException(new ProfilerConfigurationException("IProfilerCacheEngine has already been specified, cache engine of type {0} was not registered".FormatWith(typeof(T).FullName)));
                 return this;
             }
 
@@ -100,7 +99,7 @@ namespace ProductionProfiler.Core.Configuration
         {
             if (_serializerSet)
             {
-                _exceptionHandler(new ProfilerConfigurationException(string.Format("ISerializer has already been specified, serializer of type {0} was not registered".FormatWith(typeof(T).FullName))));
+                _profilerConfiguration.ReportException(new ProfilerConfigurationException(string.Format("ISerializer has already been specified, serializer of type {0} was not registered".FormatWith(typeof(T).FullName))));
                 return this;
             }
 
@@ -127,7 +126,7 @@ namespace ProductionProfiler.Core.Configuration
             }
             catch (Exception e)
             {
-                _exceptionHandler(e);
+                _profilerConfiguration.ReportException(e);
             }
             
             return this;
@@ -145,7 +144,7 @@ namespace ProductionProfiler.Core.Configuration
 
         public IFluentConfiguration Authorize(Func<HttpContext, bool> authorisedForManagement)
         {
-            _authorisedForManagement = authorisedForManagement;
+            _profilerConfiguration.AuthorizedForManagement = authorisedForManagement;
             return this;
         }
 
@@ -164,7 +163,7 @@ namespace ProductionProfiler.Core.Configuration
         {
             if (_requestDataCollectorSet)
             {
-                _exceptionHandler(new ProfilerConfigurationException(string.Format("IHttpRequestDataCollector has already been specified, http request data collector of type {0} was not registered".FormatWith(typeof(T).FullName))));
+                _profilerConfiguration.ReportException(new ProfilerConfigurationException(string.Format("IHttpRequestDataCollector has already been specified, http request data collector of type {0} was not registered".FormatWith(typeof(T).FullName))));
                 return this;
             }
 
@@ -177,7 +176,7 @@ namespace ProductionProfiler.Core.Configuration
         {
             if (_responseDataCollectorSet)
             {
-                _exceptionHandler(new ProfilerConfigurationException(string.Format("IHttpResponseDataCollector has already been specified, http response data collector of type {0} was not registered".FormatWith(typeof(T).FullName))));
+                _profilerConfiguration.ReportException(new ProfilerConfigurationException(string.Format("IHttpResponseDataCollector has already been specified, http response data collector of type {0} was not registered".FormatWith(typeof(T).FullName))));
                 return this;
             }
 
@@ -195,11 +194,11 @@ namespace ProductionProfiler.Core.Configuration
             try
             {
                 RegisterDependencies();
-                ProfilerContext.Initialise(_requestFilter, _container, _authorisedForManagement, _exceptionHandler, _profilerConfiguration);
+                ProfilerContext.Initialise(_container, _profilerConfiguration);
             }
             catch (Exception e)
             {
-                _exceptionHandler(e);
+                _profilerConfiguration.ReportException(e);
             }
         }
 
@@ -301,7 +300,7 @@ namespace ProductionProfiler.Core.Configuration
             {
                 if (_configureInstance._profilerConfiguration.MethodDataCollectorMappings.IsCollectorTypeMapped(_collectorType))
                 {
-                    _configureInstance._exceptionHandler(new ProfilerConfigurationException(string.Format("IMethodDataCollector has already been registered for type {0}.".FormatWith(_collectorType.FullName))));
+                    _configureInstance._profilerConfiguration.ReportException(new ProfilerConfigurationException(string.Format("IMethodDataCollector has already been registered for type {0}.".FormatWith(_collectorType.FullName))));
                     return true;
                 }
 
@@ -328,7 +327,7 @@ namespace ProductionProfiler.Core.Configuration
                 if (exceptionHandler == null)
                     exceptionHandler = e => System.Diagnostics.Trace.Write(e.Format());
 
-                _configureInstance._exceptionHandler = exceptionHandler;
+                _configureInstance._profilerConfiguration.ReportException = exceptionHandler;
                 return _configureInstance;
             }
         }

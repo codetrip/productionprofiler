@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Castle.Facilities.FactorySupport;
@@ -50,6 +51,7 @@ namespace ProductionProfiler.Web
 
         protected void Application_Start()
         {
+            Thread.Sleep(10000);
             AreaRegistration.RegisterAllAreas();
 
             RegisterGlobalFilters(GlobalFilters.Filters);
@@ -90,7 +92,7 @@ namespace ProductionProfiler.Web
             Configure.With(container)
                 .HandleExceptionsVia(e => System.Diagnostics.Trace.Write(e.Format()))
                 .Logger(new Log4NetLogger())
-                .DataProvider(new SqlPersistenceProvider(new SqlConfiguration("profiler-sqlite", "profiler", "Profiler")))
+                .DataProvider(new SqlPersistenceProvider(new SqlConfiguration("profiler", "profiler", "Profiler")))
                 .HttpRequestDataCollector<BasicHttpRequestDataCollector>()
                 .HttpResponseDataCollector<BasicHttpResponseDataCollector>()
                 .CollectInputOutputMethodDataForTypes(new[] { typeof(IWorkflow) })

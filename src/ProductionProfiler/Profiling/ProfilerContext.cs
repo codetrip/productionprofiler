@@ -12,45 +12,41 @@ namespace ProductionProfiler.Core.Profiling
 {
     public class ProfilerContext
     {
-        private IContainer _container;
-        private Func<HttpRequest, bool> _shouldProfile;
-        private static ProfilerContext _current = new ProfilerContext();
-        private Func<HttpContext, bool> _authorizedForManagement;
-        private Action<Exception> _reportException;
-        private ProfilerConfiguration _configuration;
+        private const string ProfileContextKey = "profile-context-key";
+        private static IContainer _container;
+        private static ProfilerConfiguration _configuration;
+        private IRequestProfiler _profiler;
 
         #region Internal Constructors
 
-        internal static void Initialise(Func<HttpRequest, bool> shouldProfileRequest,
-            IContainer container,
-            Func<HttpContext, bool> authorizedForManagement,
-            Action<Exception> reportException,
-            ProfilerConfiguration configuration)
+        internal static void Initialise(IContainer container, ProfilerConfiguration configuration)
         {
-            _current = new ProfilerContext
-            {
-                _container = container,
-                _shouldProfile = shouldProfileRequest,
-                _authorizedForManagement = authorizedForManagement,
-                _reportException = reportException,
-                _configuration = configuration
-            };
+            _configuration = configuration;
+            _container = container;
         }
 
-        internal ProfilerContext()
-        { }
+        private ProfilerContext()
+        {}
 
         #endregion
 
         public static ProfilerContext Current
         {
-            get
-            {
-                return _current;
+            get 
+            { 
+                if(HttpContext.Current.Items[ProfileContextKey] == null)
+                {
+                    HttpContext.Current.Items[ProfileContextKey] = new ProfilerContext();
+                }
+
+                return HttpContext.Current.Items[ProfileContextKey] as ProfilerContext;
             }
         }
 
-        public IRequestProfiler Profiler { get; private set; }
+        public IRequestProfiler Profiler
+        {
+            get { return _profiler ?? (_profiler = _container.Resolve<IRequestProfiler>()); }
+        }
 
         public IEnumerable<IMethodDataCollector> GetMethodDataCollectorsForType(Type targetType)
         {
@@ -69,12 +65,11 @@ namespace ProductionProfiler.Core.Profiling
 
         public bool ShouldProfile(HttpRequest request)
         {
-            return _shouldProfile == null ? false : !request.RawUrl.Contains("/profiler") && _shouldProfile(request);
+            return _configuration.ShouldProfile != null && (!request.RawUrl.Contains("/profiler") && _configuration.ShouldProfile(request));
         }
 
         public void StartProfiling(HttpContext context)
         {
-            Profiler = _container.Resolve<IRequestProfiler>();
             Profiler.StartProfiling(context);
             HttpContext.Current.Items[Constants.RequestProfileContextKey] = true;
         }
@@ -84,12 +79,7 @@ namespace ProductionProfiler.Core.Profiling
             if (ProfilingCurrentRequest())
             {
                 HttpContext.Current.Items.Remove(Constants.RequestProfileContextKey);
-
-                if (Profiler != null)
-                {
-                    Profiler.StopProfiling(response);
-                    Profiler = null;
-                }
+                Profiler.StopProfiling(response);
             }
         }
 
@@ -97,20 +87,20 @@ namespace ProductionProfiler.Core.Profiling
         {
             System.Diagnostics.Trace.Write(e.Format());
 
-            if(_reportException != null)
+            if (_configuration.ReportException != null)
             {
-                _reportException(e);
+                _configuration.ReportException(e);
             }
         }
 
         public bool ProfilingCurrentRequest()
         {
-            return HttpContext.Current.Items.Contains(Constants.RequestProfileContextKey) && Profiler != null;
+            return HttpContext.Current.Items.Contains(Constants.RequestProfileContextKey);
         }
 
         public bool AuthorisedForManagement(HttpContext context)
         {
-            return _authorizedForManagement == null ? true : _authorizedForManagement(context);
+            return _configuration.AuthorizedForManagement == null || _configuration.AuthorizedForManagement(context);
         }
 
         public IRequestHandler GetRequestHandler(string name)

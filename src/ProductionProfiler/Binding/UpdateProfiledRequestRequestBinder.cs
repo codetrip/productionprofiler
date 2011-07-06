@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using ProductionProfiler.Core.Extensions;
 using ProductionProfiler.Core.Handlers.Entities;
 
 namespace ProductionProfiler.Core.Binding
@@ -21,7 +22,7 @@ namespace ProductionProfiler.Core.Binding
                 return profiledRequest;
 
             profiledRequest.Server = formParams.Get("Server");
-            profiledRequest.ProfilingCount = int.Parse(formParams.Get("ProfilingCount"));
+            profiledRequest.ProfilingCount = formParams.Get("ProfilingCount").IsNullOrEmpty() ? (int?)null : int.Parse(formParams.Get("ProfilingCount"));
             profiledRequest.Enabled = formParams.Get("Enabled").Contains("true");
 
             return profiledRequest;

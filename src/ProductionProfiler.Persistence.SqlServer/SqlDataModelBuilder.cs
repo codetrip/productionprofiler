@@ -10,7 +10,7 @@ using ProductionProfiler.Core.Extensions;
 
 namespace ProductionProfiler.Persistence.Sql
 {
-    public static class DataModelBuilder
+    public static class SqlDataModelBuilder
     {
         public static void BuildDataModel(SqlConfiguration configuration)
         {

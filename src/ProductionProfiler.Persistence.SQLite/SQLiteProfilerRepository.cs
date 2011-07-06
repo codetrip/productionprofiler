@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Persistence.Entities;
 using ProductionProfiler.Core.Profiling.Entities;
 using ProductionProfiler.Core.Serialization;
-using ProductionProfiler.Core.Extensions;
 using PetaPoco = ProductionProfiler.Core.Persistence;
-using System.Linq;
 
-namespace ProductionProfiler.Persistence.Sql
+namespace ProductionProfiler.Persistence.SQLite
 {
-    public class SqlProfilerRepository : IProfilerRepository
+    public class SQLiteProfilerRepository : IProfilerRepository
     {
-        private readonly SqlConfiguration _configuration;
+        private readonly SQLiteConfiguration _configuration;
 
-        public SqlProfilerRepository(SqlConfiguration configuration)
+        public SQLiteProfilerRepository(SQLiteConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -24,7 +23,7 @@ namespace ProductionProfiler.Persistence.Sql
         {
             using(var database = new Database(_configuration.ConnectionStringName))
             {
-                var page = database.Page<ProfiledRequest>(pagingInfo.PageNumber, pagingInfo.PageSize, "SELECT * FROM {0}.ProfiledRequest".FormatWith(_configuration.SchemaName));
+                var page = database.Page<ProfiledRequest>(pagingInfo.PageNumber, pagingInfo.PageSize, "SELECT * FROM ProfiledRequest");
                 return new Core.Persistence.Entities.Page<ProfiledRequest>(page.Items, new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, (int)page.TotalItems));
             }
         }
@@ -33,7 +32,7 @@ namespace ProductionProfiler.Persistence.Sql
         {
             using (var database = new Database(_configuration.ConnectionStringName))
             {
-                return database.Single<ProfiledRequest>("SELECT * FROM {0}.ProfiledRequest WHERE Url = @0".FormatWith(_configuration.SchemaName), url);
+                return database.Single<ProfiledRequest>("SELECT * FROM ProfiledRequest WHERE Url = @0", url);
             }
         }
 
@@ -41,23 +40,20 @@ namespace ProductionProfiler.Persistence.Sql
         {
             using (var database = new Database(_configuration.ConnectionStringName))
             {
-                return database.Fetch<ProfiledRequest>("SELECT * FROM {0}.ProfiledRequest WHERE Enabled = 1 AND (ProfilingCount > 0 OR ProfilingCount IS NULL)".FormatWith(_configuration.SchemaName));
+                return database.Fetch<ProfiledRequest>("SELECT * FROM ProfiledRequest WHERE Enabled = 1 AND (ProfilingCount > 0 OR ProfilingCount IS NULL)");
             }
         }
 
         public void SaveProfiledRequestWhenNotFound(ProfiledRequest profiledRequest)
         {
-            if(_configuration.GenerateIds && profiledRequest.Id != default(Guid))
-            {
-                profiledRequest.Id = Guid.NewGuid();
-            }
+            profiledRequest.Id = Guid.NewGuid();
 
             using (var database = new Database(_configuration.ConnectionStringName))
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine("IF NOT EXISTS(SELECT '*' FROM {0}.ProfiledRequest WHERE Url = @0)".FormatWith(_configuration.SchemaName));
+                sb.AppendLine("IF NOT EXISTS(SELECT '*' FROM ProfiledRequest WHERE Url = @0)");
                 sb.AppendLine("BEGIN");
-                sb.AppendLine(database.InsertSql("{0}.ProfiledRequest".FormatWith(_configuration.SchemaName), "Id", profiledRequest));
+                sb.AppendLine(database.InsertSql("ProfiledRequest", "Id", profiledRequest));
                 sb.AppendLine("END");
                 database.Execute(new PetaPoco.Sql(sb.ToString(), profiledRequest.Url, profiledRequest.ElapsedMilliseconds, profiledRequest.ProfilingCount, profiledRequest.ProfiledOnUtc, profiledRequest.Server, profiledRequest.HttpMethod, profiledRequest.Enabled));
             }
@@ -65,21 +61,18 @@ namespace ProductionProfiler.Persistence.Sql
 
         public void SaveProfiledRequest(ProfiledRequest profiledRequest)
         {
-            if (_configuration.GenerateIds && profiledRequest.Id != default(Guid))
-            {
-                profiledRequest.Id = Guid.NewGuid();
-            }
+            profiledRequest.Id = Guid.NewGuid();
 
             using (var database = new Database(_configuration.ConnectionStringName))
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine("IF NOT EXISTS(SELECT '*' FROM {0}.ProfiledRequest WHERE Url = @0)".FormatWith(_configuration.SchemaName));
+                sb.AppendLine("IF NOT EXISTS(SELECT '*' FROM ProfiledRequest WHERE Url = @0)");
                 sb.AppendLine("BEGIN");
-                sb.AppendLine(database.InsertSql("{0}.ProfiledRequest".FormatWith(_configuration.SchemaName), "Id", profiledRequest));
+                sb.AppendLine(database.InsertSql("ProfiledRequest", "Id", profiledRequest));
                 sb.AppendLine("END");
                 sb.AppendLine("ELSE");
                 sb.AppendLine("BEGIN");
-                sb.AppendLine(database.UpdateSql("{0}.ProfiledRequest".FormatWith(_configuration.SchemaName), "Id", profiledRequest, profiledRequest.Id));
+                sb.AppendLine(database.UpdateSql("ProfiledRequest", "Id", profiledRequest, profiledRequest.Id));
                 sb.AppendLine("END");
                 database.Execute(new PetaPoco.Sql(sb.ToString(), profiledRequest.Url, profiledRequest.ElapsedMilliseconds, profiledRequest.ProfilingCount, profiledRequest.ProfiledOnUtc, profiledRequest.Server, profiledRequest.HttpMethod, profiledRequest.Enabled, profiledRequest.Id));
             }
@@ -89,7 +82,7 @@ namespace ProductionProfiler.Persistence.Sql
         {
             using (var database = new Database(_configuration.ConnectionStringName))
             {
-                database.Delete("{0}.ProfiledRequest".FormatWith(_configuration.SchemaName), "Url", null, url);
+                database.Delete("ProfiledRequest", "Url", null, url);
             }
         }
 
@@ -100,7 +93,7 @@ namespace ProductionProfiler.Persistence.Sql
                 var results = database.Page<ProfiledRequestDataWrapper>(
                     pagingInfo.PageNumber, 
                     pagingInfo.PageSize,
-                    "SELECT * FROM {0}.ProfiledRequestData WHERE Url = @0 ORDER BY CapturedOnUtc DESC".FormatWith(_configuration.SchemaName), url);
+                    "SELECT * FROM ProfiledRequestData WHERE Url = @0 ORDER BY CapturedOnUtc DESC", url);
 
                 if (results != null)
                 {
@@ -127,7 +120,7 @@ namespace ProductionProfiler.Persistence.Sql
         {
             using (var database = new Database(_configuration.ConnectionStringName))
             {
-                var data = database.Single<ProfiledRequestDataWrapper>("SELECT * FROM {0}.ProfiledRequestData WHERE Id = @0".FormatWith(_configuration.SchemaName), id);
+                var data = database.Single<ProfiledRequestDataWrapper>("SELECT * FROM ProfiledRequestData WHERE Id = @0", id);
 
                 if(data != null)
                 {
@@ -142,7 +135,7 @@ namespace ProductionProfiler.Persistence.Sql
         {
             using (var database = new Database(_configuration.ConnectionStringName))
             {
-                var page = database.Page<ProfiledRequestData>(pagingInfo.PageNumber, pagingInfo.PageSize, "SELECT DISTINCT Url FROM {0}.ProfiledRequestData".FormatWith(_configuration.SchemaName));
+                var page = database.Page<ProfiledRequestData>(pagingInfo.PageNumber, pagingInfo.PageSize, "SELECT DISTINCT Url FROM ProfiledRequestData");
                 return new Core.Persistence.Entities.Page<string>(page.Items.Select(i => i.Url), new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, (int)page.TotalItems));
             }
         }
@@ -151,7 +144,7 @@ namespace ProductionProfiler.Persistence.Sql
         {
             using (var database = new Database(_configuration.ConnectionStringName))
             {
-                database.Delete("{0}.ProfiledRequestData".FormatWith(_configuration.SchemaName), "Url", null, url);
+                database.Delete("ProfiledRequestData", "Url", null, url);
             }
         }
 
@@ -159,16 +152,13 @@ namespace ProductionProfiler.Persistence.Sql
         {
             using (var database = new Database(_configuration.ConnectionStringName))
             {
-                database.Delete("{0}.ProfiledRequestData".FormatWith(_configuration.SchemaName), "Id", null, id);
+                database.Delete("ProfiledRequestData", "Id", null, id);
             }
         }
 
         public void SaveProfiledRequestData(ProfiledRequestData profiledRequestData)
         {
-            if (_configuration.GenerateIds && profiledRequestData.Id != default(Guid))
-            {
-                profiledRequestData.Id = Guid.NewGuid();
-            }
+            profiledRequestData.Id = Guid.NewGuid();
 
             using (var database = new Database(_configuration.ConnectionStringName))
             {
@@ -180,20 +170,17 @@ namespace ProductionProfiler.Persistence.Sql
                     CapturedOnUtc = profiledRequestData.CapturedOnUtc
                 };
 
-                database.Insert("{0}.ProfiledRequestData".FormatWith(_configuration.SchemaName), "Id", false, dataWrapper);
+                database.Insert("ProfiledRequestData", "Id", false, dataWrapper);
             }
         }
 
         public void SaveResponse(ProfiledResponse response)
         {
-            if (_configuration.GenerateIds && response.Id != default(Guid))
-            {
-                response.Id = Guid.NewGuid();
-            }
+            response.Id = Guid.NewGuid();
            
             using (var database = new Database(_configuration.ConnectionStringName))
             {
-                database.Insert("{0}.ProfiledResponse".FormatWith(_configuration.SchemaName), "Id", false, response);
+                database.Insert("ProfiledResponse", "Id", false, response);
             }
         }
 
@@ -201,7 +188,7 @@ namespace ProductionProfiler.Persistence.Sql
         {
             using (var database = new Database(_configuration.ConnectionStringName))
             {
-                return database.Single<ProfiledResponse>("SELECT * FROM {0}.ProfiledResponse WHERE Id = @0".FormatWith(_configuration.SchemaName), id);
+                return database.Single<ProfiledResponse>("SELECT * FROM ProfiledResponse WHERE Id = @0", id);
             }
         }
 
@@ -209,7 +196,7 @@ namespace ProductionProfiler.Persistence.Sql
         {
             using (var database = new Database(_configuration.ConnectionStringName))
             {
-                database.Delete("{0}.ProfiledResponse".FormatWith(_configuration.SchemaName), "Id", null, id);
+                database.Delete("ProfiledResponse", "Id", null, id);
             }
         }
 
@@ -217,7 +204,7 @@ namespace ProductionProfiler.Persistence.Sql
         {
             using (var database = new Database(_configuration.ConnectionStringName))
             {
-                database.Delete("{0}.ProfiledResponse".FormatWith(_configuration.SchemaName), "Url", null, url);
+                database.Delete("ProfiledResponse", "Url", null, url);
             }
         }
     }
