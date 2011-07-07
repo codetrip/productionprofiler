@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Web;
 using ProductionProfiler.Core.Collectors;
 using ProductionProfiler.Core.Configuration;
+using ProductionProfiler.Core.Factory;
 using ProductionProfiler.Core.Handlers;
 using ProductionProfiler.Core.IoC;
 using ProductionProfiler.Core.Resources;
@@ -33,13 +34,13 @@ namespace ProductionProfiler.Core.Profiling
         public static ProfilerContext Current
         {
             get 
-            { 
-                if(HttpContext.Current.Items[ProfileContextKey] == null)
+            {
+                if (HttpContextFactory.GetHttpContext().Items[ProfileContextKey] == null)
                 {
-                    HttpContext.Current.Items[ProfileContextKey] = new ProfilerContext();
+                    HttpContextFactory.GetHttpContext().Items[ProfileContextKey] = new ProfilerContext();
                 }
 
-                return HttpContext.Current.Items[ProfileContextKey] as ProfilerContext;
+                return HttpContextFactory.GetHttpContext().Items[ProfileContextKey] as ProfilerContext;
             }
         }
 
@@ -68,17 +69,22 @@ namespace ProductionProfiler.Core.Profiling
             return _configuration.ShouldProfile != null && (!request.RawUrl.Contains("/profiler") && _configuration.ShouldProfile(request));
         }
 
+        public bool MonitoringEnabled
+        {
+            get { return _configuration.MonitoringEnabled; }
+        }
+
         public void StartProfiling(HttpContext context)
         {
             Profiler.StartProfiling(context);
-            HttpContext.Current.Items[Constants.RequestProfileContextKey] = true;
+            HttpContextFactory.GetHttpContext().Items[Constants.RequestProfileContextKey] = true;
         }
 
         public void StopProfiling(HttpResponse response)
         {
             if (ProfilingCurrentRequest())
             {
-                HttpContext.Current.Items.Remove(Constants.RequestProfileContextKey);
+                HttpContextFactory.GetHttpContext().Items.Remove(Constants.RequestProfileContextKey);
                 Profiler.StopProfiling(response);
             }
         }
@@ -95,7 +101,7 @@ namespace ProductionProfiler.Core.Profiling
 
         public bool ProfilingCurrentRequest()
         {
-            return HttpContext.Current.Items.Contains(Constants.RequestProfileContextKey);
+            return HttpContextFactory.GetHttpContext().Items.Contains(Constants.RequestProfileContextKey);
         }
 
         public bool AuthorisedForManagement(HttpContext context)

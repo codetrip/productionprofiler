@@ -16,14 +16,12 @@ namespace ProductionProfiler.Persistence.SQLite
         public static void BuildDataModel(SQLiteConfiguration configuration)
         {
             string scriptContents = GetScript();
-            var dbFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ExtractFilename(ConfigurationManager.ConnectionStrings[configuration.ConnectionStringName].ConnectionString)); 
+            var dbFile = ExtractFilename(ConfigurationManager.ConnectionStrings[configuration.ConnectionStringName].ConnectionString); 
 
             try
             {
                 if (File.Exists(dbFile))
                     return;
-
-                SQLiteConnection.CreateFile(dbFile);
 
                 using (var connection = new SQLiteConnection(ConfigurationManager.ConnectionStrings[configuration.ConnectionStringName].ConnectionString))
                 {
@@ -57,7 +55,7 @@ namespace ProductionProfiler.Persistence.SQLite
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 File.Delete(dbFile);
                 throw;
@@ -76,19 +74,25 @@ namespace ProductionProfiler.Persistence.SQLite
 
             script.Append(
                 @"
+                DROP TABLE IF EXISTS ProfiledRequest
+                GO
+                DROP TABLE IF EXISTS ProfiledRequestData
+                GO
+                DROP TABLE IF EXISTS ProfiledResponse
+                GO
                 CREATE TABLE ProfiledRequest(
 	                Id uniqueidentifier NOT NULL PRIMARY KEY ASC,
 	                Url TEXT NOT NULL UNIQUE,
 	                ElapsedMilliseconds INTEGER NULL,
 	                ProfilingCount INTEGER NULL,
-	                ProfiledOnUtc INTEGER NULL,
+	                ProfiledOnUtc TEXT NULL,
 	                Server TEXT NULL,
 	                HttpMethod TEXT NULL,
 	                Enabled BOOL NOT NULL DEFAULT 0
                 )
                 GO
 
-                CREATE INDEX IX_ProfiledRequest_Url ON ProfiledRequest(Url);
+                CREATE UNIQUE INDEX IX_ProfiledRequest_Url ON ProfiledRequest(Url);
                 GO
             ");
 
@@ -98,7 +102,7 @@ namespace ProductionProfiler.Persistence.SQLite
 	                Id uniqueidentifier NOT NULL PRIMARY KEY ASC,
 	                Url TEXT NOT NULL,
 	                Data BLOB NOT NULL,
-                    CapturedOnUtc INTEGER NOT NULL
+                    CapturedOnUtc TEXT NOT NULL
                 ) 
                 GO
 

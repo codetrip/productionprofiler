@@ -77,7 +77,7 @@ namespace ProductionProfiler.Persistence.Sql
 	                    [Id] [uniqueidentifier] NOT NULL,
 	                    [Url] [varchar](900) NOT NULL CONSTRAINT UQ_ProfiledRequest_Url UNIQUE,
 	                    [ElapsedMilliseconds] [bigint] NULL,
-	                    [ProfilingCount] [int] NULL,
+	                    [ProfilingCount] [bigint] NULL,
 	                    [ProfiledOnUtc] [datetime] NULL,
 	                    [Server] [nvarchar](128) NULL,
 	                    [HttpMethod] [nvarchar](8) NULL,

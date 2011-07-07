@@ -1,9 +1,8 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using log4net;
 
-namespace ProductionProfiler.Web.Models
+namespace ProductionProfiler.Tests.Components
 {
     public class TestWorkflow1 : IWorkflow1
     {

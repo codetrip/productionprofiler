@@ -2,8 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Web.Mvc;
+using ProductionProfiler.Tests.Components;
 using log4net;
-using ProductionProfiler.Web.Models;
 
 namespace ProductionProfiler.Web.Controllers
 {

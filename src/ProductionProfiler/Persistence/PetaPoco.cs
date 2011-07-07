@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Linq;
 using System.Text;
@@ -21,6 +22,7 @@ using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Linq.Expressions;
+using ProductionProfiler.Core.Extensions;
 
 namespace ProductionProfiler.Core.Persistence
 {
@@ -1173,7 +1175,7 @@ namespace ProductionProfiler.Core.Persistence
             }
         }
 
-        public string InsertSql(string tableName, string primaryKeyName, object poco)
+        public string InsertSql(string tableName, string primaryKeyName, object poco, bool autoIncrement = true)
         {
             var pd = PocoData.ForObject(poco, primaryKeyName);
             var names = new List<string>();
@@ -1187,7 +1189,7 @@ namespace ProductionProfiler.Core.Persistence
                     continue;
 
                 // Don't insert the primary key (except under oracle where we need bring in the next sequence value)
-                if (primaryKeyName != null && string.Compare(i.Key, primaryKeyName, true) == 0)
+                if (autoIncrement && primaryKeyName != null && string.Compare(i.Key, primaryKeyName, true) == 0)
                 {
                     if (_dbType == DBType.Oracle && !string.IsNullOrEmpty(pd.TableInfo.SequenceName))
                     {
@@ -2125,15 +2127,15 @@ namespace ProductionProfiler.Core.Persistence
                 Func<object, object> converter = null;
 
                 // Get converter from the mapper
-                if (Database.Mapper != null)
+                if (Mapper != null)
                 {
                     if (pc != null)
                     {
-                        converter = Database.Mapper.GetFromDbConverter(pc.PropertyInfo, srcType);
+                        converter = Mapper.GetFromDbConverter(pc.PropertyInfo, srcType);
                     }
                     else
                     {
-                        var m2 = Database.Mapper as IMapper2;
+                        var m2 = Mapper as IMapper2;
                         if (m2 != null)
                         {
                             converter = m2.GetFromDbConverter(dstType, srcType);
@@ -2144,7 +2146,7 @@ namespace ProductionProfiler.Core.Persistence
                 // Standard DateTime->Utc mapper
                 if (forceDateTimesToUtc && converter == null && srcType == typeof(DateTime) && (dstType == typeof(DateTime) || dstType == typeof(DateTime?)))
                 {
-                    converter = delegate(object src) { return new DateTime(((DateTime)src).Ticks, DateTimeKind.Utc); };
+                    converter = src => new DateTime(((DateTime) src).Ticks, DateTimeKind.Utc);
                 }
 
                 // Forced type conversion including integral types -> enum
@@ -2154,12 +2156,19 @@ namespace ProductionProfiler.Core.Persistence
                     {
                         if (srcType != typeof(int))
                         {
-                            converter = delegate(object src) { return Convert.ChangeType(src, typeof(int), null); };
+                            converter = src => Convert.ChangeType(src, typeof (int), null);
                         }
                     }
                     else if (!dstType.IsAssignableFrom(srcType))
                     {
-                        converter = delegate(object src) { return Convert.ChangeType(src, dstType, null); };
+                        if (dstType.IsGenericType && dstType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
+                        {
+                            converter = new NullableConverter(dstType).ConvertFrom;
+                        }
+                        else
+                        {
+                            converter = src => Convert.ChangeType(src, dstType, null);
+                        }
                     }
                 }
                 return converter;

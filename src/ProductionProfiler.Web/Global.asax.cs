@@ -9,6 +9,8 @@ using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.Releasers;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
+using ProductionProfiler.Persistence.SQLite;
+using ProductionProfiler.Tests.Components;
 using log4net.Config;
 using ProductionProfiler.Core.Caching;
 using ProductionProfiler.Core.Collectors;
@@ -18,8 +20,6 @@ using ProductionProfiler.IoC.Windsor;
 using ProductionProfiler.Logging.Log4Net;
 using ProductionProfiler.Persistence.Sql;
 using ProductionProfiler.Web.Controllers;
-using ProductionProfiler.Web.Models;
-using ProductionProfiler.Web.Profilng;
 using ProductionProfiler.Core.Extensions;
 using StructureMap;
 
@@ -92,7 +92,7 @@ namespace ProductionProfiler.Web
             Configure.With(container)
                 .HandleExceptionsVia(e => System.Diagnostics.Trace.Write(e.Format()))
                 .Logger(new Log4NetLogger())
-                .DataProvider(new SqlPersistenceProvider(new SqlConfiguration("profiler", "profiler", "Profiler")))
+                .DataProvider(new SQLitePersistenceProvider(new SQLiteConfiguration("profiler-sqlite")))
                 .HttpRequestDataCollector<BasicHttpRequestDataCollector>()
                 .HttpResponseDataCollector<BasicHttpResponseDataCollector>()
                 .CollectInputOutputMethodDataForTypes(new[] { typeof(IWorkflow) })
@@ -102,7 +102,7 @@ namespace ProductionProfiler.Web
                 .RequestFilter(req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty)
                 .CaptureExceptions()
                 .CaptureResponse()
-                //.EnableMonitoring(5000, 3000)
+                .EnableMonitoring(5000, 500)
                 .Initialise();
         }
 
@@ -115,7 +115,7 @@ namespace ProductionProfiler.Web
         {
             ObjectFactory.Configure(c => c.Scan(a =>
             {
-                a.TheCallingAssembly();
+                a.AssemblyContainingType(typeof(IWorkflow));
                 a.With(new DerivedOpenGenericInterfaceConnectionScanner(typeof(IWorkflow<,>)));
             }));
 
@@ -133,7 +133,7 @@ namespace ProductionProfiler.Web
                     .BasedOn<IController>()
                     .Configure(c => c.LifeStyle.Transient));
 
-            _container.Register(AllTypes.FromAssembly(Assembly.GetExecutingAssembly())
+            _container.Register(AllTypes.FromAssembly(typeof(IWorkflow).Assembly)
                 .BasedOn(typeof(IWorkflow<,>))
                     .WithService
                     .FromInterface(typeof(IWorkflow<,>))

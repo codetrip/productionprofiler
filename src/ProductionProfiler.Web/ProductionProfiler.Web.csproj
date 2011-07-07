@@ -58,13 +58,13 @@
     <Reference Include="StructureMap">
       <HintPath>..\..\lib\StructureMap\StructureMap.dll</HintPath>
     </Reference>
-    <Reference Include="System.Data.SQLite, Version=1.0.66.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+    <Reference Include="System.Data.SQLite, Version=1.0.74.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\SQLite\System.Data.SQLite.DLL</HintPath>
+      <HintPath>..\..\lib\SQLite\x86\System.Data.SQLite.dll</HintPath>
     </Reference>
-    <Reference Include="System.Data.SQLite.Linq, Version=2.0.38.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.74.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\SQLite\System.Data.SQLite.Linq.dll</HintPath>
+      <HintPath>..\..\lib\SQLite\x86\System.Data.SQLite.Linq.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.WebPages" />
@@ -96,9 +96,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\IWorkflow.cs" />
-    <Compile Include="Models\Workflows.cs" />
-    <Compile Include="Profilng\WorkflowMethodDataCollector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -146,9 +143,17 @@
       <Project>{3B04FCA1-FEF7-472E-AAF4-70CBCC18453A}</Project>
       <Name>ProductionProfiler.Persistence.Mongo</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ProductionProfiler.Persistence.SQLite\ProductionProfiler.Persistence.SQLite.csproj">
+      <Project>{3E7624E7-DD1C-41FF-BF02-52B7BE47F84F}</Project>
+      <Name>ProductionProfiler.Persistence.SQLite</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ProductionProfiler.Persistence.SqlServer\ProductionProfiler.Persistence.Sql.csproj">
       <Project>{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}</Project>
       <Name>ProductionProfiler.Persistence.Sql</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ProductionProfiler.Tests\ProductionProfiler.Tests.csproj">
+      <Project>{29DAE741-A801-415D-8C7B-C94A7CDA3415}</Project>
+      <Name>ProductionProfiler.Tests</Name>
     </ProjectReference>
     <ProjectReference Include="..\ProductionProfiler\ProductionProfiler.Core.csproj">
       <Project>{767A9F14-9537-48A1-95B6-A1D753E1DA4E}</Project>

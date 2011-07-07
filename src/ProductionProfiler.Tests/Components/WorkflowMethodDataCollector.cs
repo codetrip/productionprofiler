@@ -1,8 +1,7 @@
 ﻿using ProductionProfiler.Core.Collectors;
 using ProductionProfiler.Core.Profiling.Entities;
-using ProductionProfiler.Web.Models;
 
-namespace ProductionProfiler.Web.Profilng
+namespace ProductionProfiler.Tests.Components
 {
     public class WorkflowMethodDataCollector : IMethodDataCollector
     {

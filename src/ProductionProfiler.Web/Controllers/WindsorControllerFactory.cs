@@ -3,6 +3,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Castle.Windsor;
+using ProductionProfiler.Core.Factory;
 
 namespace ProductionProfiler.Web.Controllers
 {
@@ -14,7 +15,7 @@ namespace ProductionProfiler.Web.Controllers
             {
                 try
                 {
-                    return base.GetControllerInstance(requestContext, controllerType);
+                    return base.GetControllerInstance(requestContext, null);
                 }
                 catch (HttpException)
                 {
@@ -37,9 +38,10 @@ namespace ProductionProfiler.Web.Controllers
         {
             try
             {
-                if(HttpContext.Current != null)
+                var httpContext = HttpContextFactory.GetHttpContext();
+                if (httpContext != null)
                 {
-                    IContainerAccessor application = HttpContext.Current.ApplicationInstance as IContainerAccessor;
+                    IContainerAccessor application = httpContext.ApplicationInstance as IContainerAccessor;
 
                     if (application != null)
                     {

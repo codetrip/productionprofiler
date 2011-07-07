@@ -3,6 +3,7 @@ using System.IO;
 using System.ServiceModel;
 using System.Web;
 using System.Web.Hosting;
+using ProductionProfiler.Core.Factory;
 
 namespace ProductionProfiler.Core.Dynamic
 {
@@ -27,7 +28,7 @@ namespace ProductionProfiler.Core.Dynamic
         {
             string location;
 
-            if (HttpContext.Current != null)
+            if (HttpContextFactory.GetHttpContext() != null)
             {
                 // web (IIS/WCF ASP compatibility mode)context
                 location = HttpRuntime.BinDirectory;

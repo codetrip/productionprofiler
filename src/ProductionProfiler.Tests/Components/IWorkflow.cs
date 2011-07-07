@@ -1,5 +1,5 @@
 ﻿
-namespace ProductionProfiler.Web.Models
+namespace ProductionProfiler.Tests.Components
 {
     public interface IWorkflow<in TRequest, out TResponse> : IWorkflow
     {

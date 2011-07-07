@@ -42,7 +42,7 @@ namespace ProductionProfiler.Core.Modules
         {
             try
             {
-                if (ProfilerContext.Current.ProfilingCurrentRequest())
+                if (ProfilerContext.Current.ProfilingCurrentRequest() || ProfilerContext.Current.MonitoringEnabled)
                 {
                     ProfilerContext.Current.EndRequest(((HttpApplication)sender).Context);
                 }

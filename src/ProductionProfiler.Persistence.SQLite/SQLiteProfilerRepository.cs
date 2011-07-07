@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using ProductionProfiler.Core.Persistence;
@@ -46,35 +47,32 @@ namespace ProductionProfiler.Persistence.SQLite
 
         public void SaveProfiledRequestWhenNotFound(ProfiledRequest profiledRequest)
         {
-            profiledRequest.Id = Guid.NewGuid();
-
             using (var database = new Database(_configuration.ConnectionStringName))
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine("IF NOT EXISTS(SELECT '*' FROM ProfiledRequest WHERE Url = @0)");
-                sb.AppendLine("BEGIN");
-                sb.AppendLine(database.InsertSql("ProfiledRequest", "Id", profiledRequest));
-                sb.AppendLine("END");
-                database.Execute(new PetaPoco.Sql(sb.ToString(), profiledRequest.Url, profiledRequest.ElapsedMilliseconds, profiledRequest.ProfilingCount, profiledRequest.ProfiledOnUtc, profiledRequest.Server, profiledRequest.HttpMethod, profiledRequest.Enabled));
+                sb.AppendLine(database.InsertSql("ProfiledRequest", "Id", profiledRequest, false));
+
+                //not particurly elegant, but we only want to add this ProfiledRequest if one for the same URL 
+                //does not already exist, so we are relying on the unique index on Url field to do this.
+                try
+                {
+                    database.Execute(new Sql(sb.ToString(), profiledRequest.Id, profiledRequest.Url, profiledRequest.ElapsedMilliseconds, profiledRequest.ProfilingCount, profiledRequest.ProfiledOnUtc, profiledRequest.Server, profiledRequest.HttpMethod, profiledRequest.Enabled));
+                }
+                catch (SQLiteException e)
+                {
+                    if(!e.Message.Contains("Abort due to constraint violation"))
+                        throw;
+                }
             }
         }
 
         public void SaveProfiledRequest(ProfiledRequest profiledRequest)
         {
-            profiledRequest.Id = Guid.NewGuid();
-
             using (var database = new Database(_configuration.ConnectionStringName))
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine("IF NOT EXISTS(SELECT '*' FROM ProfiledRequest WHERE Url = @0)");
-                sb.AppendLine("BEGIN");
-                sb.AppendLine(database.InsertSql("ProfiledRequest", "Id", profiledRequest));
-                sb.AppendLine("END");
-                sb.AppendLine("ELSE");
-                sb.AppendLine("BEGIN");
-                sb.AppendLine(database.UpdateSql("ProfiledRequest", "Id", profiledRequest, profiledRequest.Id));
-                sb.AppendLine("END");
-                database.Execute(new PetaPoco.Sql(sb.ToString(), profiledRequest.Url, profiledRequest.ElapsedMilliseconds, profiledRequest.ProfilingCount, profiledRequest.ProfiledOnUtc, profiledRequest.Server, profiledRequest.HttpMethod, profiledRequest.Enabled, profiledRequest.Id));
+                sb.AppendLine(database.InsertSql("ProfiledRequest", "Id", profiledRequest, false).Replace("INSERT INTO", "REPLACE INTO"));
+                database.Execute(new Sql(sb.ToString(), profiledRequest.Id, profiledRequest.Url, profiledRequest.ElapsedMilliseconds, profiledRequest.ProfilingCount, profiledRequest.ProfiledOnUtc, profiledRequest.Server, profiledRequest.HttpMethod, profiledRequest.Enabled, profiledRequest.Id));
             }
         }
 
@@ -158,8 +156,6 @@ namespace ProductionProfiler.Persistence.SQLite
 
         public void SaveProfiledRequestData(ProfiledRequestData profiledRequestData)
         {
-            profiledRequestData.Id = Guid.NewGuid();
-
             using (var database = new Database(_configuration.ConnectionStringName))
             {
                 var dataWrapper = new ProfiledRequestDataWrapper
@@ -176,8 +172,6 @@ namespace ProductionProfiler.Persistence.SQLite
 
         public void SaveResponse(ProfiledResponse response)
         {
-            response.Id = Guid.NewGuid();
-           
             using (var database = new Database(_configuration.ConnectionStringName))
             {
                 database.Insert("ProfiledResponse", "Id", false, response);

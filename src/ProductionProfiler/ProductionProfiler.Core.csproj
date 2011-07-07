@@ -61,6 +61,7 @@
     <Compile Include="Binding\IAddProfiledRequestRequestBinder.cs" />
     <Compile Include="Binding\IUpdateProfiledRequestRequestBinder.cs" />
     <Compile Include="Binding\UpdateProfiledRequestRequestBinder.cs" />
+    <Compile Include="Caching\NullCacheEngine.cs" />
     <Compile Include="Caching\HttpRuntimeCacheEngine.cs" />
     <Compile Include="Caching\IProfilerCacheEngine.cs" />
     <Compile Include="Collectors\BasicHttpResponseDataCollector.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Dynamic\PropertyMapper.cs" />
     <Compile Include="Extensions\ObjectReflectionExtensions.cs" />
     <Compile Include="Extensions\StackExtensions.cs" />
+    <Compile Include="Factory\HttpContextFactory.cs" />
     <Compile Include="IoC\RequestProfilingInterceptor.cs" />
     <Compile Include="Logging\DefaultLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />
@@ -155,6 +157,7 @@
     <EmbeddedResource Include="Resources\Minus.gif" />
     <EmbeddedResource Include="Resources\Plus.gif" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
