@@ -58,14 +58,6 @@
     <Reference Include="StructureMap">
       <HintPath>..\..\lib\StructureMap\StructureMap.dll</HintPath>
     </Reference>
-    <Reference Include="System.Data.SQLite, Version=1.0.74.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\SQLite\x86\System.Data.SQLite.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Data.SQLite.Linq, Version=1.0.74.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\SQLite\x86\System.Data.SQLite.Linq.dll</HintPath>
-    </Reference>
     <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.WebPages" />
     <Reference Include="System.Web.Helpers" />
@@ -143,9 +135,9 @@
       <Project>{3B04FCA1-FEF7-472E-AAF4-70CBCC18453A}</Project>
       <Name>ProductionProfiler.Persistence.Mongo</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ProductionProfiler.Persistence.SQLite\ProductionProfiler.Persistence.SQLite.csproj">
-      <Project>{3E7624E7-DD1C-41FF-BF02-52B7BE47F84F}</Project>
-      <Name>ProductionProfiler.Persistence.SQLite</Name>
+    <ProjectReference Include="..\ProductionProfiler.Persistence.Raven\ProductionProfiler.Persistence.Raven.csproj">
+      <Project>{FBD23662-A373-4A87-8CA9-E94333F00071}</Project>
+      <Name>ProductionProfiler.Persistence.Raven</Name>
     </ProjectReference>
     <ProjectReference Include="..\ProductionProfiler.Persistence.SqlServer\ProductionProfiler.Persistence.Sql.csproj">
       <Project>{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}</Project>

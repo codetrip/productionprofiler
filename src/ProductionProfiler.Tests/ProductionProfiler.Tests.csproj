@@ -106,10 +106,6 @@
       <Project>{FBD23662-A373-4A87-8CA9-E94333F00071}</Project>
       <Name>ProductionProfiler.Persistence.Raven</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ProductionProfiler.Persistence.SQLite\ProductionProfiler.Persistence.SQLite.csproj">
-      <Project>{3E7624E7-DD1C-41FF-BF02-52B7BE47F84F}</Project>
-      <Name>ProductionProfiler.Persistence.SQLite</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ProductionProfiler.Persistence.SqlServer\ProductionProfiler.Persistence.Sql.csproj">
       <Project>{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}</Project>
       <Name>ProductionProfiler.Persistence.Sql</Name>

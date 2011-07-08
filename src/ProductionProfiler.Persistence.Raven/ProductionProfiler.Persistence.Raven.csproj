@@ -37,6 +37,21 @@
     <AssemblyOriginatorKeyFile>..\..\tools\profiler.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MissingBitsFromClientProfile">
+      <HintPath>..\..\lib\Raven\MissingBitsFromClientProfile.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json.Net35">
+      <HintPath>..\..\lib\Json.NET\Newtonsoft.Json.Net35.dll</HintPath>
+    </Reference>
+    <Reference Include="Raven.Abstractions-3.5">
+      <HintPath>..\..\lib\Raven\Raven.Abstractions-3.5.dll</HintPath>
+    </Reference>
+    <Reference Include="Raven.Client.Lightweight-3.5">
+      <HintPath>..\..\lib\Raven\Raven.Client.Lightweight-3.5.dll</HintPath>
+    </Reference>
+    <Reference Include="Raven.Json-3.5">
+      <HintPath>..\..\lib\Raven\Raven.Json-3.5.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -46,7 +61,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RavenProfilerRepository.cs" />
+    <Compile Include="RavenPersistenceProvider.cs" />
+    <Compile Include="RavenConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ProductionProfiler\ProductionProfiler.Core.csproj">
+      <Project>{767A9F14-9537-48A1-95B6-A1D753E1DA4E}</Project>
+      <Name>ProductionProfiler.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

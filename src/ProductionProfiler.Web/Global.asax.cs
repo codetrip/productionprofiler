@@ -9,7 +9,7 @@ using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.Releasers;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
-using ProductionProfiler.Persistence.SQLite;
+using ProductionProfiler.Persistence.Raven;
 using ProductionProfiler.Tests.Components;
 using log4net.Config;
 using ProductionProfiler.Core.Caching;
@@ -18,7 +18,6 @@ using ProductionProfiler.Core.Configuration;
 using ProductionProfiler.IoC.StructureMap;
 using ProductionProfiler.IoC.Windsor;
 using ProductionProfiler.Logging.Log4Net;
-using ProductionProfiler.Persistence.Sql;
 using ProductionProfiler.Web.Controllers;
 using ProductionProfiler.Core.Extensions;
 using StructureMap;
@@ -92,7 +91,7 @@ namespace ProductionProfiler.Web
             Configure.With(container)
                 .HandleExceptionsVia(e => System.Diagnostics.Trace.Write(e.Format()))
                 .Logger(new Log4NetLogger())
-                .DataProvider(new SQLitePersistenceProvider(new SQLiteConfiguration("profiler-sqlite")))
+                .DataProvider(new RavenPersistenceProvider("http://localhost:8010"))
                 .HttpRequestDataCollector<BasicHttpRequestDataCollector>()
                 .HttpResponseDataCollector<BasicHttpResponseDataCollector>()
                 .CollectInputOutputMethodDataForTypes(new[] { typeof(IWorkflow) })
