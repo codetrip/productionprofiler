@@ -25,7 +25,10 @@ namespace ProductionProfiler.Core.Handlers
                 }
             }
 
-            if (!requestInfo.ResourceName.Contains(".gif") && !requestInfo.ResourceName.Contains(".jpg") && context.Request.Headers.Get(Constants.HttpHeaders.AcceptEncoding) != null && context.Request.Headers.Get(Constants.HttpHeaders.AcceptEncoding).Contains(Constants.RequestEncoding.GZip))
+            if (!requestInfo.ResourceName.Contains(".gif") && 
+                !requestInfo.ResourceName.Contains(".jpg") && 
+                context.Request.Headers.Get(Constants.HttpHeaders.AcceptEncoding) != null && 
+                context.Request.Headers.Get(Constants.HttpHeaders.AcceptEncoding).Contains(Constants.RequestEncoding.GZip))
             {
                 context.Response.Filter = new GZipStream(context.Response.Filter, CompressionMode.Compress);
                 context.Response.AppendHeader(Constants.HttpHeaders.ContentEncoding, Constants.RequestEncoding.GZip);
