@@ -55,7 +55,7 @@ namespace ProductionProfiler.Persistence.SQLite
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 File.Delete(dbFile);
                 throw;
