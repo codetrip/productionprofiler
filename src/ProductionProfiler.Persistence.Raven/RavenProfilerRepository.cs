@@ -77,6 +77,10 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
+                // HRB: removed this code as it's causing problems ("Error: Attempted to associated a different object with id"),
+                // and it's not necessary - Raven will simply overwrite the stored profile, which is what we want.
+                
+                /*
                 var request = session.Query<ProfiledRequest>(ProfiledRequestIndexName)
                     .Where(r => r.Url == profiledRequest.Url)
                     .FirstOrDefault();
@@ -86,6 +90,7 @@ namespace ProductionProfiler.Persistence.Raven
                 {
                     session.Delete(request);
                 }
+                */
 
                 session.Store(profiledRequest);
                 session.SaveChanges();
