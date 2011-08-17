@@ -6,13 +6,13 @@ using ProductionProfiler.Core.Extensions;
 
 namespace ProductionProfiler.Core.Binding
 {
-    public class AddProfiledRequestRequestBinder : IAddProfiledRequestRequestBinder
+    public class AddUrlToProfileRequestBinder : IAddUrlToProfileRequestBinder
     {
         private readonly List<ModelValidationError> _errors = new List<ModelValidationError>();
         
-        public ProfiledRequest Bind(NameValueCollection formParams)
+        public UrlToProfile Bind(NameValueCollection formParams)
         {
-            ProfiledRequest profiledRequest = new ProfiledRequest
+            UrlToProfile urlToProfile = new UrlToProfile
             {
                 Url = formParams.Get("Url"),
                 ProfilingCount = formParams.Get("ProfilingCount").IsNullOrEmpty() ? (int?)null : int.Parse(formParams.Get("ProfilingCount")),
@@ -20,7 +20,7 @@ namespace ProductionProfiler.Core.Binding
                 Enabled = true
             };
 
-            return profiledRequest;
+            return urlToProfile;
         }
 
         public bool IsValid(NameValueCollection formParams)

@@ -10,9 +10,9 @@ namespace ProductionProfiler.Persistence.Mongo
 {
     public class MongoProfilerRepository : IProfilerRepository
     {
-        public const string ProfiledRequestDatabaseName = "profiledrequests";
+        public const string UrlToProfileDatabaseName = "UrlToProfiles";
         public const string StoredResponseDatabaseName = "profiledresponses";
-        public const string ProfiledRequestDataDatabaseName = "profiledrequestdata";
+        public const string UrlToProfileDataDatabaseName = "UrlToProfiledata";
 
         private readonly MongoConfiguration _configuration;
 
@@ -21,60 +21,49 @@ namespace ProductionProfiler.Persistence.Mongo
             _configuration = configuration;
         }
 
-        public PE.Page<ProfiledRequest> GetProfiledRequests(PagingInfo pagingInfo)
+        public PE.Page<UrlToProfile> GetUrlsToProfile(PagingInfo pagingInfo)
         {
-            using (MongoSession session = MongoSession.Connect(ProfiledRequestDatabaseName, _configuration.Server, _configuration.Port))
+            using (MongoSession session = MongoSession.Connect(UrlToProfileDatabaseName, _configuration.Server, _configuration.Port))
             {
-                return session.Page<ProfiledRequest>(pagingInfo);
+                return session.Page<UrlToProfile>(pagingInfo);
             }
         }
 
-        public ProfiledRequest GetProfiledRequestByUrl(string url)
+        public UrlToProfile GetUrlToProfile(string url)
         {
-            using (MongoSession session = MongoSession.Connect(ProfiledRequestDatabaseName, _configuration.Server, _configuration.Port))
+            using (MongoSession session = MongoSession.Connect(UrlToProfileDatabaseName, _configuration.Server, _configuration.Port))
             {
-                return session.Items<ProfiledRequest>().Where(b => b.Url == url).FirstOrDefault();
+                return session.Items<UrlToProfile>().Where(b => b.Url == url).FirstOrDefault();
             }
         }
 
-        public List<ProfiledRequest> GetCurrentRequestsToProfile()
+        public List<UrlToProfile> GetCurrentUrlsToProfile()
         {
-            using (MongoSession session = MongoSession.Connect(ProfiledRequestDatabaseName, _configuration.Server, _configuration.Port))
+            using (MongoSession session = MongoSession.Connect(UrlToProfileDatabaseName, _configuration.Server, _configuration.Port))
             {
-                return session.Items<ProfiledRequest>().Where(req => req.Enabled).Where(req => req.ProfilingCount == null || req.ProfilingCount > 0).ToList();
+                return session.Items<UrlToProfile>().Where(req => req.Enabled).Where(req => req.ProfilingCount == null || req.ProfilingCount > 0).ToList();
             }
         }
 
-        public void SaveProfiledRequestWhenNotFound(ProfiledRequest profiledRequest)
+        public void SaveUrlToProfile(UrlToProfile urlToProfile)
         {
-            using (MongoSession session = MongoSession.Connect(ProfiledRequestDatabaseName, _configuration.Server, _configuration.Port))
+            using (MongoSession session = MongoSession.Connect(UrlToProfileDatabaseName, _configuration.Server, _configuration.Port))
             {
-                var request = session.Items<ProfiledRequest>().Where(b => b.Url == profiledRequest.Url).Select(r => r.Url).FirstOrDefault();
-
-                if (request == null)
-                    session.Save(profiledRequest);
+                session.Save(urlToProfile);
             }
         }
 
-        public void SaveProfiledRequest(ProfiledRequest profiledRequest)
+        public void DeleteUrlToProfile(string url)
         {
-            using (MongoSession session = MongoSession.Connect(ProfiledRequestDatabaseName, _configuration.Server, _configuration.Port))
+            using (MongoSession session = MongoSession.Connect(UrlToProfileDatabaseName, _configuration.Server, _configuration.Port))
             {
-                session.Save(profiledRequest);
-            }
-        }
-
-        public void DeleteProfiledRequest(string url)
-        {
-            using (MongoSession session = MongoSession.Connect(ProfiledRequestDatabaseName, _configuration.Server, _configuration.Port))
-            {
-                session.Delete<ProfiledRequest, object>(new { Url = url });
+                session.Delete<UrlToProfile, object>(new { Url = url });
             }
         }
 
         public ProfiledRequestData GetProfiledRequestDataById(Guid id)
         {
-            using (MongoSession session = MongoSession.Connect(ProfiledRequestDataDatabaseName, _configuration.Server, _configuration.Port))
+            using (MongoSession session = MongoSession.Connect(UrlToProfileDataDatabaseName, _configuration.Server, _configuration.Port))
             {
                 return session.Items<ProfiledRequestData>().Where(b => b.Id == id).FirstOrDefault();
             }
@@ -82,17 +71,17 @@ namespace ProductionProfiler.Persistence.Mongo
 
         public void DeleteProfiledRequestDataById(Guid id)
         {
-            using (MongoSession session = MongoSession.Connect(ProfiledRequestDataDatabaseName, _configuration.Server, _configuration.Port))
+            using (MongoSession session = MongoSession.Connect(UrlToProfileDataDatabaseName, _configuration.Server, _configuration.Port))
             {
                 session.Delete<ProfiledRequestData, object>(new { Id = id });
             }
         }
 
-        public void SaveProfiledRequestData(ProfiledRequestData entity)
+        public void SaveProfiledRequestData(ProfiledRequestData data)
         {
-            using (MongoSession session = MongoSession.Connect(ProfiledRequestDataDatabaseName, _configuration.Server, _configuration.Port))
+            using (MongoSession session = MongoSession.Connect(UrlToProfileDataDatabaseName, _configuration.Server, _configuration.Port))
             {
-                session.Save(entity);
+                session.Save(data);
             }
         }
 
@@ -128,16 +117,16 @@ namespace ProductionProfiler.Persistence.Mongo
             }
         }
 
-        public PE.Page<ProfiledRequestPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo)
+        public PE.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo)
         {
-            using (MongoSession session = MongoSession.Connect(ProfiledRequestDataDatabaseName, _configuration.Server, _configuration.Port))
+            using (MongoSession session = MongoSession.Connect(UrlToProfileDataDatabaseName, _configuration.Server, _configuration.Port))
             {
-                return session.Page<ProfiledRequestData, DateTime, ProfiledRequestPreview>(
+                return session.Page<ProfiledRequestData, DateTime, ProfiledRequestDataPreview>(
                     pagingInfo,
                     app => app.Url == url,
                     app => app.CapturedOnUtc,
                     false,
-                    t => new ProfiledRequestPreview
+                    t => new ProfiledRequestDataPreview
                     {
                         CapturedOnUtc = t.CapturedOnUtc,
                         ElapsedMilliseconds = t.ElapsedMilliseconds,
@@ -148,9 +137,69 @@ namespace ProductionProfiler.Persistence.Mongo
             }
         }
 
-        public PE.Page<string> GetDistinctProfiledRequestUrls(PagingInfo pagingInfo)
+        public Core.Persistence.Entities.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewBySessionId(Guid sessionId, PagingInfo pagingInfo)
         {
-            using (MongoSession session = MongoSession.Connect(ProfiledRequestDataDatabaseName, _configuration.Server, _configuration.Port))
+            using (MongoSession session = MongoSession.Connect(UrlToProfileDataDatabaseName, _configuration.Server, _configuration.Port))
+            {
+                return session.Page<ProfiledRequestData, DateTime, ProfiledRequestDataPreview>(
+                    pagingInfo,
+                    app => app.SessionId == sessionId,
+                    app => app.CapturedOnUtc,
+                    false,
+                    t => new ProfiledRequestDataPreview
+                    {
+                        CapturedOnUtc = t.CapturedOnUtc,
+                        ElapsedMilliseconds = t.ElapsedMilliseconds,
+                        Id = t.Id,
+                        Server = t.Server,
+                        Url = t.Url
+                    });
+            }
+        }
+
+        public Core.Persistence.Entities.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewBySessionUserId(string sessionUserId, PagingInfo pagingInfo)
+        {
+            using (MongoSession session = MongoSession.Connect(UrlToProfileDataDatabaseName, _configuration.Server, _configuration.Port))
+            {
+                return session.Page<ProfiledRequestData, DateTime, ProfiledRequestDataPreview>(
+                    pagingInfo,
+                    app => app.SessionUserId == sessionUserId,
+                    app => app.CapturedOnUtc,
+                    false,
+                    t => new ProfiledRequestDataPreview
+                    {
+                        CapturedOnUtc = t.CapturedOnUtc,
+                        ElapsedMilliseconds = t.ElapsedMilliseconds,
+                        Id = t.Id,
+                        Server = t.Server,
+                        Url = t.Url
+                    });
+            }
+        }
+
+        public Core.Persistence.Entities.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewBySamplingId(Guid samplingId, PagingInfo pagingInfo)
+        {
+            using (MongoSession session = MongoSession.Connect(UrlToProfileDataDatabaseName, _configuration.Server, _configuration.Port))
+            {
+                return session.Page<ProfiledRequestData, DateTime, ProfiledRequestDataPreview>(
+                    pagingInfo,
+                    app => app.SamplingId == samplingId,
+                    app => app.CapturedOnUtc,
+                    false,
+                    t => new ProfiledRequestDataPreview
+                    {
+                        CapturedOnUtc = t.CapturedOnUtc,
+                        ElapsedMilliseconds = t.ElapsedMilliseconds,
+                        Id = t.Id,
+                        Server = t.Server,
+                        Url = t.Url
+                    });
+            }
+        }
+
+        public PE.Page<string> GetDistinctUrlsToProfile(PagingInfo pagingInfo)
+        {
+            using (MongoSession session = MongoSession.Connect(UrlToProfileDataDatabaseName, _configuration.Server, _configuration.Port))
             {
                 return session.Distinct<ProfiledRequestData, string, string>("Url", pagingInfo, url => url, true);
             }
@@ -158,7 +207,7 @@ namespace ProductionProfiler.Persistence.Mongo
 
         public void DeleteProfiledRequestDataByUrl(string url)
         {
-            using (MongoSession session = MongoSession.Connect(ProfiledRequestDataDatabaseName, _configuration.Server, _configuration.Port))
+            using (MongoSession session = MongoSession.Connect(UrlToProfileDataDatabaseName, _configuration.Server, _configuration.Port))
             {
                 session.Delete<ProfiledRequestData, object>(new { Url = url });
             }

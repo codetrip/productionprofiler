@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ProductionProfiler.Core.Collectors;
-using ProductionProfiler.Core.IoC;
+using ProductionProfiler.Core.Profiling;
 
 namespace ProductionProfiler.Core.Configuration
 {
@@ -16,7 +16,7 @@ namespace ProductionProfiler.Core.Configuration
 
         public IList<Type> InputOutputMethodDataTypes { get; set; }
 
-        public IEnumerable<IMethodDataCollector> GetMethodDataCollectorsForType(Type methodTargetType, IContainer container)
+        public IEnumerable<IMethodDataCollector> GetMethodDataCollectorsForType(Type methodTargetType)
         {
             if(!_mappedCollectors.ContainsKey(methodTargetType))
             {
@@ -35,7 +35,7 @@ namespace ProductionProfiler.Core.Configuration
             {
                 foreach(string key in keys)
                 {
-                    yield return container.Resolve<IMethodDataCollector>(key);
+                    yield return ProfilerContext.Container.Resolve<IMethodDataCollector>(key);
                 }
             }
         }

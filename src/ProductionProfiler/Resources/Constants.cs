@@ -65,11 +65,11 @@ namespace ProductionProfiler.Core.Resources
         {
             public const string Results = "results";
             public const string ViewResponse = "response";
-            public const string ViewProfiledRequests = "vpr";
-            public const string AddProfiledRequest = "apr";
-            public const string UpdateProfiledRequest = "upr";
-            public const string DeleteProfiledRequestDataById = "dprid";
-            public const string DeleteProfiledRequestDataByUrl = "dprurl";
+            public const string ViewUrlToProfiles = "vpr";
+            public const string AddUrlToProfile = "apr";
+            public const string UpdateUrlToProfile = "upr";
+            public const string DeleteUrlToProfileDataById = "dprid";
+            public const string DeleteUrlToProfileDataByUrl = "dprurl";
         }
     }
 }

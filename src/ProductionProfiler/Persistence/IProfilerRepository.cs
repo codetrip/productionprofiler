@@ -10,57 +10,45 @@ namespace ProductionProfiler.Core.Persistence
     public interface IProfilerRepository : IDoNotWantToBeProfiled
     {
         /// <summary>
-        /// Returns a page of Profiled requests ordered by date captured descending
+        /// Returns a page of URL's to profile ordered by URL
         /// </summary>
         /// <param name="pagingInfo"></param>
         /// <returns></returns>
-        PE.Page<ProfiledRequest> GetProfiledRequests(PagingInfo pagingInfo);
+        PE.Page<UrlToProfile> GetUrlsToProfile(PagingInfo pagingInfo);
         /// <summary>
-        /// Returns a ProfiledRequest instance matching the specified URL
+        /// Returns a UrlToProfile instance matching the specified URL
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        ProfiledRequest GetProfiledRequestByUrl(string url);
+        UrlToProfile GetUrlToProfile(string url);
         /// <summary>
-        /// Returns a list of all ProfiledRequests that are active. Active means, Enabled and with a ProfilingCount > 0
+        /// Returns a list of all UrlToProfiles that are active. Active means, Enabled and with a ProfilingCount > 0
         /// </summary>
         /// <returns></returns>
-        List<ProfiledRequest> GetCurrentRequestsToProfile();
+        List<UrlToProfile> GetCurrentUrlsToProfile();
         /// <summary>
-        /// Saves ProfiledRequest if an only if an instance with the ProfiledRequest.Url does not already exist
+        /// Saves the UrlToProfile instance to the data store (should overwrite if an instance with the same URL already exists)
         /// </summary>
-        /// <param name="profiledRequest"></param>
-        void SaveProfiledRequestWhenNotFound(ProfiledRequest profiledRequest);
+        /// <param name="urlToProfile"></param>
+        void SaveUrlToProfile(UrlToProfile urlToProfile);
         /// <summary>
-        /// Saves the ProfiledRequest instance to the data store (should overwrite if an instance with the same URL already exists)
-        /// </summary>
-        /// <param name="profiledRequest"></param>
-        void SaveProfiledRequest(ProfiledRequest profiledRequest);
-        /// <summary>
-        /// Deletes the ProfiledRequest instance for the specified URL
+        /// Deletes the UrlToProfile instance for the specified URL
         /// </summary>
         /// <param name="url"></param>
-        void DeleteProfiledRequest(string url);
+        void DeleteUrlToProfile(string url);
 
-        /// <summary>
-        /// Returns a preview of all profiled request data capruted for the specified URL
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="pagingInfo"></param>
-        /// <returns></returns>
-        PE.Page<ProfiledRequestPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo);
-        /// <summary>
-        /// Returns a ProfiledRequestData instance matching the specified Id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        PE.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo);
+        PE.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewBySessionId(Guid sessionId, PagingInfo pagingInfo);
+        PE.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewBySessionUserId(string sessionUserId, PagingInfo pagingInfo);
+        PE.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewBySamplingId(Guid samplingId, PagingInfo pagingInfo);
+
         ProfiledRequestData GetProfiledRequestDataById(Guid id);
         /// <summary>
         /// Returns a distinct page of URL's from profiled requests
         /// </summary>
         /// <param name="pagingInfo"></param>
         /// <returns></returns>
-        PE.Page<string> GetDistinctProfiledRequestUrls(PagingInfo pagingInfo);
+        PE.Page<string> GetDistinctUrlsToProfile(PagingInfo pagingInfo);
         /// <summary>
         /// Deletes all profiled request data captured for the specified URL
         /// </summary>

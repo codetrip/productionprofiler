@@ -31,13 +31,13 @@ namespace ProductionProfiler.Persistence.Raven
         }
 
         /// <summary>
-        /// create two indexes for the URL field in the ProfiledRequestDatabaseName and ProfiledRequestDataDatabaseName databases
+        /// create two indexes for the URL field in the UrlToProfileDatabaseName and UrlToProfileDataDatabaseName databases
         /// </summary>
         public void Initialise()
         {
-            _documentStore.DatabaseCommands.PutIndex("ProfiledRequestIndex", new IndexDefinition
+            _documentStore.DatabaseCommands.PutIndex("UrlToProfileIndex", new IndexDefinition
             {
-                Map = "from doc in docs.ProfiledRequests select new { ProfilingCount = doc.ProfilingCount, Enabled = doc.Enabled, Url = doc.Url, __document_id = doc.__document_id }",
+                Map = "from doc in docs.UrlToProfiles select new { ProfilingCount = doc.ProfilingCount, Enabled = doc.Enabled, Url = doc.Url, __document_id = doc.__document_id }",
                 Fields = new List<string>(new []{ "ProfilingCount" }),
                 Indexes = new Dictionary<string, FieldIndexing>
                 {
@@ -53,9 +53,9 @@ namespace ProductionProfiler.Persistence.Raven
                 }
             });
 
-            _documentStore.DatabaseCommands.PutIndex("ProfiledRequestDataIndex", new IndexDefinition
+            _documentStore.DatabaseCommands.PutIndex("UrlToProfileDataIndex", new IndexDefinition
             {
-                Map = "from doc in docs.ProfiledRequestDatas select new { Id = doc.Id, CapturedOnUtc = doc.CapturedOnUtc, Url = doc.Url, __document_id = doc.__document_id }",
+                Map = "from doc in docs.UrlToProfileDatas select new { Id = doc.Id, CapturedOnUtc = doc.CapturedOnUtc, Url = doc.Url, __document_id = doc.__document_id }",
                 Fields = new List<string>(new[] { "CapturedOnUtc" }),
                 Indexes = new Dictionary<string, FieldIndexing>
                 {

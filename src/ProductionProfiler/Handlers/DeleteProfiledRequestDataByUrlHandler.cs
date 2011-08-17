@@ -6,19 +6,19 @@ namespace ProductionProfiler.Core.Handlers
 {
     public class DeleteProfiledDataByUrlRequestHandler : RequestHandlerBase
     {
-        private readonly IProfilerRepository _profiledRequestsRepository;
+        private readonly IProfilerRepository _urlToProfilesRepository;
 
-        public DeleteProfiledDataByUrlRequestHandler(IProfilerRepository profiledRequestsRepository)
+        public DeleteProfiledDataByUrlRequestHandler(IProfilerRepository urlToProfilesRepository)
         {
-            _profiledRequestsRepository = profiledRequestsRepository;
+            _urlToProfilesRepository = urlToProfilesRepository;
         }
 
         protected override JsonResponse DoHandleRequest(RequestInfo requestInfo)
         {
             string url = requestInfo.Form.Get("Url");
 
-            _profiledRequestsRepository.DeleteProfiledRequestDataByUrl(url);
-            _profiledRequestsRepository.DeleteResponseByUrl(url);
+            _urlToProfilesRepository.DeleteProfiledRequestDataByUrl(url);
+            _urlToProfilesRepository.DeleteResponseByUrl(url);
 
             return new JsonResponse
             {

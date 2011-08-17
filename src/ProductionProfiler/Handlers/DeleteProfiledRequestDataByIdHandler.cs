@@ -7,11 +7,11 @@ namespace ProductionProfiler.Core.Handlers
 {
     public class DeleteProfiledDataByIdRequestHandler : RequestHandlerBase
     {
-        private readonly IProfilerRepository _profiledRequestsRepository;
+        private readonly IProfilerRepository _urlToProfileRepository;
 
-        public DeleteProfiledDataByIdRequestHandler(IProfilerRepository profiledRequestsRepository)
+        public DeleteProfiledDataByIdRequestHandler(IProfilerRepository urlToProfileRepository)
         {
-            _profiledRequestsRepository = profiledRequestsRepository;
+            _urlToProfileRepository = urlToProfileRepository;
         }
 
         protected override JsonResponse DoHandleRequest(RequestInfo requestInfo)
@@ -19,8 +19,8 @@ namespace ProductionProfiler.Core.Handlers
             Guid id;
             if (Guid.TryParse(requestInfo.Form.Get("Id"), out id))
             {
-                _profiledRequestsRepository.DeleteProfiledRequestDataById(id);
-                _profiledRequestsRepository.DeleteResponseById(id);
+                _urlToProfileRepository.DeleteProfiledRequestDataById(id);
+                _urlToProfileRepository.DeleteResponseById(id);
             }
 
             return new JsonResponse

@@ -74,25 +74,22 @@ namespace ProductionProfiler.Persistence.SQLite
 
             script.Append(
                 @"
-                DROP TABLE IF EXISTS ProfiledRequest
+                DROP TABLE IF EXISTS UrlToProfile
                 GO
                 DROP TABLE IF EXISTS ProfiledRequestData
                 GO
                 DROP TABLE IF EXISTS ProfiledResponse
                 GO
-                CREATE TABLE ProfiledRequest(
+                CREATE TABLE UrlToProfile(
 	                Id uniqueidentifier NOT NULL PRIMARY KEY ASC,
 	                Url TEXT NOT NULL UNIQUE,
-	                ElapsedMilliseconds INTEGER NULL,
 	                ProfilingCount INTEGER NULL,
-	                ProfiledOnUtc TEXT NULL,
 	                Server TEXT NULL,
-	                HttpMethod TEXT NULL,
 	                Enabled BOOL NOT NULL DEFAULT 0
                 )
                 GO
 
-                CREATE UNIQUE INDEX IX_ProfiledRequest_Url ON ProfiledRequest(Url);
+                CREATE UNIQUE INDEX IX_UrlToProfile_Url ON UrlToProfile(Url);
                 GO
             ");
 
@@ -100,13 +97,16 @@ namespace ProductionProfiler.Persistence.SQLite
                 @"
                 CREATE TABLE ProfiledRequestData(
 	                Id uniqueidentifier NOT NULL PRIMARY KEY ASC,
+                    SessionId uniqueidentifier NULL,
+                    SessionUserId TEXT NULL,
+                    SamplingId uniqueidentifier NULL,
 	                Url TEXT NOT NULL,
 	                Data BLOB NOT NULL,
                     CapturedOnUtc TEXT NOT NULL
                 ) 
                 GO
 
-                CREATE INDEX IX_ProfiledRequestData_Url ON ProfiledRequest(Url);
+                CREATE INDEX IX_UrlToProfileData_Url ON UrlToProfile(Url);
                 GO
             ");
 

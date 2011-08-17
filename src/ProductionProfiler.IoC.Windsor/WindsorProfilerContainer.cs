@@ -61,6 +61,11 @@ namespace ProductionProfiler.IoC.Windsor
             return _container.ResolveAll<T>();
         }
 
+        public bool HasObject(Type type)
+        {
+            return _container.Kernel.HasComponent(type);
+        }
+
         public void InitialiseForProxyInterception(IEnumerable<Type> typesToIntercept, IEnumerable<Type> typesToIgnore)
         {
             RegisterTransient<RequestProfilingInterceptor>(typeof(RequestProfilingInterceptor));

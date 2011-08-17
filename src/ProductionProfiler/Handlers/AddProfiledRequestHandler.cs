@@ -8,43 +8,43 @@ using ProductionProfiler.Core.Extensions;
 
 namespace ProductionProfiler.Core.Handlers
 {
-    public class AddProfiledRequestHandler : RequestHandlerBase
+    public class AddUrlToProfileHandler : RequestHandlerBase
     {
-        private readonly IProfilerRepository _profiledRequestsRepository;
-        private readonly IAddProfiledRequestRequestBinder _addProfiledRequestRequestBinder;
+        private readonly IProfilerRepository _UrlToProfilesRepository;
+        private readonly IAddUrlToProfileRequestBinder _addUrlToProfileRequestBinder;
         private readonly IProfilerCacheEngine _profilerCacheEngine;
 
-        public AddProfiledRequestHandler(IProfilerRepository profiledRequestsRepository,
-            IAddProfiledRequestRequestBinder addProfiledRequestRequestBinder, 
+        public AddUrlToProfileHandler(IProfilerRepository UrlToProfilesRepository,
+            IAddUrlToProfileRequestBinder addUrlToProfileRequestBinder, 
             IProfilerCacheEngine profilerCacheEngine)
         {
-            _profiledRequestsRepository = profiledRequestsRepository;
+            _UrlToProfilesRepository = UrlToProfilesRepository;
             _profilerCacheEngine = profilerCacheEngine;
-            _addProfiledRequestRequestBinder = addProfiledRequestRequestBinder;
+            _addUrlToProfileRequestBinder = addUrlToProfileRequestBinder;
         }
 
         protected override JsonResponse DoHandleRequest(RequestInfo requestInfo)
         {
-            if (!_addProfiledRequestRequestBinder.IsValid(requestInfo.Form))
+            if (!_addUrlToProfileRequestBinder.IsValid(requestInfo.Form))
             {
                 return new JsonResponse
                 {
                     Success = false,
-                    Errors = _addProfiledRequestRequestBinder.Errors
+                    Errors = _addUrlToProfileRequestBinder.Errors
                 };
             }
 
-            var profiledRequest = _addProfiledRequestRequestBinder.Bind(requestInfo.Form);
+            var UrlToProfile = _addUrlToProfileRequestBinder.Bind(requestInfo.Form);
 
             //store the new request
-            _profiledRequestsRepository.SaveProfiledRequest(profiledRequest);
+            _UrlToProfilesRepository.SaveUrlToProfile(UrlToProfile);
 
             //invalidate the current requests to profile cache key
             _profilerCacheEngine.Remove(Constants.CacheKeys.CurrentRequestsToProfile);   
 
             return new JsonResponse
             {
-                Redirect = Constants.Urls.ProfilerHandler.FormatWith(Constants.Handlers.ViewProfiledRequests)
+                Redirect = Constants.Urls.ProfilerHandler.FormatWith(Constants.Handlers.ViewUrlToProfiles)
             };
         }
     }

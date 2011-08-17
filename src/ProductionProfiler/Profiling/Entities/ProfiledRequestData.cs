@@ -7,6 +7,9 @@ namespace ProductionProfiler.Core.Profiling.Entities
     public class ProfiledRequestData
     {
         public Guid Id { get; set; }
+        public Guid SessionId { get; set; }
+        public string SessionUserId { get; set; }
+        public Guid SamplingId { get; set; }
         public DateTime CapturedOnUtc { get; set; }
         public string Url { get; set; }
         public long ElapsedMilliseconds { get; set; }

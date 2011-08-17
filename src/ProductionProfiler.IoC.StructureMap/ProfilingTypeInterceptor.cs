@@ -24,7 +24,7 @@ namespace ProductionProfiler.IoC.StructureMap
 
         public object Process(object target, IContext context)
         {
-            if (ProfilerContext.Current.ProfilingCurrentRequest())
+            if (ProfilerContext.Profiling)
             {
                 var interfaces = target.GetType().GetInterfaces();
 
@@ -40,7 +40,7 @@ namespace ProductionProfiler.IoC.StructureMap
 
         public bool MatchesType(Type serviceType)
         {
-            if (!ProfilerContext.Current.ProfilingCurrentRequest())
+            if (!ProfilerContext.Profiling)
                 return false;
 
             return (_typesToIntercept == null || _typesToIntercept.Any(t => t.IsAssignableFrom(serviceType))) && !_typesToIgnore.Any(t => t.IsAssignableFrom(serviceType));

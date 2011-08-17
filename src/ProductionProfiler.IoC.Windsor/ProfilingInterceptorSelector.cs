@@ -21,7 +21,7 @@ namespace ProductionProfiler.IoC.Windsor
 
         public bool HasInterceptors(ComponentModel model)
         {
-            if (ProfilerContext.Current.ProfilingCurrentRequest())
+            if (ProfilerContext.Profiling)
             {
                 return ShouldIntercept(model.Service);
             }
@@ -31,7 +31,7 @@ namespace ProductionProfiler.IoC.Windsor
 
         public InterceptorReference[] SelectInterceptors(ComponentModel model, InterceptorReference[] interceptors)
         {
-            if (ProfilerContext.Current.ProfilingCurrentRequest())
+            if (ProfilerContext.Profiling)
             {
                 if (!ShouldIntercept(model.Service))
                     return interceptors;

@@ -6,9 +6,8 @@ using log4net.Repository.Hierarchy;
 using ProductionProfiler.Core.Extensions;
 using ProductionProfiler.Core.Profiling.Entities;
 using ProductionProfiler.Core.Resources;
-using ILogger = ProductionProfiler.Core.Logging.ILogger;
 
-namespace ProductionProfiler.Logging.Log4Net
+namespace ProductionProfiler.Core.Logging
 {
     public class Log4NetLogger : ILogger
     {

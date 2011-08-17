@@ -60,6 +60,11 @@ namespace ProductionProfiler.IoC.StructureMap
             return _container.GetAllInstances<T>().ToArray();
         }
 
+        public bool HasObject(Type type)
+        {
+            return _container.TryGetInstance(type) != null;
+        }
+
         public void InitialiseForProxyInterception(IEnumerable<Type> typesToIntercept, IEnumerable<Type> typesToIgnore)
         {
             _container.Configure(c => c.RegisterInterceptor(new ProfilingTypeInterceptor(new ProxyGenerator(), typesToIntercept, typesToIgnore)));

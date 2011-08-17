@@ -71,18 +71,15 @@ namespace ProductionProfiler.Persistence.Sql
 
             script.Append(
                 @"
-                IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}].[ProfiledRequest]') AND type in (N'U'))
+                IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}].[UrlToProfile]') AND type in (N'U'))
                 BEGIN
-                    CREATE TABLE [{0}].[ProfiledRequest](
+                    CREATE TABLE [{0}].[UrlToProfile](
 	                    [Id] [uniqueidentifier] NOT NULL,
-	                    [Url] [varchar](900) NOT NULL CONSTRAINT UQ_ProfiledRequest_Url UNIQUE,
-	                    [ElapsedMilliseconds] [bigint] NULL,
+	                    [Url] [varchar](900) NOT NULL CONSTRAINT UQ_UrlToProfile_Url UNIQUE,
 	                    [ProfilingCount] [bigint] NULL,
-	                    [ProfiledOnUtc] [datetime] NULL,
 	                    [Server] [nvarchar](128) NULL,
-	                    [HttpMethod] [nvarchar](8) NULL,
 	                    [Enabled] [bit] NOT NULL DEFAULT 0
-                    CONSTRAINT PK_ProfiledRequest PRIMARY KEY NONCLUSTERED 
+                    CONSTRAINT PK_UrlToProfile PRIMARY KEY NONCLUSTERED 
                     (
 	                    [Id] ASC
                     )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
@@ -90,18 +87,18 @@ namespace ProductionProfiler.Persistence.Sql
                 END
                 GO
 
-                IF NOT EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[{0}].[ProfiledRequest]') AND name = N'IX_ProfiledRequest_Url')
+                IF NOT EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[{0}].[UrlToProfile]') AND name = N'IX_UrlToProfile_Url')
                 BEGIN
-                    CREATE UNIQUE CLUSTERED INDEX [IX_ProfiledRequest_Url] ON [{0}].[ProfiledRequest]
+                    CREATE UNIQUE CLUSTERED INDEX [IX_UrlToProfile_Url] ON [{0}].[UrlToProfile]
                     (
 	                    [Url] ASC
                     )
                 END
                 GO
 
-                IF NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE name = N'DF_ProfiledRequest_Id')
+                IF NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE name = N'DF_UrlToProfile_Id')
                 BEGIN
-                    ALTER TABLE [{0}].[ProfiledRequest] ADD CONSTRAINT [DF_ProfiledRequest_Id]  DEFAULT (newid()) FOR [Id]
+                    ALTER TABLE [{0}].[UrlToProfile] ADD CONSTRAINT [DF_UrlToProfile_Id]  DEFAULT (newid()) FOR [Id]
                 END
                 GO
             ".FormatWith(schema));
@@ -112,10 +109,13 @@ namespace ProductionProfiler.Persistence.Sql
                 BEGIN
                     CREATE TABLE [{0}].[ProfiledRequestData](
 	                    [Id] [uniqueidentifier] NOT NULL,
+                        [SessionId] [uniqueidentifier] NULL,
+                        [SessionUserId] [nvarchar](128) NULL,
+                        [SamplingId] [uniqueidentifier] NULL,
 	                    [Url] [varchar](900) NOT NULL,
 	                    [Data] [varbinary](max) NOT NULL,
                         [CapturedOnUtc] [DATETIME] NOT NULL
-                    CONSTRAINT PK_ProfiledRequestData PRIMARY KEY NONCLUSTERED 
+                    CONSTRAINT PK_UrlToProfileData PRIMARY KEY NONCLUSTERED 
                     (
 	                    [Id] ASC
                     )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
@@ -123,9 +123,9 @@ namespace ProductionProfiler.Persistence.Sql
                 END
                 GO
 
-                IF NOT EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[{0}].[ProfiledRequestData]') AND name = N'IX_ProfiledRequestData_Url')
+                IF NOT EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[{0}].[ProfiledRequestData]') AND name = N'IX_UrlToProfileData_Url')
                 BEGIN
-                    CREATE CLUSTERED INDEX [IX_ProfiledRequestData_Url] ON [{0}].[ProfiledRequestData]
+                    CREATE CLUSTERED INDEX [IX_UrlToProfileData_Url] ON [{0}].[ProfiledRequestData]
                     (
 	                    [Url] ASC
                     )

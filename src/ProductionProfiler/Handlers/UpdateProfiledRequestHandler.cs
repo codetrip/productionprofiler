@@ -6,44 +6,44 @@ using ProductionProfiler.Core.Resources;
 
 namespace ProductionProfiler.Core.Handlers
 {
-    public class UpdateProfiledRequestHandler : RequestHandlerBase
+    public class UpdateUrlToProfileHandler : RequestHandlerBase
     {
         private readonly IProfilerRepository _repository;
-        private readonly IUpdateProfiledRequestRequestBinder _updateProfiledRequestRequestBinder;
+        private readonly IUpdateUrlToProfileRequestBinder _updateUrlToProfileRequestBinder;
         private readonly IProfilerCacheEngine _profilerCacheEngine;
 
-        public UpdateProfiledRequestHandler(IProfilerRepository repository, 
-            IUpdateProfiledRequestRequestBinder updateProfiledRequestRequestBinder, 
+        public UpdateUrlToProfileHandler(IProfilerRepository repository, 
+            IUpdateUrlToProfileRequestBinder updateUrlToProfileRequestBinder, 
             IProfilerCacheEngine profilerCacheEngine)
         {
             _repository = repository;
             _profilerCacheEngine = profilerCacheEngine;
-            _updateProfiledRequestRequestBinder = updateProfiledRequestRequestBinder;
+            _updateUrlToProfileRequestBinder = updateUrlToProfileRequestBinder;
         }
 
         protected override JsonResponse DoHandleRequest(RequestInfo requestInfo)
         {
-            if (!_updateProfiledRequestRequestBinder.IsValid(requestInfo.Form))
+            if (!_updateUrlToProfileRequestBinder.IsValid(requestInfo.Form))
             {
                 return new JsonResponse
                 {
                     Success = false,
-                    Errors = _updateProfiledRequestRequestBinder.Errors
+                    Errors = _updateUrlToProfileRequestBinder.Errors
                 };
             }
 
-            var request = _updateProfiledRequestRequestBinder.Bind(requestInfo.Form);
+            var request = _updateUrlToProfileRequestBinder.Bind(requestInfo.Form);
 
             if (request.Delete)
             {
-                var storedRequest = _repository.GetProfiledRequestByUrl(request.Url);
+                var storedRequest = _repository.GetUrlToProfile(request.Url);
 
                 if (storedRequest != null)
-                    _repository.DeleteProfiledRequest(storedRequest.Url);
+                    _repository.DeleteUrlToProfile(storedRequest.Url);
             }
             else
             {
-                var storedRequest = _repository.GetProfiledRequestByUrl(request.Url);
+                var storedRequest = _repository.GetUrlToProfile(request.Url);
 
                 if (storedRequest != null)
                 {
@@ -51,7 +51,7 @@ namespace ProductionProfiler.Core.Handlers
                     storedRequest.Server = request.Server;
                     storedRequest.Enabled = request.Enabled;
 
-                    _repository.SaveProfiledRequest(storedRequest);
+                    _repository.SaveUrlToProfile(storedRequest);
                 }
             }
 
@@ -60,7 +60,7 @@ namespace ProductionProfiler.Core.Handlers
 
             return new JsonResponse
             {
-                Redirect = string.Format(Constants.Urls.ProfilerHandler, Constants.Handlers.ViewProfiledRequests)
+                Redirect = string.Format(Constants.Urls.ProfilerHandler, Constants.Handlers.ViewUrlToProfiles)
             };
         }
     }

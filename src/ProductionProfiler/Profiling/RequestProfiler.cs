@@ -14,40 +14,45 @@ using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Core.Profiling
 {
-    public class RequestProfiler : IRequestProfiler
+    public class RequestProfiler : ComponentBase, IRequestProfiler
     {
-        private readonly ProfilerConfiguration _configuration;
         private readonly IHttpRequestDataCollector _httpRequestDataCollector;
         private readonly IHttpResponseDataCollector _httpResponseDataCollector;
         private readonly IProfilerRepository _repository;
         private readonly IMethodInputOutputDataCollector _methodInputOutputDataCollector;
-        private readonly Stack<MethodData> _methodStack = new Stack<MethodData>(); 
+        private readonly Stack<MethodData> _methodStack = new Stack<MethodData>();
+        private readonly ProfilerConfiguration _configuration;
         private readonly ILogger _logger;
         private readonly int _threadId;
+        private readonly Guid _requestId;
         private ProfiledRequestData _profileData;
         private Stopwatch _watch;
+        private IEnumerable<IProfilingCoordinator> _coordinators;
 
-        public RequestProfiler(ProfilerConfiguration configuration, 
-            IHttpRequestDataCollector httpRequestDataCollector, 
+        public RequestProfiler(IHttpRequestDataCollector httpRequestDataCollector, 
             IHttpResponseDataCollector httpResponseDataCollector, 
             IProfilerRepository repository, 
             IMethodInputOutputDataCollector methodInputOutputDataCollector,
-            ILogger logger)
+            ILogger logger,
+            ProfilerConfiguration configuration)
         {
-            _configuration = configuration;
             _methodInputOutputDataCollector = methodInputOutputDataCollector;
             _logger = logger;
             _repository = repository;
             _httpResponseDataCollector = httpResponseDataCollector;
             _httpRequestDataCollector = httpRequestDataCollector;
             _threadId = Thread.CurrentThread.ManagedThreadId;
-            RequestId = Guid.NewGuid();
+            _requestId = Guid.NewGuid();
+            _configuration = configuration;
         }
 
-        public Guid RequestId { get; set; }
-
-        public void StartProfiling(HttpContext context)
+        public void Start(HttpContext context, IEnumerable<IProfilingCoordinator> coordinators)
         {
+            ProfilerContext.Profiling = true;
+            _coordinators = coordinators;
+
+            Trace("Started profiling for Url:={0}, Request Id:={1}, Server:={2}...", context.Request.RawUrl, _requestId, Environment.MachineName);
+
             try
             {
                 _logger.StartProfiling();
@@ -59,7 +64,7 @@ namespace ProductionProfiler.Core.Profiling
                     Server = Environment.MachineName,
                     ClientIpAddress = context.Request.ClientIpAddress(),
                     Ajax = context.Request.IsAjaxRequest(),
-                    Id = RequestId
+                    Id = _requestId
                 };
 
                 //add data from the configured IHttpRequestDataCollector
@@ -67,6 +72,7 @@ namespace ProductionProfiler.Core.Profiling
 
                 if (_configuration.CaptureExceptions)
                 {
+                    Trace("...Profiler configured to capture all exceptions");
                     AppDomain.CurrentDomain.FirstChanceException += CaptureException;
                 }
 
@@ -76,15 +82,18 @@ namespace ProductionProfiler.Core.Profiling
                     var f = context.Response.Filter;
                     context.Response.Filter = _configuration.ResponseFilter(context);
                     _profileData.CapturedResponse = true;
+                    Trace("...Profiler configured to capture response, adding response filter of type:={0}", context.Response.Filter.GetType());
                 }
 
                 _watch = Stopwatch.StartNew();
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
-                ProfilerContext.Current.StopProfiling(context.Response);
-                ProfilerContext.Current.Exception(e);
-            }
+                Error(e);
+                Stop(context.Response);
+            } 
+            
+            Trace("Start profiling complete");
         }
 
         private void CaptureException(object sender, FirstChanceExceptionEventArgs e)
@@ -111,8 +120,17 @@ namespace ProductionProfiler.Core.Profiling
             }
         }
 
-        public void StopProfiling(HttpResponse response)
+        public void Stop(HttpResponse response)
         {
+            if (!ProfilerContext.Profiling)
+            {
+                Trace("Stop invoked, but profiler not running, returning...");
+                return;
+            }
+
+            ProfilerContext.Profiling = false;
+            Trace("Stop Profiling RequestId:={0}...", _requestId);
+
             try
             {
                 _logger.StopProfiling();
@@ -137,28 +155,39 @@ namespace ProductionProfiler.Core.Profiling
                         _repository.SaveResponse(new ProfiledResponse
                         {
                             Body = responseFilter.Response,
-                            Id = RequestId,
+                            Id = _requestId,
                             Url = _profileData.Url
                         });
                     }
                 }
+
+                //allow the coordinators that have been enabled for this request to augment to profile data before we save it.
+                foreach (var coordinator in _coordinators)
+                {
+                    coordinator.AugmentProfiledRequestData(_profileData);
+                }
             }
             catch (Exception e)
             {
-                ProfilerContext.Current.Exception(e);
+                Error(e);
             }
             finally
             {
                 try
                 {
+                    Trace("...Attempting to persist profile data");
                     _repository.SaveProfiledRequestData(_profileData);
+                    Trace("...Success");
                 }
                 catch (Exception ex)
                 {
-                    ProfilerContext.Current.Exception(ex);
+                    Error(ex);
                 }
             }
+
+            Trace("Stop profiling complete.");
         }
+
 
         public void MethodEntry(MethodInvocation invocation)
         {
@@ -166,6 +195,8 @@ namespace ProductionProfiler.Core.Profiling
             {
                 MethodName = string.Format("{0}.{1}", invocation.TargetType.FullName, invocation.MethodName)
             };
+
+            Trace("Entering method:={0}...", method.MethodName);
 
             try
             {
@@ -178,7 +209,7 @@ namespace ProductionProfiler.Core.Profiling
 
                 if (_configuration.MethodDataCollectorMappings.AnyMappedTypes())
                 {
-                    foreach (var collector in ProfilerContext.Current.GetMethodDataCollectorsForType(invocation.TargetType))
+                    foreach (var collector in _configuration.MethodDataCollectorMappings.GetMethodDataCollectorsForType(invocation.TargetType))
                     {
                         collector.Entry(invocation);
                     }
@@ -191,7 +222,7 @@ namespace ProductionProfiler.Core.Profiling
             }
             catch(Exception e)
             {
-                ProfilerContext.Current.Exception(e);
+                Error(e);
 
                 method.Exceptions.Add(new ThrownException
                 {
@@ -206,20 +237,24 @@ namespace ProductionProfiler.Core.Profiling
                 _logger.CurrentMethod = method;
                 _methodStack.Push(method);
             }
+
+            Trace("Entering method complete");
         }
 
         public void MethodExit(MethodInvocation invocation)
         {
+            Trace("Exiting method:={0}...", string.Format("{0}.{1}", invocation.TargetType.FullName, invocation.MethodName));
+
             MethodData currentMethod = null;
 
             try
             {
                 currentMethod = _methodStack.Pop();
                 currentMethod.Stop( _watch.ElapsedMilliseconds);
-            
+
                 if (_configuration.MethodDataCollectorMappings.AnyMappedTypes())
                 {
-                    foreach (var collector in ProfilerContext.Current.GetMethodDataCollectorsForType(invocation.TargetType))
+                    foreach (var collector in _configuration.MethodDataCollectorMappings.GetMethodDataCollectorsForType(invocation.TargetType))
                     {
                         collector.Exit(invocation);
                     }
@@ -235,7 +270,7 @@ namespace ProductionProfiler.Core.Profiling
             }
             catch (Exception e)
             {
-                ProfilerContext.Current.Exception(e);
+                Error(e);
 
                 if(currentMethod != null)
                 {
@@ -247,6 +282,8 @@ namespace ProductionProfiler.Core.Profiling
                     });
                 }
             }
+
+            Trace("Exiting method complete");
         }
     }
 }

@@ -36,14 +36,6 @@ namespace ProductionProfiler.Core.Configuration
         /// <returns></returns>
         IFluentConfiguration RequestFilter(Func<HttpRequest, bool> requestFilter);
         /// <summary>
-        /// If set during configuration the profiler will monitor all requests and log any requests
-        /// that exceed the thresholds set when configuring monitoring
-        /// </summary>
-        /// <param name="postThreshold">Maximum number of milliseconds a POST request should take before being flagged</param>
-        /// <param name="getThreshold">Maximum number of milliseconds a GET request should take before being flagged</param>
-        /// <returns></returns>
-        IFluentConfiguration EnableMonitoring(long postThreshold, long getThreshold);
-        /// <summary>
         /// If set, any exception that occurs in an intercepted method will be logged with the profile data.
         /// </summary>
         /// <returns></returns>
@@ -68,8 +60,10 @@ namespace ProductionProfiler.Core.Configuration
         IFluentConfiguration Serializer<T>() where T : ISerializer;
         IFluentConfiguration HttpRequestDataCollector<T>() where T : IHttpRequestDataCollector;
         IFluentConfiguration HttpResponseDataCollector<T>() where T : IHttpResponseDataCollector;
-        IFluentConfiguration Authorize(Func<HttpContext, bool> authorisedForManagement);
+        IFluentConfiguration AuthoriseManagement(Func<HttpContext, bool> authorisedForManagement);
+        IFluentConfiguration AuthoriseSession(Func<string, bool> authoriseSession);
         IFluentConfiguration CollectInputOutputMethodDataForTypes(IEnumerable<Type> typesToCollectInputOutputDataFor);
+        IFluentCoordinatorConfiguration Coordinators { get; }
         IFluentCollectorConfiguration AddMethodDataCollector<T>() where T : IMethodDataCollector;
         void Initialise();
     }

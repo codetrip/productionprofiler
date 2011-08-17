@@ -10,12 +10,12 @@ namespace ProductionProfiler.Core.Handlers
         public static IRequestHandler Create(RequestInfo requestInfo)
         {
             if (!string.IsNullOrEmpty(requestInfo.Handler))
-                return ProfilerContext.Current.GetRequestHandler(requestInfo.Handler);
+                return ProfilerContext.Container.Resolve<IRequestHandler>(requestInfo.Handler);
 
             if (!string.IsNullOrEmpty(requestInfo.ResourceName))
                 return new ResourceRequestHandler();
 
-            return ProfilerContext.Current.GetRequestHandler(Constants.Handlers.ViewProfiledRequests);
+            return ProfilerContext.Container.Resolve<IRequestHandler>(Constants.Handlers.ViewUrlToProfiles);
         }
     }
 }

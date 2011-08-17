@@ -17,8 +17,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.Persiste
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.Persistence.Sql", "ProductionProfiler.Persistence.SqlServer\ProductionProfiler.Persistence.Sql.csproj", "{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.Logging.Log4Net", "ProductionProfiler.Logging.Log4Net\ProductionProfiler.Logging.Log4Net.csproj", "{6D09BFE2-8FB6-44EA-BB25-92D560446F5D}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionProfiler.Persistence.SQLite", "ProductionProfiler.Persistence.SQLite\ProductionProfiler.Persistence.SQLite.csproj", "{3E7624E7-DD1C-41FF-BF02-52B7BE47F84F}"
 EndProject
 Global
@@ -59,10 +57,6 @@ Global
 		{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0A80DB0-1D1E-47A7-A802-EE362116FD6B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6D09BFE2-8FB6-44EA-BB25-92D560446F5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6D09BFE2-8FB6-44EA-BB25-92D560446F5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6D09BFE2-8FB6-44EA-BB25-92D560446F5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6D09BFE2-8FB6-44EA-BB25-92D560446F5D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3E7624E7-DD1C-41FF-BF02-52B7BE47F84F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3E7624E7-DD1C-41FF-BF02-52B7BE47F84F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E7624E7-DD1C-41FF-BF02-52B7BE47F84F}.Release|Any CPU.ActiveCfg = Release|Any CPU

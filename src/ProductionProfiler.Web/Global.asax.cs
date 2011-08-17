@@ -9,6 +9,8 @@ using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.Releasers;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
+using ProductionProfiler.Core.Logging;
+using ProductionProfiler.Persistence.Mongo;
 using ProductionProfiler.Persistence.Raven;
 using ProductionProfiler.Tests.Components;
 using log4net.Config;
@@ -17,7 +19,6 @@ using ProductionProfiler.Core.Collectors;
 using ProductionProfiler.Core.Configuration;
 using ProductionProfiler.IoC.StructureMap;
 using ProductionProfiler.IoC.Windsor;
-using ProductionProfiler.Logging.Log4Net;
 using ProductionProfiler.Web.Controllers;
 using ProductionProfiler.Core.Extensions;
 using StructureMap;
@@ -91,17 +92,17 @@ namespace ProductionProfiler.Web
             Configure.With(container)
                 .HandleExceptionsVia(e => System.Diagnostics.Trace.Write(e.Format()))
                 .Logger(new Log4NetLogger())
-                .DataProvider(new RavenPersistenceProvider("http://localhost:8010"))
+                .DataProvider(new MongoPersistenceProvider("localhost", 27017))
                 .HttpRequestDataCollector<BasicHttpRequestDataCollector>()
                 .HttpResponseDataCollector<BasicHttpResponseDataCollector>()
                 .CollectInputOutputMethodDataForTypes(new[] { typeof(IWorkflow) })
                 .AddMethodDataCollector<WorkflowMethodDataCollector>()
                     .ForTypesAssignableFrom(new []{typeof(IWorkflow)})
                 .CacheEngine<HttpRuntimeCacheEngine>()
-                .RequestFilter(req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty)
+                .RequestFilter(req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty)  
                 .CaptureExceptions()
                 .CaptureResponse()
-                .EnableMonitoring(5000, 500)
+                .Coordinators.Session().Url().Add()
                 .Initialise();
         }
 

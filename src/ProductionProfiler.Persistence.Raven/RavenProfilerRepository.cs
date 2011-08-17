@@ -11,8 +11,8 @@ namespace ProductionProfiler.Persistence.Raven
 {
     public class RavenProfilerRepository : IProfilerRepository
     {
-        public const string ProfiledRequestIndexName = "ProfiledRequestIndex";
-        public const string ProfiledRequestDataIndexName = "ProfiledRequestDataIndex";
+        public const string UrlToProfileIndexName = "UrlToProfileIndex";
+        public const string UrlToProfileDataIndexName = "UrlToProfileDataIndex";
         public const string ProfiledResponseIndexName = "ProfiledResponseIndex";
 
         private readonly DocumentStore _database;
@@ -22,58 +22,41 @@ namespace ProductionProfiler.Persistence.Raven
             _database = database;
         }
 
-        public Core.Persistence.Entities.Page<ProfiledRequest> GetProfiledRequests(PagingInfo pagingInfo)
+        public Core.Persistence.Entities.Page<UrlToProfile> GetUrlsToProfile(PagingInfo pagingInfo)
         {
             using (var session = _database.OpenSession())
             {
-                var documentQuery = session.Advanced.LuceneQuery<ProfiledRequest>(ProfiledRequestIndexName)
+                var documentQuery = session.Advanced.LuceneQuery<UrlToProfile>(UrlToProfileIndexName)
                     .Skip((pagingInfo.PageNumber - 1) * pagingInfo.PageSize)
                     .Take(pagingInfo.PageSize)
                     .WaitForNonStaleResults(new TimeSpan(0, 0, 3));
 
-                return new Core.Persistence.Entities.Page<ProfiledRequest>(
+                return new Core.Persistence.Entities.Page<UrlToProfile>(
                     documentQuery.ToList(), 
                     new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, documentQuery.QueryResult.TotalResults));
             }
         }
 
-        public ProfiledRequest GetProfiledRequestByUrl(string url)
+        public UrlToProfile GetUrlToProfile(string url)
         {
             using (var session = _database.OpenSession())
             {
-                return session.Query<ProfiledRequest>(ProfiledRequestIndexName).Where(r => r.Url == url).FirstOrDefault();
+                return session.Query<UrlToProfile>(UrlToProfileIndexName).Where(r => r.Url == url).FirstOrDefault();
             }
         }
 
-        public List<ProfiledRequest> GetCurrentRequestsToProfile()
+        public List<UrlToProfile> GetCurrentUrlsToProfile()
         {
             using (var session = _database.OpenSession())
             {
-                return session.Query<ProfiledRequest>(ProfiledRequestIndexName)
+                return session.Query<UrlToProfile>(UrlToProfileIndexName)
                     .Where(req => req.Enabled)
                     .Where(req => req.ProfilingCount == null || req.ProfilingCount > 0)
                     .ToList();
             }
         }
 
-        public void SaveProfiledRequestWhenNotFound(ProfiledRequest profiledRequest)
-        {
-            using (var session = _database.OpenSession())
-            {
-                var request = session.Query<ProfiledRequest>(ProfiledRequestIndexName)
-                    .Where(r => r.Url == profiledRequest.Url)
-                    .Select(r => r.Url)
-                    .FirstOrDefault();
-
-                if (request == null)
-                {
-                    session.Store(profiledRequest);
-                    session.SaveChanges();
-                }
-            }
-        }
-
-        public void SaveProfiledRequest(ProfiledRequest profiledRequest)
+        public void SaveUrlToProfile(UrlToProfile urlToProfile)
         {
             using (var session = _database.OpenSession())
             {
@@ -81,8 +64,8 @@ namespace ProductionProfiler.Persistence.Raven
                 // and it's not necessary - Raven will simply overwrite the stored profile, which is what we want.
                 
                 /*
-                var request = session.Query<ProfiledRequest>(ProfiledRequestIndexName)
-                    .Where(r => r.Url == profiledRequest.Url)
+                var request = session.Query<UrlToProfile>(UrlToProfileIndexName)
+                    .Where(r => r.Url == UrlToProfile.Url)
                     .FirstOrDefault();
 
                 //if one exists delete it and replace with the new incoming request
@@ -92,16 +75,16 @@ namespace ProductionProfiler.Persistence.Raven
                 }
                 */
 
-                session.Store(profiledRequest);
+                session.Store(urlToProfile);
                 session.SaveChanges();
             }
         }
 
-        public void DeleteProfiledRequest(string url)
+        public void DeleteUrlToProfile(string url)
         {
             using (var session = _database.OpenSession())
             {
-                var item = session.Query<ProfiledRequest>(ProfiledRequestIndexName).Where(r => r.Url == url).FirstOrDefault();
+                var item = session.Query<UrlToProfile>(UrlToProfileIndexName).Where(r => r.Url == url).FirstOrDefault();
 
                 if (item != null)
                 {
@@ -111,11 +94,11 @@ namespace ProductionProfiler.Persistence.Raven
             }
         }
 
-        public Core.Persistence.Entities.Page<string> GetDistinctProfiledRequestUrls(PagingInfo pagingInfo)
+        public Core.Persistence.Entities.Page<string> GetDistinctUrlsToProfile(PagingInfo pagingInfo)
         {
             using (var session = _database.OpenSession())
             {
-                var documentQuery = session.Query<ProfiledRequestData>(ProfiledRequestDataIndexName)
+                var documentQuery = session.Query<ProfiledRequestData>(UrlToProfileDataIndexName)
                     .Distinct()
                     .Select(r => r.Url);
 
@@ -135,7 +118,7 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                return session.Query<ProfiledRequestData>(ProfiledRequestDataIndexName).Where(r => r.Id == id).FirstOrDefault();
+                return session.Query<ProfiledRequestData>(UrlToProfileDataIndexName).Where(r => r.Id == id).FirstOrDefault();
             }
         }
 
@@ -143,7 +126,7 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                var item = session.Query<ProfiledRequestData>(ProfiledRequestDataIndexName).Where(r => r.Id == id).FirstOrDefault();
+                var item = session.Query<ProfiledRequestData>(UrlToProfileDataIndexName).Where(r => r.Id == id).FirstOrDefault();
 
                 if (item != null)
                 {
@@ -153,40 +136,72 @@ namespace ProductionProfiler.Persistence.Raven
             }
         }
 
-        public void SaveProfiledRequestData(ProfiledRequestData entity)
+        public void SaveProfiledRequestData(ProfiledRequestData data)
         {
             using (var session = _database.OpenSession())
             {
-                session.Store(entity);
+                session.Store(data);
                 session.SaveChanges();
             }
         }
 
-        public Core.Persistence.Entities.Page<ProfiledRequestPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo)
+        public Core.Persistence.Entities.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo)
         {
             using (var session = _database.OpenSession())
             {
-                var linqQuery = session.Query<ProfiledRequestData>(ProfiledRequestDataIndexName).Where(r => r.Url == url);
-                var pagination = new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, linqQuery.Count());
-                var results = linqQuery.OrderByDescending(r => r.CapturedOnUtc)
-                    .Select(r => new ProfiledRequestPreview
-                    {
-                        CapturedOnUtc = r.CapturedOnUtc,
-                        ElapsedMilliseconds = r.ElapsedMilliseconds,
-                        Id = r.Id,
-                        Server = r.Server,
-                        Url = r.Url
-                    }).Skip((pagingInfo.PageNumber - 1) * pagingInfo.PageSize).Take(pagingInfo.PageSize);
-
-                return new Core.Persistence.Entities.Page<ProfiledRequestPreview>(results.ToList(), pagination);
+                var linqQuery = session.Query<ProfiledRequestData>(UrlToProfileDataIndexName).Where(r => r.Url == url);
+                return DoGetPreview(linqQuery, pagingInfo);
             }
+        }
+
+        public Core.Persistence.Entities.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewBySessionId(Guid sessionId, PagingInfo pagingInfo)
+        {
+            using (var session = _database.OpenSession())
+            {
+                var linqQuery = session.Query<ProfiledRequestData>(UrlToProfileDataIndexName).Where(r => r.SessionId == sessionId);
+                return DoGetPreview(linqQuery, pagingInfo);
+            }
+        }
+
+        public Core.Persistence.Entities.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewBySessionUserId(string sessionUserId, PagingInfo pagingInfo)
+        {
+            using (var session = _database.OpenSession())
+            {
+                var linqQuery = session.Query<ProfiledRequestData>(UrlToProfileDataIndexName).Where(r => r.SessionUserId == sessionUserId);
+                return DoGetPreview(linqQuery, pagingInfo);
+            }
+        }
+
+        public Core.Persistence.Entities.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewBySamplingId(Guid samplingId, PagingInfo pagingInfo)
+        {
+            using (var session = _database.OpenSession())
+            {
+                var linqQuery = session.Query<ProfiledRequestData>(UrlToProfileDataIndexName).Where(r => r.SamplingId == samplingId);
+                return DoGetPreview(linqQuery, pagingInfo);
+            }
+        }
+
+        private Core.Persistence.Entities.Page<ProfiledRequestDataPreview> DoGetPreview(IRavenQueryable<ProfiledRequestData> linqQuery, PagingInfo pagingInfo)
+        {
+            var pagination = new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, linqQuery.Count());
+            var results = linqQuery.OrderByDescending(r => r.CapturedOnUtc)
+                .Select(r => new ProfiledRequestDataPreview
+                {
+                    CapturedOnUtc = r.CapturedOnUtc,
+                    ElapsedMilliseconds = r.ElapsedMilliseconds,
+                    Id = r.Id,
+                    Server = r.Server,
+                    Url = r.Url
+                }).Skip((pagingInfo.PageNumber - 1) * pagingInfo.PageSize).Take(pagingInfo.PageSize);
+
+            return new Core.Persistence.Entities.Page<ProfiledRequestDataPreview>(results.ToList(), pagination);
         }
 
         public void DeleteProfiledRequestDataByUrl(string url)
         {
             using (var session = _database.OpenSession())
             {
-                foreach (var document in session.Query<ProfiledRequestData>(ProfiledRequestDataIndexName).Where(r => r.Url == url))
+                foreach (var document in session.Query<ProfiledRequestData>(UrlToProfileDataIndexName).Where(r => r.Url == url))
                 {
                     session.Delete(document);
                 }

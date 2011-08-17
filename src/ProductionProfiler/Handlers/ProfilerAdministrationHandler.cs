@@ -4,11 +4,11 @@ using ProductionProfiler.Core.Profiling;
 
 namespace ProductionProfiler.Core.Handlers
 {
-    public class ProfilerAdministrationHandler : IHttpHandler, IRequiresSessionState 
+    public class ProfilerAdministrationHandler : ComponentBase, IHttpHandler, IRequiresSessionState 
     {
         public void ProcessRequest(HttpContext context)
         {
-            if(ProfilerContext.Current.AuthorisedForManagement(context))
+            if(ProfilerContext.Configuration.AuthorisedForManagement(context))
             {
                 var requestInfo = RequestInfoParser.Parse(context.Request);
                 var requestHandler = RequestHandlerFactory.Create(requestInfo);

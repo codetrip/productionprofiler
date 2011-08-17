@@ -106,7 +106,7 @@ if (window.jQueryProfiler) {
                     }
                 });
             },
-            renderProfiledRequests: function (data) {
+            renderUrlToProfiles: function (data) {
                 var html = '<form action="/profiler?handler=apr" method="post">' +
                 '<table class="w1000">' +
                 '<tr><th>Url to profile (Supports Regular Expressions)</th><th>Server</th><th>Profile Count</th><th></th></tr>' +
@@ -301,7 +301,7 @@ if (window.jQueryProfiler) {
                     }
                 default:
                     {
-                        $.viewengine.renderProfiledRequests(profileData);
+                        $.viewengine.renderUrlToProfiles(profileData);
                         break;
                     }
             }

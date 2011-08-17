@@ -2,6 +2,6 @@
 
 namespace ProductionProfiler.Core.Binding
 {
-    public interface IUpdateProfiledRequestRequestBinder : IRequestBinder<ProfiledRequestUpdateModel>
+    public interface IUpdateUrlToProfileRequestBinder : IRequestBinder<UrlToProfileUpdateModel>
     {}
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using log4net.Core;
 
-namespace ProductionProfiler.Logging.Log4Net
+namespace ProductionProfiler.Core.Logging
 {
     public class AppendLoggingEventEventArgs : EventArgs
     {

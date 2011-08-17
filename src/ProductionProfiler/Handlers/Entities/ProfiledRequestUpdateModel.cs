@@ -4,7 +4,7 @@ using System;
 namespace ProductionProfiler.Core.Handlers.Entities
 {
     [Serializable]
-    public class ProfiledRequestUpdateModel
+    public class UrlToProfileUpdateModel
     {
         public string Url { get; set; }
         public int? ProfilingCount { get; set; }

@@ -2,7 +2,7 @@
 using log4net.Appender;
 using log4net.Core;
 
-namespace ProductionProfiler.Logging.Log4Net
+namespace ProductionProfiler.Core.Logging
 {
     public class Log4NetProfilingAppender : AppenderSkeleton
     {

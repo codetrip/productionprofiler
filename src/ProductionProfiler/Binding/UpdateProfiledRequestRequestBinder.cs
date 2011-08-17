@@ -6,26 +6,26 @@ using ProductionProfiler.Core.Handlers.Entities;
 
 namespace ProductionProfiler.Core.Binding
 {
-    public class UpdateProfiledRequestRequestBinder : IUpdateProfiledRequestRequestBinder
+    public class UpdateUrlToProfileRequestBinder : IUpdateUrlToProfileRequestBinder
     {
         private readonly List<ModelValidationError> _errors = new List<ModelValidationError>();
 
-        public ProfiledRequestUpdateModel Bind(NameValueCollection formParams)
+        public UrlToProfileUpdateModel Bind(NameValueCollection formParams)
         {
-            var profiledRequest = new ProfiledRequestUpdateModel
+            var UrlToProfile = new UrlToProfileUpdateModel
             {
                 Delete = formParams.AllKeys.Where(k => k == "Delete").FirstOrDefault() != null,
                 Url = formParams.Get("Url")
             };
 
-            if (profiledRequest.Delete)
-                return profiledRequest;
+            if (UrlToProfile.Delete)
+                return UrlToProfile;
 
-            profiledRequest.Server = formParams.Get("Server");
-            profiledRequest.ProfilingCount = formParams.Get("ProfilingCount").IsNullOrEmpty() ? (int?)null : int.Parse(formParams.Get("ProfilingCount"));
-            profiledRequest.Enabled = formParams.Get("Enabled").Contains("true");
+            UrlToProfile.Server = formParams.Get("Server");
+            UrlToProfile.ProfilingCount = formParams.Get("ProfilingCount").IsNullOrEmpty() ? (int?)null : int.Parse(formParams.Get("ProfilingCount"));
+            UrlToProfile.Enabled = formParams.Get("Enabled").Contains("true");
 
-            return profiledRequest;
+            return UrlToProfile;
         }
 
         public bool IsValid(NameValueCollection formParams)

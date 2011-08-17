@@ -13,5 +13,6 @@ namespace ProductionProfiler.Core.IoC
         T Resolve<T>();
         T Resolve<T>(string key);
         T[] ResolveAll<T>();
+        bool HasObject(Type type);
     }
 }

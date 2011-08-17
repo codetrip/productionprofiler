@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Web;
+using ProductionProfiler.Core.Auditing;
 using ProductionProfiler.Core.Binding;
 using ProductionProfiler.Core.Caching;
 using ProductionProfiler.Core.Collectors;
+using ProductionProfiler.Core.Coordinators;
 using ProductionProfiler.Core.Handlers;
 using ProductionProfiler.Core.IoC;
 using ProductionProfiler.Core.Logging;
@@ -15,6 +17,7 @@ using ProductionProfiler.Core.Resources;
 using ProductionProfiler.Core.Extensions;
 using ProductionProfiler.Core.Serialization;
 using System.Linq;
+using ProductionProfiler.Core.Web;
 
 namespace ProductionProfiler.Core.Configuration
 {
@@ -36,7 +39,7 @@ namespace ProductionProfiler.Core.Configuration
             {
                 _profilerConfiguration = new ProfilerConfiguration
                 {
-                    ShouldProfile = req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty
+                    RequestFilter = req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty
                 },
                 _container = container
             };
@@ -58,7 +61,7 @@ namespace ProductionProfiler.Core.Configuration
 
         IFluentConfiguration IFluentConfiguration.RequestFilter(Func<HttpRequest, bool> requestFilter)
         {
-            _profilerConfiguration.ShouldProfile = requestFilter;
+            _profilerConfiguration.RequestFilter = requestFilter;
             return this;
         }
 
@@ -108,14 +111,6 @@ namespace ProductionProfiler.Core.Configuration
             return this;
         }
 
-        IFluentConfiguration IFluentConfiguration.EnableMonitoring(long postThreshold, long getThreshold)
-        {
-            _profilerConfiguration.GetRequestThreshold = getThreshold;
-            _profilerConfiguration.PostRequestThreshold = postThreshold;
-            _profilerConfiguration.MonitoringEnabled = true;
-            return this;
-        }
-
         IFluentConfiguration IFluentConfiguration.DataProvider(IPersistenceProvider persistenceProvider)
         {
             try
@@ -142,9 +137,15 @@ namespace ProductionProfiler.Core.Configuration
 
         #region Collectors
 
-        public IFluentConfiguration Authorize(Func<HttpContext, bool> authorisedForManagement)
+        public IFluentConfiguration AuthoriseManagement(Func<HttpContext, bool> authorisedForManagement)
         {
-            _profilerConfiguration.AuthorizedForManagement = authorisedForManagement;
+            _profilerConfiguration.AuthoriseManagement = authorisedForManagement;
+            return this;
+        }
+
+        public IFluentConfiguration AuthoriseSession(Func<string, bool> authoriseSession)
+        {
+            _profilerConfiguration.AuthoriseSession = authoriseSession;
             return this;
         }
 
@@ -152,6 +153,11 @@ namespace ProductionProfiler.Core.Configuration
         {
             _profilerConfiguration.MethodDataCollectorMappings.InputOutputMethodDataTypes = typesToCollectInputOutputDataFor.ToList();
             return this;
+        }
+
+        public IFluentCoordinatorConfiguration Coordinators
+        {
+            get { return new FluentCoordinatorConfiguration(this); }
         }
 
         IFluentCollectorConfiguration IFluentConfiguration.AddMethodDataCollector<T>()
@@ -205,18 +211,19 @@ namespace ProductionProfiler.Core.Configuration
         private void RegisterDependencies()
         {
             _container.RegisterPerWebRequest<IRequestProfiler>(typeof(RequestProfiler));
-            _container.RegisterPerWebRequest<IRequestProfilingCoordinator>(typeof(RequestProfilingCoordinator));
             _container.RegisterSingletonInstance(_profilerConfiguration);
-            _container.RegisterTransient<IRequestHandler>(typeof(UpdateProfiledRequestHandler), Constants.Handlers.UpdateProfiledRequest);
+            _container.RegisterTransient<IRequestHandler>(typeof(UpdateUrlToProfileHandler), Constants.Handlers.UpdateUrlToProfile);
             _container.RegisterTransient<IRequestHandler>(typeof(ViewResultsRequestHandler), Constants.Handlers.Results);
-            _container.RegisterTransient<IRequestHandler>(typeof(AddProfiledRequestHandler), Constants.Handlers.AddProfiledRequest);
-            _container.RegisterTransient<IRequestHandler>(typeof(ViewProfiledRequestsHandler), Constants.Handlers.ViewProfiledRequests);
+            _container.RegisterTransient<IRequestHandler>(typeof(AddUrlToProfileHandler), Constants.Handlers.AddUrlToProfile);
+            _container.RegisterTransient<IRequestHandler>(typeof(ViewUrlToProfilesHandler), Constants.Handlers.ViewUrlToProfiles);
             _container.RegisterTransient<IRequestHandler>(typeof(ViewResponseRequestHandler), Constants.Handlers.ViewResponse);
-            _container.RegisterTransient<IRequestHandler>(typeof(DeleteProfiledDataByIdRequestHandler), Constants.Handlers.DeleteProfiledRequestDataById);
-            _container.RegisterTransient<IRequestHandler>(typeof(DeleteProfiledDataByUrlRequestHandler), Constants.Handlers.DeleteProfiledRequestDataByUrl);
-            _container.RegisterTransient<IAddProfiledRequestRequestBinder>(typeof(AddProfiledRequestRequestBinder));
-            _container.RegisterTransient<IUpdateProfiledRequestRequestBinder>(typeof(UpdateProfiledRequestRequestBinder));
+            _container.RegisterTransient<IRequestHandler>(typeof(DeleteProfiledDataByIdRequestHandler), Constants.Handlers.DeleteUrlToProfileDataById);
+            _container.RegisterTransient<IRequestHandler>(typeof(DeleteProfiledDataByUrlRequestHandler), Constants.Handlers.DeleteUrlToProfileDataByUrl);
+            _container.RegisterTransient<IAddUrlToProfileRequestBinder>(typeof(AddUrlToProfileRequestBinder));
+            _container.RegisterTransient<IUpdateUrlToProfileRequestBinder>(typeof(UpdateUrlToProfileRequestBinder));
             _container.RegisterTransient<IMethodInputOutputDataCollector>(typeof(MethodInputOutputDataCollector));
+            _container.RegisterTransient<IComponentAuditor>(typeof(Log4NetComponentAuditor));
+            _container.RegisterSingleton<ICookieManager>(typeof(CookieManager));
 
             if (!_requestDataCollectorSet)
                 _container.RegisterTransient<IHttpRequestDataCollector>(typeof(NullHttpRequestDataCollector));
@@ -328,6 +335,49 @@ namespace ProductionProfiler.Core.Configuration
                     exceptionHandler = e => System.Diagnostics.Trace.Write(e.Format());
 
                 _configureInstance._profilerConfiguration.ReportException = exceptionHandler;
+                return _configureInstance;
+            }
+        }
+
+        #endregion
+
+        #region CoordinatorConfiguration
+
+        private class FluentCoordinatorConfiguration : IFluentCoordinatorConfiguration
+        {
+            private readonly Configure _configureInstance;
+
+            public FluentCoordinatorConfiguration(Configure configureInstance)
+            {
+                _configureInstance = configureInstance;
+            }
+
+            public IFluentConfiguration Register<T>() where T : IProfilingCoordinator
+            {
+                _configureInstance._container.RegisterTransient<IProfilingCoordinator>(typeof(T), typeof(T).Name);
+                return _configureInstance;
+            }
+
+            public IFluentCoordinatorConfiguration Url()
+            {
+                _configureInstance._container.RegisterTransient<IProfilingCoordinator>(typeof(UrlCoordinator), typeof(UrlCoordinator).Name);
+                return this;
+            }
+
+            public IFluentCoordinatorConfiguration Session()
+            {
+                _configureInstance._container.RegisterTransient<IProfilingCoordinator>(typeof(SessionCoordinator), typeof(SessionCoordinator).Name);
+                return this;
+            }
+
+            public IFluentCoordinatorConfiguration Sampling()
+            {
+                _configureInstance._container.RegisterTransient<IProfilingCoordinator>(typeof(SamplingCoordinator), typeof(SamplingCoordinator).Name);
+                return this;
+            }
+
+            public IFluentConfiguration Add()
+            {
                 return _configureInstance;
             }
         }

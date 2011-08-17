@@ -11,7 +11,7 @@ namespace ProductionProfiler.Core.IoC
     {
         public void Intercept(IInvocation invocation)
         {
-            if (!ProfilerContext.Current.ProfilingCurrentRequest())
+            if (!ProfilerContext.Profiling)
             {
                 invocation.Proceed();
             }
@@ -25,13 +25,13 @@ namespace ProductionProfiler.Core.IoC
                     MethodName = invocation.Method.Name
                 };
 
-                ProfilerContext.Current.Profiler.MethodEntry(methodInvocation);
+                ProfilerContext.Profiler.MethodEntry(methodInvocation);
 
                 invocation.Proceed();
 
                 methodInvocation.ReturnValue = invocation.ReturnValue;
 
-                ProfilerContext.Current.Profiler.MethodExit(methodInvocation);
+                ProfilerContext.Profiler.MethodExit(methodInvocation);
             }
         }
     }

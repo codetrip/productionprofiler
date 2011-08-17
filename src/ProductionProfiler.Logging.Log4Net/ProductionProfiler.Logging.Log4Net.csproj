@@ -49,10 +49,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppendLoggingEventEventArgs.cs" />
-    <Compile Include="Log4NetLogger.cs" />
-    <Compile Include="Log4NetProfilingAppender.cs" />
-    <Compile Include="LoggingEventExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -3,6 +3,6 @@ using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Core.Binding
 {
-    public interface IAddProfiledRequestRequestBinder : IRequestBinder<ProfiledRequest>
+    public interface IAddUrlToProfileRequestBinder : IRequestBinder<UrlToProfile>
     {}
 }

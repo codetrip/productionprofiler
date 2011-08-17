@@ -5,6 +5,7 @@ using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Profiling.Entities;
 using ProductionProfiler.Core.Resources;
 using System.Linq;
+using RequestInfo = ProductionProfiler.Core.Handlers.Entities.RequestInfo;
 
 namespace ProductionProfiler.Core.Handlers
 {
@@ -23,7 +24,7 @@ namespace ProductionProfiler.Core.Handlers
             {
                 case Constants.Actions.Results:
                     {
-                        var data = _repository.GetDistinctProfiledRequestUrls(requestInfo.Paging);
+                        var data = _repository.GetDistinctUrlsToProfile(requestInfo.Paging);
 
                         return new JsonResponse
                         {
@@ -39,7 +40,7 @@ namespace ProductionProfiler.Core.Handlers
                         {
                             Data = data.Select(item =>
                             {
-                                EncodedProfiledRequestPreview encodedItem = new EncodedProfiledRequestPreview
+                                EncodedProfiledRequestDataPreview encodedItem = new EncodedProfiledRequestDataPreview
                                 {
                                     EncodedUrl = item.Url.Encode()
                                 };

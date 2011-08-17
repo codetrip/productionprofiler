@@ -20,106 +20,132 @@ namespace ProductionProfiler.Persistence.Sql
             _configuration = configuration;
         }
 
-        public Core.Persistence.Entities.Page<ProfiledRequest> GetProfiledRequests(PagingInfo pagingInfo)
+        public Core.Persistence.Entities.Page<UrlToProfile> GetUrlsToProfile(PagingInfo pagingInfo)
         {
             using(var database = new Database(_configuration.ConnectionStringName))
             {
-                var page = database.Page<ProfiledRequest>(pagingInfo.PageNumber, pagingInfo.PageSize, "SELECT * FROM {0}.ProfiledRequest".FormatWith(_configuration.SchemaName));
-                return new Core.Persistence.Entities.Page<ProfiledRequest>(page.Items, new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, (int)page.TotalItems));
+                var page = database.Page<UrlToProfile>(pagingInfo.PageNumber, pagingInfo.PageSize, "SELECT * FROM {0}.UrlToProfile".FormatWith(_configuration.SchemaName));
+                return new Core.Persistence.Entities.Page<UrlToProfile>(page.Items, new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, (int)page.TotalItems));
             }
         }
 
-        public ProfiledRequest GetProfiledRequestByUrl(string url)
+        public UrlToProfile GetUrlToProfile(string url)
         {
             using (var database = new Database(_configuration.ConnectionStringName))
             {
-                return database.Single<ProfiledRequest>("SELECT * FROM {0}.ProfiledRequest WHERE Url = @0".FormatWith(_configuration.SchemaName), url);
+                return database.Single<UrlToProfile>("SELECT * FROM {0}.UrlToProfile WHERE Url = @0".FormatWith(_configuration.SchemaName), url);
             }
         }
 
-        public List<ProfiledRequest> GetCurrentRequestsToProfile()
+        public List<UrlToProfile> GetCurrentUrlsToProfile()
         {
             using (var database = new Database(_configuration.ConnectionStringName))
             {
-                return database.Fetch<ProfiledRequest>("SELECT * FROM {0}.ProfiledRequest WHERE Enabled = 1 AND (ProfilingCount > 0 OR ProfilingCount IS NULL)".FormatWith(_configuration.SchemaName));
+                return database.Fetch<UrlToProfile>("SELECT * FROM {0}.UrlToProfile WHERE Enabled = 1 AND (ProfilingCount > 0 OR ProfilingCount IS NULL)".FormatWith(_configuration.SchemaName));
             }
         }
 
-        public void SaveProfiledRequestWhenNotFound(ProfiledRequest profiledRequest)
+        public void SaveUrlToProfile(UrlToProfile urlToProfile)
         {
-            if(_configuration.GenerateIds && profiledRequest.Id != default(Guid))
+            if (_configuration.GenerateIds && urlToProfile.Id != default(Guid))
             {
-                profiledRequest.Id = Guid.NewGuid();
-            }
-
-            using (var database = new Database(_configuration.ConnectionStringName))
-            {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendLine("IF NOT EXISTS(SELECT '*' FROM {0}.ProfiledRequest WHERE Url = @0)".FormatWith(_configuration.SchemaName));
-                sb.AppendLine("BEGIN");
-                sb.AppendLine(database.InsertSql("{0}.ProfiledRequest".FormatWith(_configuration.SchemaName), "Id", profiledRequest));
-                sb.AppendLine("END");
-                database.Execute(new PetaPoco.Sql(sb.ToString(), profiledRequest.Url, profiledRequest.ElapsedMilliseconds, profiledRequest.ProfilingCount, profiledRequest.ProfiledOnUtc, profiledRequest.Server, profiledRequest.HttpMethod, profiledRequest.Enabled));
-            }
-        }
-
-        public void SaveProfiledRequest(ProfiledRequest profiledRequest)
-        {
-            if (_configuration.GenerateIds && profiledRequest.Id != default(Guid))
-            {
-                profiledRequest.Id = Guid.NewGuid();
+                urlToProfile.Id = Guid.NewGuid();
             }
 
             using (var database = new Database(_configuration.ConnectionStringName))
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine("IF NOT EXISTS(SELECT '*' FROM {0}.ProfiledRequest WHERE Url = @0)".FormatWith(_configuration.SchemaName));
+                sb.AppendLine("IF NOT EXISTS(SELECT '*' FROM {0}.UrlToProfile WHERE Url = @0)".FormatWith(_configuration.SchemaName));
                 sb.AppendLine("BEGIN");
-                sb.AppendLine(database.InsertSql("{0}.ProfiledRequest".FormatWith(_configuration.SchemaName), "Id", profiledRequest));
+                sb.AppendLine(database.InsertSql("{0}.UrlToProfile".FormatWith(_configuration.SchemaName), "Id", urlToProfile));
                 sb.AppendLine("END");
                 sb.AppendLine("ELSE");
                 sb.AppendLine("BEGIN");
-                sb.AppendLine(database.UpdateSql("{0}.ProfiledRequest".FormatWith(_configuration.SchemaName), "Id", profiledRequest, profiledRequest.Id));
+                sb.AppendLine(database.UpdateSql("{0}.UrlToProfile".FormatWith(_configuration.SchemaName), "Id", urlToProfile, urlToProfile.Id));
                 sb.AppendLine("END");
-                database.Execute(new PetaPoco.Sql(sb.ToString(), profiledRequest.Url, profiledRequest.ElapsedMilliseconds, profiledRequest.ProfilingCount, profiledRequest.ProfiledOnUtc, profiledRequest.Server, profiledRequest.HttpMethod, profiledRequest.Enabled, profiledRequest.Id));
+                database.Execute(new PetaPoco.Sql(sb.ToString(), urlToProfile.Url, urlToProfile.ProfilingCount, urlToProfile.Server, urlToProfile.Enabled, urlToProfile.Id));
             }
         }
 
-        public void DeleteProfiledRequest(string url)
+        public void DeleteUrlToProfile(string url)
         {
             using (var database = new Database(_configuration.ConnectionStringName))
             {
-                database.Delete("{0}.ProfiledRequest".FormatWith(_configuration.SchemaName), "Url", null, url);
+                database.Delete("{0}.UrlToProfile".FormatWith(_configuration.SchemaName), "Url", null, url);
             }
         }
 
-        public Core.Persistence.Entities.Page<ProfiledRequestPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo)
+        private Core.Persistence.Entities.Page<ProfiledRequestDataPreview> DoGetPreview(PetaPoco.Page<ProfiledRequestDataWrapper> results, PagingInfo pagingInfo)
+        {
+            if (results != null)
+            {
+                return new Core.Persistence.Entities.Page<ProfiledRequestDataPreview>(
+                    results.Items.Select(p =>
+                    {
+                        var data = BinarySerializer<ProfiledRequestData>.Deserialize(p.Data);
+                        return new ProfiledRequestDataPreview
+                        {
+                            CapturedOnUtc = data.CapturedOnUtc,
+                            ElapsedMilliseconds = data.ElapsedMilliseconds,
+                            Server = data.Server,
+                            Id = data.Id,
+                            Url = data.Url
+                        };
+                    }), new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, (int)results.TotalItems));
+            }
+
+            return new Core.Persistence.Entities.Page<ProfiledRequestDataPreview>(new ProfiledRequestDataPreview[0], new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, 0));
+        }
+
+        public Core.Persistence.Entities.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo)
         {
             using (var database = new Database(_configuration.ConnectionStringName))
             {
                 var results = database.Page<ProfiledRequestDataWrapper>(
-                    pagingInfo.PageNumber, 
+                    pagingInfo.PageNumber,
                     pagingInfo.PageSize,
-                    "SELECT * FROM {0}.ProfiledRequestData WHERE Url = @0 ORDER BY CapturedOnUtc DESC".FormatWith(_configuration.SchemaName), url);
+                    "SELECT * FROM ProfiledRequestData WHERE Url = @0 ORDER BY CapturedOnUtc DESC", url);
 
-                if (results != null)
-                {
-                    return new Core.Persistence.Entities.Page<ProfiledRequestPreview>(
-                        results.Items.Select(p =>
-                        {
-                            var data = BinarySerializer<ProfiledRequestData>.Deserialize(p.Data);
-                            return new ProfiledRequestPreview
-                            {
-                                CapturedOnUtc = data.CapturedOnUtc,
-                                ElapsedMilliseconds = data.ElapsedMilliseconds,
-                                Server = data.Server,
-                                Id = data.Id,
-                                Url = data.Url
-                            };
-                        }), new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, (int)results.TotalItems));
-                }
+                return DoGetPreview(results, pagingInfo);
+            }
+        }
 
-                return new Core.Persistence.Entities.Page<ProfiledRequestPreview>(new ProfiledRequestPreview[0], new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, 0));
+        public Core.Persistence.Entities.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewBySessionId(Guid sessionId, PagingInfo pagingInfo)
+        {
+            using (var database = new Database(_configuration.ConnectionStringName))
+            {
+                var results = database.Page<ProfiledRequestDataWrapper>(
+                    pagingInfo.PageNumber,
+                    pagingInfo.PageSize,
+                    "SELECT * FROM ProfiledRequestData WHERE SessionId = @0 ORDER BY CapturedOnUtc DESC", sessionId);
+
+                return DoGetPreview(results, pagingInfo);
+            }
+        }
+
+        public Core.Persistence.Entities.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewBySessionUserId(string sessionUserId, PagingInfo pagingInfo)
+        {
+            using (var database = new Database(_configuration.ConnectionStringName))
+            {
+                var results = database.Page<ProfiledRequestDataWrapper>(
+                    pagingInfo.PageNumber,
+                    pagingInfo.PageSize,
+                    "SELECT * FROM ProfiledRequestData WHERE SessionUserId = @0 ORDER BY CapturedOnUtc DESC", sessionUserId);
+
+                return DoGetPreview(results, pagingInfo);
+            }
+        }
+
+        public Core.Persistence.Entities.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewBySamplingId(Guid samplingId, PagingInfo pagingInfo)
+        {
+            using (var database = new Database(_configuration.ConnectionStringName))
+            {
+                var results = database.Page<ProfiledRequestDataWrapper>(
+                    pagingInfo.PageNumber,
+                    pagingInfo.PageSize,
+                    "SELECT * FROM ProfiledRequestData WHERE SamplingId = @0 ORDER BY CapturedOnUtc DESC", samplingId);
+
+                return DoGetPreview(results, pagingInfo);
             }
         }
 
@@ -138,7 +164,7 @@ namespace ProductionProfiler.Persistence.Sql
             return null;
         }
 
-        public Core.Persistence.Entities.Page<string> GetDistinctProfiledRequestUrls(PagingInfo pagingInfo)
+        public Core.Persistence.Entities.Page<string> GetDistinctUrlsToProfile(PagingInfo pagingInfo)
         {
             using (var database = new Database(_configuration.ConnectionStringName))
             {
@@ -177,7 +203,10 @@ namespace ProductionProfiler.Persistence.Sql
                     Id = profiledRequestData.Id,
                     Url = profiledRequestData.Url,
                     Data = BinarySerializer<ProfiledRequestData>.Serialize(profiledRequestData),
-                    CapturedOnUtc = profiledRequestData.CapturedOnUtc
+                    CapturedOnUtc = profiledRequestData.CapturedOnUtc,
+                    SamplingId = profiledRequestData.SamplingId,
+                    SessionId = profiledRequestData.SessionId,
+                    SessionUserId = profiledRequestData.SessionUserId
                 };
 
                 database.Insert("{0}.ProfiledRequestData".FormatWith(_configuration.SchemaName), "Id", false, dataWrapper);
