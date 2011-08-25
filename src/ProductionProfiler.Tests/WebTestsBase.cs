@@ -39,11 +39,9 @@ namespace ProductionProfiler.Tests
                 .DataProvider(new SqlPersistenceProvider(new SqlConfiguration("profiler", "profiler", "Profiler")))
                 .HttpRequestDataCollector<BasicHttpRequestDataCollector>()
                 .HttpResponseDataCollector<BasicHttpResponseDataCollector>()
-                .CollectInputOutputMethodDataForTypes(new[] { typeof(IWorkflow) })
+                .CollectMethodDataForTypes(new[] { typeof(IWorkflow) })
                 .CacheEngine<NullCacheEngine>()
                 .RequestFilter(req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty)
-                .CaptureExceptions()
-                .CaptureResponse()
                 .Initialise();
         }
     }

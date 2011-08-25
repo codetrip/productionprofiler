@@ -70,7 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\IWorkflow.cs" />
-    <Compile Include="Components\WorkflowMethodDataCollector.cs" />
+    <Compile Include="Components\WorkflowMethodInvocationDataCollector.cs" />
     <Compile Include="Components\Workflows.cs" />
     <Compile Include="Integration\CastleWebTests.cs" />
     <Compile Include="Mocks\MockHttpContext.cs" />

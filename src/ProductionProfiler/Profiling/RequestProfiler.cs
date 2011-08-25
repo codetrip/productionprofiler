@@ -9,7 +9,6 @@ using ProductionProfiler.Core.Collectors;
 using ProductionProfiler.Core.Configuration;
 using ProductionProfiler.Core.Extensions;
 using ProductionProfiler.Core.Logging;
-using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Core.Profiling
@@ -18,8 +17,7 @@ namespace ProductionProfiler.Core.Profiling
     {
         private readonly IHttpRequestDataCollector _httpRequestDataCollector;
         private readonly IHttpResponseDataCollector _httpResponseDataCollector;
-        private readonly IProfilerRepository _repository;
-        private readonly IMethodInputOutputDataCollector _methodInputOutputDataCollector;
+        private readonly IMethodDataCollector _methodDataCollector;
         private readonly Stack<MethodData> _methodStack = new Stack<MethodData>();
         private readonly ProfilerConfiguration _configuration;
         private readonly ILogger _logger;
@@ -27,18 +25,16 @@ namespace ProductionProfiler.Core.Profiling
         private readonly Guid _requestId;
         private ProfiledRequestData _profileData;
         private Stopwatch _watch;
-        private IEnumerable<IProfilingCoordinator> _coordinators;
+        private IEnumerable<IProfilingTrigger> _coordinators;
 
         public RequestProfiler(IHttpRequestDataCollector httpRequestDataCollector, 
             IHttpResponseDataCollector httpResponseDataCollector, 
-            IProfilerRepository repository, 
-            IMethodInputOutputDataCollector methodInputOutputDataCollector,
+            IMethodDataCollector methodDataCollector,
             ILogger logger,
             ProfilerConfiguration configuration)
         {
-            _methodInputOutputDataCollector = methodInputOutputDataCollector;
+            _methodDataCollector = methodDataCollector;
             _logger = logger;
-            _repository = repository;
             _httpResponseDataCollector = httpResponseDataCollector;
             _httpRequestDataCollector = httpRequestDataCollector;
             _threadId = Thread.CurrentThread.ManagedThreadId;
@@ -46,7 +42,7 @@ namespace ProductionProfiler.Core.Profiling
             _configuration = configuration;
         }
 
-        public void Start(HttpContext context, IEnumerable<IProfilingCoordinator> coordinators)
+        public void Start(HttpContext context, IEnumerable<IProfilingTrigger> coordinators)
         {
             ProfilerContext.Profiling = true;
             _coordinators = coordinators;
@@ -70,20 +66,13 @@ namespace ProductionProfiler.Core.Profiling
                 //add data from the configured IHttpRequestDataCollector
                 _profileData.RequestData.AddRangeIfNotNull(_httpRequestDataCollector.Collect(context.Request));
 
-                if (_configuration.CaptureExceptions)
-                {
-                    Trace("...Profiler configured to capture all exceptions");
-                    AppDomain.CurrentDomain.FirstChanceException += CaptureException;
-                }
+                //add hook to capture exceptions
+                AppDomain.CurrentDomain.FirstChanceException += CaptureException;
 
-                if (_configuration.CaptureResponse)
-                {
-                    //bug in asp.net 3.5 requires you to read the response Filter before you set it!
-                    var f = context.Response.Filter;
-                    context.Response.Filter = _configuration.ResponseFilter(context);
-                    _profileData.CapturedResponse = true;
-                    Trace("...Profiler configured to capture response, adding response filter of type:={0}", context.Response.Filter.GetType());
-                }
+                //set up our response filter to capture the full response
+                //bug in asp.net 3.5 requires you to read the response Filter before you set it!
+                var f = context.Response.Filter;
+                context.Response.Filter = _configuration.ResponseFilter(context);
 
                 _watch = Stopwatch.StartNew();
             }
@@ -144,21 +133,17 @@ namespace ProductionProfiler.Core.Profiling
                 //add data from the configured IHttpRequestDataCollector
                 _profileData.ResponseData.AddRangeIfNotNull(_httpResponseDataCollector.Collect(response));
 
-                if (_configuration.CaptureExceptions)
-                    AppDomain.CurrentDomain.FirstChanceException -= CaptureException;
+                AppDomain.CurrentDomain.FirstChanceException -= CaptureException;
 
-                if (_configuration.CaptureResponse)
+                var responseFilter = response.Filter as IResponseFilter;
+                if (responseFilter != null)
                 {
-                    var responseFilter = response.Filter as IResponseFilter;
-                    if (responseFilter != null)
+                    ProfilerContext.EnqueueForPersistence(new ProfiledResponse
                     {
-                        _repository.SaveResponse(new ProfiledResponse
-                        {
-                            Body = responseFilter.Response,
-                            Id = _requestId,
-                            Url = _profileData.Url
-                        });
-                    }
+                        Body = responseFilter.Response,
+                        Id = _requestId,
+                        Url = _profileData.Url
+                    });
                 }
 
                 //allow the coordinators that have been enabled for this request to augment to profile data before we save it.
@@ -176,7 +161,7 @@ namespace ProductionProfiler.Core.Profiling
                 try
                 {
                     Trace("...Attempting to persist profile data");
-                    _repository.SaveProfiledRequestData(_profileData);
+                    ProfilerContext.EnqueueForPersistence(_profileData);
                     Trace("...Success");
                 }
                 catch (Exception ex)
@@ -215,9 +200,9 @@ namespace ProductionProfiler.Core.Profiling
                     }
                 }
 
-                if (_configuration.MethodDataCollectorMappings.ShouldCollectInputOutputDataForType(invocation.TargetType))
+                if (_configuration.MethodDataCollectorMappings.ShouldCollectMethodDataForType(invocation.TargetType))
                 {
-                    method.Arguments = _methodInputOutputDataCollector.GetArguments(invocation).ToList();
+                    method.Arguments = _methodDataCollector.GetArguments(invocation).ToList();
                 }
             }
             catch(Exception e)
@@ -260,9 +245,9 @@ namespace ProductionProfiler.Core.Profiling
                     }
                 }
 
-                if (_configuration.MethodDataCollectorMappings.ShouldCollectInputOutputDataForType(invocation.TargetType))
+                if (_configuration.MethodDataCollectorMappings.ShouldCollectMethodDataForType(invocation.TargetType))
                 {
-                    currentMethod.ReturnValue = _methodInputOutputDataCollector.GetReturnValue(invocation);
+                    currentMethod.ReturnValue = _methodDataCollector.GetReturnValue(invocation);
                 }
 
                 currentMethod.Data = invocation.MethodData;

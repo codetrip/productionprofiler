@@ -7,12 +7,12 @@ using ProductionProfiler.Core.Auditing;
 using ProductionProfiler.Core.Binding;
 using ProductionProfiler.Core.Caching;
 using ProductionProfiler.Core.Collectors;
-using ProductionProfiler.Core.Coordinators;
 using ProductionProfiler.Core.Handlers;
 using ProductionProfiler.Core.IoC;
 using ProductionProfiler.Core.Logging;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Profiling;
+using ProductionProfiler.Core.Profiling.Triggers;
 using ProductionProfiler.Core.Resources;
 using ProductionProfiler.Core.Extensions;
 using ProductionProfiler.Core.Serialization;
@@ -39,7 +39,8 @@ namespace ProductionProfiler.Core.Configuration
             {
                 _profilerConfiguration = new ProfilerConfiguration
                 {
-                    RequestFilter = req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty
+                    RequestFilter = req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty,
+                    ResponseFilter = context => new StoreResponseFilter(context.Response.Filter)
                 },
                 _container = container
             };
@@ -65,23 +66,9 @@ namespace ProductionProfiler.Core.Configuration
             return this;
         }
 
-        IFluentConfiguration IFluentConfiguration.CaptureExceptions()
+        IFluentConfiguration IFluentConfiguration.ResponseFilter<T>(Func<HttpContext, T> responseFilterConstructor)
         {
-            _profilerConfiguration.CaptureExceptions = true;
-            return this;
-        }
-
-        IFluentConfiguration IFluentConfiguration.CaptureResponse<T>(Func<HttpContext, T> responseFilterConstructor)
-        {
-            _profilerConfiguration.CaptureResponse = true;
             _profilerConfiguration.ResponseFilter = responseFilterConstructor;
-            return this;
-        }
-
-        IFluentConfiguration IFluentConfiguration.CaptureResponse()
-        {
-            _profilerConfiguration.CaptureResponse = true;
-            _profilerConfiguration.ResponseFilter = context => new StoreResponseFilter(context.Response.Filter);
             return this;
         }
 
@@ -149,18 +136,18 @@ namespace ProductionProfiler.Core.Configuration
             return this;
         }
 
-        public IFluentConfiguration CollectInputOutputMethodDataForTypes(IEnumerable<Type> typesToCollectInputOutputDataFor)
+        public IFluentConfiguration CollectMethodDataForTypes(IEnumerable<Type> typesToCollectInputOutputDataFor)
         {
-            _profilerConfiguration.MethodDataCollectorMappings.InputOutputMethodDataTypes = typesToCollectInputOutputDataFor.ToList();
+            _profilerConfiguration.MethodDataCollectorMappings.CollectMethodDataForTypes = typesToCollectInputOutputDataFor.ToList();
             return this;
         }
 
-        public IFluentCoordinatorConfiguration Coordinators
+        public IFluentProfilingTriggerConfiguration Trigger
         {
-            get { return new FluentCoordinatorConfiguration(this); }
+            get { return new FluentProfilingTriggerConfiguration(this); }
         }
 
-        IFluentCollectorConfiguration IFluentConfiguration.AddMethodDataCollector<T>()
+        IFluentCollectorConfiguration IFluentConfiguration.AddMethodInvocationDataCollector<T>()
         {
             return new CollectorConfiguration(this, typeof(T));
         }
@@ -221,7 +208,7 @@ namespace ProductionProfiler.Core.Configuration
             _container.RegisterTransient<IRequestHandler>(typeof(DeleteProfiledDataByUrlRequestHandler), Constants.Handlers.DeleteUrlToProfileDataByUrl);
             _container.RegisterTransient<IAddUrlToProfileRequestBinder>(typeof(AddUrlToProfileRequestBinder));
             _container.RegisterTransient<IUpdateUrlToProfileRequestBinder>(typeof(UpdateUrlToProfileRequestBinder));
-            _container.RegisterTransient<IMethodInputOutputDataCollector>(typeof(MethodInputOutputDataCollector));
+            _container.RegisterTransient<IMethodDataCollector>(typeof(MethodDataCollector));
             _container.RegisterTransient<IComponentAuditor>(typeof(Log4NetComponentAuditor));
             _container.RegisterSingleton<ICookieManager>(typeof(CookieManager));
 
@@ -262,7 +249,7 @@ namespace ProductionProfiler.Core.Configuration
             {
                 if (!MappingExists())
                 {
-                    _configureInstance._container.RegisterTransient<IMethodDataCollector>(_collectorType, _collectorType.FullName);
+                    _configureInstance._container.RegisterTransient<IMethodInvocationDataCollector>(_collectorType, _collectorType.FullName);
                     _configureInstance._profilerConfiguration.MethodDataCollectorMappings.AddMapping(new CollectorMapping
                     {
                         CollectorType = _collectorType,
@@ -277,7 +264,7 @@ namespace ProductionProfiler.Core.Configuration
             {
                 if (!MappingExists())
                 {
-                    _configureInstance._container.RegisterTransient<IMethodDataCollector>(_collectorType, _collectorType.FullName);
+                    _configureInstance._container.RegisterTransient<IMethodInvocationDataCollector>(_collectorType, _collectorType.FullName);
                     _configureInstance._profilerConfiguration.MethodDataCollectorMappings.AddMapping(new CollectorMapping
                     {
                         CollectorType = _collectorType,
@@ -292,7 +279,7 @@ namespace ProductionProfiler.Core.Configuration
             {
                 if (!MappingExists())
                 {
-                    _configureInstance._container.RegisterTransient<IMethodDataCollector>(_collectorType, _collectorType.FullName);
+                    _configureInstance._container.RegisterTransient<IMethodInvocationDataCollector>(_collectorType, _collectorType.FullName);
                     _configureInstance._profilerConfiguration.MethodDataCollectorMappings.AddMapping(new CollectorMapping
                     {
                         CollectorType = _collectorType,
@@ -307,7 +294,7 @@ namespace ProductionProfiler.Core.Configuration
             {
                 if (_configureInstance._profilerConfiguration.MethodDataCollectorMappings.IsCollectorTypeMapped(_collectorType))
                 {
-                    _configureInstance._profilerConfiguration.ReportException(new ProfilerConfigurationException(string.Format("IMethodDataCollector has already been registered for type {0}.".FormatWith(_collectorType.FullName))));
+                    _configureInstance._profilerConfiguration.ReportException(new ProfilerConfigurationException(string.Format("IMethodInvocationDataCollector has already been registered for type {0}.".FormatWith(_collectorType.FullName))));
                     return true;
                 }
 
@@ -341,43 +328,72 @@ namespace ProductionProfiler.Core.Configuration
 
         #endregion
 
-        #region CoordinatorConfiguration
+        #region Profiling Trigger Configuration
 
-        private class FluentCoordinatorConfiguration : IFluentCoordinatorConfiguration
+        private class FluentProfilingTriggerConfiguration : IFluentProfilingTriggerConfiguration
         {
             private readonly Configure _configureInstance;
 
-            public FluentCoordinatorConfiguration(Configure configureInstance)
+            public FluentProfilingTriggerConfiguration(Configure configureInstance)
             {
                 _configureInstance = configureInstance;
             }
 
-            public IFluentConfiguration Register<T>() where T : IProfilingCoordinator
+            public IFluentConfiguration ByCustomTrigger<T>() where T : IProfilingTrigger
             {
-                _configureInstance._container.RegisterTransient<IProfilingCoordinator>(typeof(T), typeof(T).Name);
+                _configureInstance._container.RegisterTransient<IProfilingTrigger>(typeof(T), typeof(T).Name);
                 return _configureInstance;
             }
 
-            public IFluentCoordinatorConfiguration Url()
+            public IFluentConfiguration ByUrl()
             {
-                _configureInstance._container.RegisterTransient<IProfilingCoordinator>(typeof(UrlCoordinator), typeof(UrlCoordinator).Name);
+                _configureInstance._container.RegisterTransient<IProfilingTrigger>(typeof(UrlBasedProfilingTrigger), typeof(UrlBasedProfilingTrigger).Name);
+                return _configureInstance;
+            }
+
+            public IFluentConfiguration BySession()
+            {
+                _configureInstance._container.RegisterTransient<IProfilingTrigger>(typeof(SessionBasedProfilingTrigger), typeof(SessionBasedProfilingTrigger).Name);
+                return _configureInstance;
+            }
+
+            public IFluentSampleProfilingTriggerConfiguration BySampling()
+            {
+                return new FluentSampleProfilingTriggerConfiguration(_configureInstance);
+            }
+        }
+
+        public class FluentSampleProfilingTriggerConfiguration : IFluentSampleProfilingTriggerConfiguration
+        {
+            private readonly Configure _configureInstance;
+            private readonly SamplingConfiguration _samplingConfiguration;
+
+            public FluentSampleProfilingTriggerConfiguration(Configure configureInstance)
+            {
+                _configureInstance = configureInstance;
+                _samplingConfiguration = new SamplingConfiguration
+                {
+                    SampleFrequency = new TimeSpan(1, 0, 0),
+                    SamplePeriod = new TimeSpan(0, 0, 10)
+                };
+            }
+
+            public IFluentSampleProfilingTriggerConfiguration Every(TimeSpan frequency)
+            {
+                _samplingConfiguration.SampleFrequency = frequency;
                 return this;
             }
 
-            public IFluentCoordinatorConfiguration Session()
+            public IFluentSampleProfilingTriggerConfiguration For(TimeSpan period)
             {
-                _configureInstance._container.RegisterTransient<IProfilingCoordinator>(typeof(SessionCoordinator), typeof(SessionCoordinator).Name);
+                _samplingConfiguration.SamplePeriod = period;
                 return this;
             }
 
-            public IFluentCoordinatorConfiguration Sampling()
+            public IFluentConfiguration Set()
             {
-                _configureInstance._container.RegisterTransient<IProfilingCoordinator>(typeof(SamplingCoordinator), typeof(SamplingCoordinator).Name);
-                return this;
-            }
-
-            public IFluentConfiguration Add()
-            {
+                _configureInstance._container.RegisterTransient<IProfilingTrigger>(typeof(SampleBasedProfilingTrigger), typeof(SampleBasedProfilingTrigger).Name);
+                _configureInstance._container.RegisterSingletonInstance(_samplingConfiguration);
                 return _configureInstance;
             }
         }

@@ -1,12 +1,12 @@
 ﻿using System.Web;
-using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Profiling.Entities;
 
-namespace ProductionProfiler.Core.Coordinators
+namespace ProductionProfiler.Core.Profiling.Triggers
 {
-    public class SamplingCoordinator : ComponentBase, IProfilingCoordinator
+    public class SampleBasedProfilingTrigger : ComponentBase, IProfilingTrigger
     {
-        public bool ShouldProfile(HttpContext context)
+
+        public bool TriggerProfiling(HttpContext context)
         {
             return false;
         }

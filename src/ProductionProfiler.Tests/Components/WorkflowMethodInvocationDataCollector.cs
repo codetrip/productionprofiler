@@ -3,7 +3,7 @@ using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Tests.Components
 {
-    public class WorkflowMethodDataCollector : IMethodDataCollector
+    public class WorkflowMethodInvocationDataCollector : IMethodInvocationDataCollector
     {
         public void Entry(MethodInvocation invocation)
         {

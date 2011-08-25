@@ -12,11 +12,11 @@ namespace ProductionProfiler.Core.Configuration
         private readonly IDictionary<Type, IEnumerable<string>> _mappedCollectors = new Dictionary<Type, IEnumerable<string>>();
         private readonly IList<Type> _mappedTypes = new List<Type>();
         private readonly IList<CollectorMapping> _collectorMappings = new List<CollectorMapping>();
-        private readonly IDictionary<Type, bool> _cachedInputOutputDataCollectorTypes = new Dictionary<Type, bool>();
+        private readonly IDictionary<Type, bool> _cachedMethodDataCollectorTypes = new Dictionary<Type, bool>();
 
-        public IList<Type> InputOutputMethodDataTypes { get; set; }
+        public IList<Type> CollectMethodDataForTypes { get; set; }
 
-        public IEnumerable<IMethodDataCollector> GetMethodDataCollectorsForType(Type methodTargetType)
+        public IEnumerable<IMethodInvocationDataCollector> GetMethodDataCollectorsForType(Type methodTargetType)
         {
             if(!_mappedCollectors.ContainsKey(methodTargetType))
             {
@@ -35,28 +35,28 @@ namespace ProductionProfiler.Core.Configuration
             {
                 foreach(string key in keys)
                 {
-                    yield return ProfilerContext.Container.Resolve<IMethodDataCollector>(key);
+                    yield return ProfilerContext.Container.Resolve<IMethodInvocationDataCollector>(key);
                 }
             }
         }
 
-        public bool ShouldCollectInputOutputDataForType(Type methodTargetType)
+        public bool ShouldCollectMethodDataForType(Type methodTargetType)
         {
-            if (InputOutputMethodDataTypes == null || InputOutputMethodDataTypes.Count == 0)
+            if (CollectMethodDataForTypes == null || CollectMethodDataForTypes.Count == 0)
                 return false;
 
-            if (!_cachedInputOutputDataCollectorTypes.ContainsKey(methodTargetType))
+            if (!_cachedMethodDataCollectorTypes.ContainsKey(methodTargetType))
             {
                 lock (_syncLock)
                 {
-                    if (!_cachedInputOutputDataCollectorTypes.ContainsKey(methodTargetType))
+                    if (!_cachedMethodDataCollectorTypes.ContainsKey(methodTargetType))
                     {
-                        _cachedInputOutputDataCollectorTypes.Add(methodTargetType, InputOutputMethodDataTypes.Where(t => t.IsAssignableFrom(methodTargetType)).Any());
+                        _cachedMethodDataCollectorTypes.Add(methodTargetType, CollectMethodDataForTypes.Where(t => t.IsAssignableFrom(methodTargetType)).Any());
                     }
                 }
             }
 
-            return _cachedInputOutputDataCollectorTypes[methodTargetType];
+            return _cachedMethodDataCollectorTypes[methodTargetType];
         }
 
         public void AddMapping(CollectorMapping mapping)

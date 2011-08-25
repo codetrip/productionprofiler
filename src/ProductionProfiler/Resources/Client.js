@@ -318,7 +318,7 @@ if (window.jQueryProfiler) {
                 this.attachEvents();
             },
             renderResultsDetail: function (data) {
-                var responseUrl = data.CapturedResponse ? '<a target="_blank" href="/profiler?handler=response&id=' + data.Id + '">view response</a>' : 'not captured';
+                var responseUrl = '<a target="_blank" href="/profiler?handler=response&id=' + data.Id + '">view response</a>';
                 this.html = '<div id="itemcontainer" class="itemcontainer"></div><table class="heading"><tr><th>Url</th><th>Request Id</th><th>Response</th><th>Captured On</th><th>Server</th><th>Elapsed Milliseconds</th><th>Client IP</th><th>Ajax</th></tr>' +
                 '<tr><td><a href="/profiler?handler=results&action=previewresults&url=' + data.EncodedUrl + '">' + data.Url + '</a></td><td>' + data.Id + '</td><td>' + responseUrl + '</td><td>' + $.profiler.formatDate(data.CapturedOnUtc) + '</td><td>' + data.Server + '</td><td>' + data.ElapsedMilliseconds + 'ms</td><td>' + data.ClientIpAddress + '</td><td>' + data.Ajax + '</td></tr></table>';
 

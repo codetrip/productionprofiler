@@ -9,11 +9,10 @@ namespace ProductionProfiler.Core.Configuration
 {
     public class ProfilerConfiguration : IDoNotWantToBeProfiled
     {
-        internal bool CaptureExceptions { get; set; }
-        internal bool CaptureResponse { get; set; }
         internal Func<HttpContext, Stream> ResponseFilter { get; set; }
         internal MethodDataCollectorMappings MethodDataCollectorMappings { get; set; }
         internal Action<Exception> ReportException { get; set; }
+        internal SamplingConfiguration SamplingConfiguration { get; set; }
 
         internal Func<HttpRequest, bool> RequestFilter { private get; set; }
         internal Func<HttpContext, bool> AuthoriseManagement { private get; set; }
@@ -24,9 +23,9 @@ namespace ProductionProfiler.Core.Configuration
             MethodDataCollectorMappings = new MethodDataCollectorMappings();
         }
 
-        public IEnumerable<IProfilingCoordinator> GetCoordinators(HttpContext context)
+        public IEnumerable<IProfilingTrigger> GetCoordinators(HttpContext context)
         {
-            return ProfilerContext.Container.ResolveAll<IProfilingCoordinator>().Where(pm => pm.ShouldProfile(context)); ;
+            return ProfilerContext.Container.ResolveAll<IProfilingTrigger>().Where(pm => pm.TriggerProfiling(context)); ;
         }
 
         public bool AuthorisedForManagement(HttpContext context)

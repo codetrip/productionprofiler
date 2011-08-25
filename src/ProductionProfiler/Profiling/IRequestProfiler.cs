@@ -8,7 +8,7 @@ namespace ProductionProfiler.Core.Profiling
     {
         void MethodEntry(MethodInvocation invocation);
         void MethodExit(MethodInvocation invocation);
-        void Start(HttpContext context, IEnumerable<IProfilingCoordinator> coordinators);
+        void Start(HttpContext context, IEnumerable<IProfilingTrigger> coordinators);
         void Stop(HttpResponse response);
     }
 }

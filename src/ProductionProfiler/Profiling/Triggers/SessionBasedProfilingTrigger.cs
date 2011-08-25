@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Web;
 using ProductionProfiler.Core.Configuration;
-using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Profiling.Entities;
 using ProductionProfiler.Core.Web;
 using ProductionProfiler.Core.Extensions;
 
-namespace ProductionProfiler.Core.Coordinators
+namespace ProductionProfiler.Core.Profiling.Triggers
 {
-    public class SessionCoordinator : ComponentBase, IProfilingCoordinator
+    public class SessionBasedProfilingTrigger : ComponentBase, IProfilingTrigger
     {
         private const string SessionCookieName = "profiler-session";
         private const string SessionCookieId = "id";
@@ -18,13 +17,13 @@ namespace ProductionProfiler.Core.Coordinators
         private readonly ICookieManager _cookieManager;
         private readonly ProfilerConfiguration _configuration;
 
-        public SessionCoordinator(ICookieManager cookieManager, ProfilerConfiguration configuration)
+        public SessionBasedProfilingTrigger(ICookieManager cookieManager, ProfilerConfiguration configuration)
         {
             _cookieManager = cookieManager;
             _configuration = configuration;
         }
 
-        public bool ShouldProfile(HttpContext context)
+        public bool TriggerProfiling(HttpContext context)
         {
             if(_cookieManager.Get(SessionCookieName) != string.Empty)
             {

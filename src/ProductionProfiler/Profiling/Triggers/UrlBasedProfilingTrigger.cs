@@ -6,24 +6,23 @@ using System.Web;
 using ProductionProfiler.Core.Caching;
 using ProductionProfiler.Core.Extensions;
 using ProductionProfiler.Core.Persistence;
-using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Profiling.Entities;
 using ProductionProfiler.Core.Resources;
 
-namespace ProductionProfiler.Core.Coordinators
+namespace ProductionProfiler.Core.Profiling.Triggers
 {
-    public class UrlCoordinator : ComponentBase, IProfilingCoordinator
+    public class UrlBasedProfilingTrigger : ComponentBase, IProfilingTrigger
     {
         private readonly IProfilerRepository _repository;
         private readonly IProfilerCacheEngine _profilerCacheEngine;
 
-        public UrlCoordinator(IProfilerRepository repository, IProfilerCacheEngine profilerCacheEngine)
+        public UrlBasedProfilingTrigger(IProfilerRepository repository, IProfilerCacheEngine profilerCacheEngine)
         {
             _profilerCacheEngine = profilerCacheEngine;
             _repository = repository;
         }
 
-        public bool ShouldProfile(HttpContext context)
+        public bool TriggerProfiling(HttpContext context)
         {
             Trace("Determining whether to run the URL profiling coordinator...");
 
@@ -75,7 +74,7 @@ namespace ProductionProfiler.Core.Coordinators
             }
             else
             {
-                Trace("...No URL's to profile, will not profile the request for the UrlCoordinator");
+                Trace("...No URL's to profile, will not profile the request for the UrlBasedProfilingTrigger");
             }
 
             Trace("Complete");

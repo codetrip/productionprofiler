@@ -1,4 +1,5 @@
-﻿using ProductionProfiler.Core.Profiling;
+﻿using System.Collections.Generic;
+using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Core.Collectors
@@ -10,13 +11,14 @@ namespace ProductionProfiler.Core.Collectors
         /// </summary>
         /// <param name="invocation"></param>
         /// <returns></returns>
-        void Entry(MethodInvocation invocation);
+        IEnumerable<DataCollectionItem> GetArguments(MethodInvocation invocation);
+
         /// <summary>
         /// Invoked after the method has been called, if there is a return type for 
         /// the method the invocation.ReturnValue will be set with this value.
         /// </summary>
         /// <param name="invocation"></param>
         /// <returns></returns>
-        void Exit(MethodInvocation invocation);
+        DataCollectionItem GetReturnValue(MethodInvocation invocation);
     }
 }

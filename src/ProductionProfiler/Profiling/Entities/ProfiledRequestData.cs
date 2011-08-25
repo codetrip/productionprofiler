@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace ProductionProfiler.Core.Profiling.Entities
 {
     [Serializable]
-    public class ProfiledRequestData
+    public class ProfiledRequestData : IAsyncPersistable
     {
         public Guid Id { get; set; }
         public Guid SessionId { get; set; }
@@ -16,7 +16,6 @@ namespace ProductionProfiler.Core.Profiling.Entities
         public string Server { get; set; }
         public string ClientIpAddress { get; set; }
         public bool Ajax { get; set; }
-        public bool CapturedResponse { get; set; }
         public List<MethodData> Methods { get; set; }
         public List<DataCollection> RequestData { get; set; }
         public List<DataCollection> ResponseData { get; set; }

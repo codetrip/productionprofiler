@@ -36,24 +36,13 @@ namespace ProductionProfiler.Core.Configuration
         /// <returns></returns>
         IFluentConfiguration RequestFilter(Func<HttpRequest, bool> requestFilter);
         /// <summary>
-        /// If set, any exception that occurs in an intercepted method will be logged with the profile data.
-        /// </summary>
-        /// <returns></returns>
-        IFluentConfiguration CaptureExceptions();
-        /// <summary>
         /// Allows you to capture the response using your own custom ResponseFilter, your filter must implement the 
         /// IResponseFilter interface which allows the profiler to capture the response body and store it.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="responseFilterConstructor">delegate to construct a response filter to apply to profiled responses</param>
+        /// <param name="responseFilter">delegate to construct a response filter to apply to profiled responses</param>
         /// <returns></returns>
-        IFluentConfiguration CaptureResponse<T>(Func<HttpContext, T> responseFilterConstructor) where T : Stream, IResponseFilter;
-        /// <summary>
-        /// If set profiler will use the StoreResponseFilter which reads the HttpResponse.OutputStream and stores
-        /// it via the persistence provider linked to the profiled request data.
-        /// </summary>
-        /// <returns></returns>
-        IFluentConfiguration CaptureResponse();
+        IFluentConfiguration ResponseFilter<T>(Func<HttpContext, T> responseFilter) where T : Stream, IResponseFilter;
         IFluentConfiguration Logger(ILogger logger);
         IFluentConfiguration DataProvider(IPersistenceProvider persistenceProvider);
         IFluentConfiguration CacheEngine<T>() where T : IProfilerCacheEngine;
@@ -62,9 +51,9 @@ namespace ProductionProfiler.Core.Configuration
         IFluentConfiguration HttpResponseDataCollector<T>() where T : IHttpResponseDataCollector;
         IFluentConfiguration AuthoriseManagement(Func<HttpContext, bool> authorisedForManagement);
         IFluentConfiguration AuthoriseSession(Func<string, bool> authoriseSession);
-        IFluentConfiguration CollectInputOutputMethodDataForTypes(IEnumerable<Type> typesToCollectInputOutputDataFor);
-        IFluentCoordinatorConfiguration Coordinators { get; }
-        IFluentCollectorConfiguration AddMethodDataCollector<T>() where T : IMethodDataCollector;
+        IFluentConfiguration CollectMethodDataForTypes(IEnumerable<Type> typesToCollectMethodDataFor);
+        IFluentProfilingTriggerConfiguration Trigger { get; }
+        IFluentCollectorConfiguration AddMethodInvocationDataCollector<T>() where T : IMethodInvocationDataCollector;
         void Initialise();
     }
 }
