@@ -12,11 +12,11 @@ namespace ProductionProfiler.Core.Logging
         /// <summary>
         /// Method invoked when we start profiling a request
         /// </summary>
-        void StartProfiling();
+        void Start();
         /// <summary>
         /// Method invoked when we stop profiling a request
         /// </summary>
-        void StopProfiling();
+        void Stop();
         /// <summary>
         /// Static initialisation of the logger if required, called once on application startup
         /// </summary>

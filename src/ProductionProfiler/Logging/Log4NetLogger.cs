@@ -14,13 +14,13 @@ namespace ProductionProfiler.Core.Logging
         private static readonly IList<Log4NetProfilingAppender> _profilingAppenders = new List<Log4NetProfilingAppender>();
         private MethodData _currentMethod;
 
-        public void StartProfiling()
+        public void Start()
         {
             foreach (var appender in _profilingAppenders)
                 appender.AppendLoggingEvent += ProfilingAppenderAppendLoggingEvent;
         }
 
-        public void StopProfiling()
+        public void Stop()
         {
             foreach (var appender in _profilingAppenders)
                 appender.AppendLoggingEvent -= ProfilingAppenderAppendLoggingEvent;
@@ -64,6 +64,15 @@ namespace ProductionProfiler.Core.Logging
             if (_currentMethod != null)
             {
                 _currentMethod.Messages.Add(e.LoggingEvent.ToLogMessage(_currentMethod.Elapsed()));
+
+                if (e.LoggingEvent.ExceptionObject != null)
+                {
+                    _currentMethod.Exceptions.AddException(e.LoggingEvent.ExceptionObject, _currentMethod.Elapsed());
+                }
+                else if (e.LoggingEvent.MessageObject is Exception)
+                {
+                    _currentMethod.Exceptions.AddException(e.LoggingEvent.MessageObject as Exception, _currentMethod.Elapsed());
+                }
             }
         }
     }

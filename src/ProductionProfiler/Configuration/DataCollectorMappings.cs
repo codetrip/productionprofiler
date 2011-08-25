@@ -6,7 +6,7 @@ using ProductionProfiler.Core.Profiling;
 
 namespace ProductionProfiler.Core.Configuration
 {
-    public class MethodDataCollectorMappings
+    public class DataCollectorMappings
     {
         private readonly object _syncLock = new object();
         private readonly IDictionary<Type, IEnumerable<string>> _mappedCollectors = new Dictionary<Type, IEnumerable<string>>();
@@ -40,7 +40,7 @@ namespace ProductionProfiler.Core.Configuration
             }
         }
 
-        public bool ShouldCollectMethodDataForType(Type methodTargetType)
+        public bool CollectMethodDataForType(Type methodTargetType)
         {
             if (CollectMethodDataForTypes == null || CollectMethodDataForTypes.Count == 0)
                 return false;
@@ -78,7 +78,7 @@ namespace ProductionProfiler.Core.Configuration
             return _collectorMappings.Any(m => m.CollectorType == collectorType);
         }
 
-        public bool AnyMappedTypes()
+        public bool HasMappings()
         {
             return _collectorMappings.Count > 0;
         }

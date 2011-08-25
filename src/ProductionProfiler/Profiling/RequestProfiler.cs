@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
-using System.Runtime.ExceptionServices;
-using System.Threading;
 using System.Web;
 using ProductionProfiler.Core.Collectors;
 using ProductionProfiler.Core.Configuration;
@@ -21,7 +19,6 @@ namespace ProductionProfiler.Core.Profiling
         private readonly Stack<MethodData> _methodStack = new Stack<MethodData>();
         private readonly ProfilerConfiguration _configuration;
         private readonly ILogger _logger;
-        private readonly int _threadId;
         private readonly Guid _requestId;
         private ProfiledRequestData _profileData;
         private Stopwatch _watch;
@@ -37,7 +34,6 @@ namespace ProductionProfiler.Core.Profiling
             _logger = logger;
             _httpResponseDataCollector = httpResponseDataCollector;
             _httpRequestDataCollector = httpRequestDataCollector;
-            _threadId = Thread.CurrentThread.ManagedThreadId;
             _requestId = Guid.NewGuid();
             _configuration = configuration;
         }
@@ -51,7 +47,7 @@ namespace ProductionProfiler.Core.Profiling
 
             try
             {
-                _logger.StartProfiling();
+                _logger.Start();
 
                 _profileData = new ProfiledRequestData
                 {
@@ -64,15 +60,12 @@ namespace ProductionProfiler.Core.Profiling
                 };
 
                 //add data from the configured IHttpRequestDataCollector
-                _profileData.RequestData.AddRangeIfNotNull(_httpRequestDataCollector.Collect(context.Request));
-
-                //add hook to capture exceptions
-                AppDomain.CurrentDomain.FirstChanceException += CaptureException;
+                _profileData.RequestData.AddIfNotNull(_httpRequestDataCollector.Collect(context.Request));
 
                 //set up our response filter to capture the full response
                 //bug in asp.net 3.5 requires you to read the response Filter before you set it!
                 var f = context.Response.Filter;
-                context.Response.Filter = _configuration.ResponseFilter(context);
+                context.Response.Filter = new StoreResponseFilter(context.Response.Filter);
 
                 _watch = Stopwatch.StartNew();
             }
@@ -83,30 +76,6 @@ namespace ProductionProfiler.Core.Profiling
             } 
             
             Trace("Start profiling complete");
-        }
-
-        private void CaptureException(object sender, FirstChanceExceptionEventArgs e)
-        {
-            try
-            {
-                var currentMethod = _methodStack.PeekIfItems();
-
-                //we check the thread id to check its not an exception from some other web request.
-                //pretty sure this isn't a problem....
-                if (currentMethod != null && _threadId == Thread.CurrentThread.ManagedThreadId && !currentMethod.Exceptions.Any(ex => ex.Type == e.Exception.GetType().FullName))
-                {
-                    currentMethod.Exceptions.Add(new ThrownException
-                    {
-                        Message = e.Exception.Format(true, true),
-                        Milliseconds = _watch.ElapsedMilliseconds,
-                        Type = e.Exception.GetType().FullName
-                    });
-                }
-            }
-            catch
-            {
-                //get a stack overflow if an exceptions is thrown by this method
-            }
         }
 
         public void Stop(HttpResponse response)
@@ -122,7 +91,7 @@ namespace ProductionProfiler.Core.Profiling
 
             try
             {
-                _logger.StopProfiling();
+                _logger.Stop();
 
                 if(_watch != null)
                 {
@@ -131,9 +100,7 @@ namespace ProductionProfiler.Core.Profiling
                 }
 
                 //add data from the configured IHttpRequestDataCollector
-                _profileData.ResponseData.AddRangeIfNotNull(_httpResponseDataCollector.Collect(response));
-
-                AppDomain.CurrentDomain.FirstChanceException -= CaptureException;
+                _profileData.ResponseData.AddIfNotNull(_httpResponseDataCollector.Collect(response));
 
                 var responseFilter = response.Filter as IResponseFilter;
                 if (responseFilter != null)
@@ -192,15 +159,15 @@ namespace ProductionProfiler.Core.Profiling
                 else
                     currentMethod.Methods.Add(method);
 
-                if (_configuration.MethodDataCollectorMappings.AnyMappedTypes())
+                if (_configuration.DataCollectorMappings.HasMappings())
                 {
-                    foreach (var collector in _configuration.MethodDataCollectorMappings.GetMethodDataCollectorsForType(invocation.TargetType))
+                    foreach (var collector in _configuration.DataCollectorMappings.GetMethodDataCollectorsForType(invocation.TargetType))
                     {
                         collector.Entry(invocation);
                     }
                 }
 
-                if (_configuration.MethodDataCollectorMappings.ShouldCollectMethodDataForType(invocation.TargetType))
+                if (_configuration.DataCollectorMappings.CollectMethodDataForType(invocation.TargetType))
                 {
                     method.Arguments = _methodDataCollector.GetArguments(invocation).ToList();
                 }
@@ -208,13 +175,7 @@ namespace ProductionProfiler.Core.Profiling
             catch(Exception e)
             {
                 Error(e);
-
-                method.Exceptions.Add(new ThrownException
-                {
-                    Message = e.Format(),
-                    Milliseconds = _watch.ElapsedMilliseconds,
-                    Type = e.GetType().ToString()
-                });
+                method.Exceptions.AddException(e, _watch.ElapsedMilliseconds);
             }
             finally
             {
@@ -237,15 +198,21 @@ namespace ProductionProfiler.Core.Profiling
                 currentMethod = _methodStack.Pop();
                 currentMethod.Stop( _watch.ElapsedMilliseconds);
 
-                if (_configuration.MethodDataCollectorMappings.AnyMappedTypes())
+                //if an exception was thrown by the method, log it here
+                if (invocation.Exception != null)
                 {
-                    foreach (var collector in _configuration.MethodDataCollectorMappings.GetMethodDataCollectorsForType(invocation.TargetType))
+                    currentMethod.Exceptions.AddException(invocation.Exception, _watch.ElapsedMilliseconds);
+                }
+
+                if (_configuration.DataCollectorMappings.HasMappings())
+                {
+                    foreach (var collector in _configuration.DataCollectorMappings.GetMethodDataCollectorsForType(invocation.TargetType))
                     {
                         collector.Exit(invocation);
                     }
                 }
 
-                if (_configuration.MethodDataCollectorMappings.ShouldCollectMethodDataForType(invocation.TargetType))
+                if (invocation.ReturnValue != null && _configuration.DataCollectorMappings.CollectMethodDataForType(invocation.TargetType))
                 {
                     currentMethod.ReturnValue = _methodDataCollector.GetReturnValue(invocation);
                 }
@@ -259,12 +226,7 @@ namespace ProductionProfiler.Core.Profiling
 
                 if(currentMethod != null)
                 {
-                    currentMethod.Exceptions.Add(new ThrownException
-                    {
-                        Message = e.Format(),
-                        Milliseconds = currentMethod.Elapsed(),
-                        Type = e.GetType().ToString()
-                    });
+                    currentMethod.Exceptions.AddException(e, currentMethod.Elapsed());
                 }
             }
 

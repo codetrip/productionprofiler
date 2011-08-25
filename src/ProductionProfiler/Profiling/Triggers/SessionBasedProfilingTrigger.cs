@@ -44,12 +44,14 @@ namespace ProductionProfiler.Core.Profiling.Triggers
 
         public void AugmentProfiledRequestData(ProfiledRequestData data)
         {
-            Guid sessionId;
-            if (Guid.TryParse(_cookieManager.Get(SessionCookieName, SessionCookieId), out sessionId))
+            try
             {
+                Guid sessionId = new Guid(_cookieManager.Get(SessionCookieName, SessionCookieId));
                 data.SessionId = sessionId;
                 data.SessionUserId = _cookieManager.Get(SessionCookieName, SessionCookieUserName);
             }
+            catch (Exception)
+            {}
         }
     }
 }

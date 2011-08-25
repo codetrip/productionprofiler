@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Web;
 using ProductionProfiler.Core.Caching;
 using ProductionProfiler.Core.Collectors;
 using ProductionProfiler.Core.Logging;
 using ProductionProfiler.Core.Persistence;
-using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Serialization;
 
 namespace ProductionProfiler.Core.Configuration
@@ -35,14 +33,6 @@ namespace ProductionProfiler.Core.Configuration
         /// <param name="requestFilter"></param>
         /// <returns></returns>
         IFluentConfiguration RequestFilter(Func<HttpRequest, bool> requestFilter);
-        /// <summary>
-        /// Allows you to capture the response using your own custom ResponseFilter, your filter must implement the 
-        /// IResponseFilter interface which allows the profiler to capture the response body and store it.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="responseFilter">delegate to construct a response filter to apply to profiled responses</param>
-        /// <returns></returns>
-        IFluentConfiguration ResponseFilter<T>(Func<HttpContext, T> responseFilter) where T : Stream, IResponseFilter;
         IFluentConfiguration Logger(ILogger logger);
         IFluentConfiguration DataProvider(IPersistenceProvider persistenceProvider);
         IFluentConfiguration CacheEngine<T>() where T : IProfilerCacheEngine;

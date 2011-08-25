@@ -25,7 +25,7 @@ namespace ProductionProfiler.Core.Handlers
             requestInfo.ContentType = request.QueryString.Get(Constants.Querystring.ContentType) ?? string.Empty;
             requestInfo.ResourceName = request.QueryString.Get(Constants.Querystring.Resource) ?? string.Empty;
             requestInfo.Url = request.QueryString.Get(Constants.Querystring.Url) ?? string.Empty;
-            requestInfo.Id = request.QueryString.Get(Constants.Querystring.Id) == null ? Guid.Empty : Guid.Parse(request.QueryString.Get(Constants.Querystring.Id));
+            requestInfo.Id = request.QueryString.Get(Constants.Querystring.Id) == null ? Guid.Empty : new Guid(request.QueryString.Get(Constants.Querystring.Id));
             requestInfo.Form = request.Form;
 
             return requestInfo;

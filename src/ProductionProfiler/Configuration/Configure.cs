@@ -39,8 +39,7 @@ namespace ProductionProfiler.Core.Configuration
             {
                 _profilerConfiguration = new ProfilerConfiguration
                 {
-                    RequestFilter = req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty,
-                    ResponseFilter = context => new StoreResponseFilter(context.Response.Filter)
+                    RequestFilter = req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty
                 },
                 _container = container
             };
@@ -63,12 +62,6 @@ namespace ProductionProfiler.Core.Configuration
         IFluentConfiguration IFluentConfiguration.RequestFilter(Func<HttpRequest, bool> requestFilter)
         {
             _profilerConfiguration.RequestFilter = requestFilter;
-            return this;
-        }
-
-        IFluentConfiguration IFluentConfiguration.ResponseFilter<T>(Func<HttpContext, T> responseFilterConstructor)
-        {
-            _profilerConfiguration.ResponseFilter = responseFilterConstructor;
             return this;
         }
 
@@ -138,7 +131,7 @@ namespace ProductionProfiler.Core.Configuration
 
         public IFluentConfiguration CollectMethodDataForTypes(IEnumerable<Type> typesToCollectInputOutputDataFor)
         {
-            _profilerConfiguration.MethodDataCollectorMappings.CollectMethodDataForTypes = typesToCollectInputOutputDataFor.ToList();
+            _profilerConfiguration.DataCollectorMappings.CollectMethodDataForTypes = typesToCollectInputOutputDataFor.ToList();
             return this;
         }
 
@@ -250,7 +243,7 @@ namespace ProductionProfiler.Core.Configuration
                 if (!MappingExists())
                 {
                     _configureInstance._container.RegisterTransient<IMethodInvocationDataCollector>(_collectorType, _collectorType.FullName);
-                    _configureInstance._profilerConfiguration.MethodDataCollectorMappings.AddMapping(new CollectorMapping
+                    _configureInstance._profilerConfiguration.DataCollectorMappings.AddMapping(new CollectorMapping
                     {
                         CollectorType = _collectorType,
                         ForTypesAssignableFrom = types
@@ -265,7 +258,7 @@ namespace ProductionProfiler.Core.Configuration
                 if (!MappingExists())
                 {
                     _configureInstance._container.RegisterTransient<IMethodInvocationDataCollector>(_collectorType, _collectorType.FullName);
-                    _configureInstance._profilerConfiguration.MethodDataCollectorMappings.AddMapping(new CollectorMapping
+                    _configureInstance._profilerConfiguration.DataCollectorMappings.AddMapping(new CollectorMapping
                     {
                         CollectorType = _collectorType,
                         ForAnyType = true
@@ -280,7 +273,7 @@ namespace ProductionProfiler.Core.Configuration
                 if (!MappingExists())
                 {
                     _configureInstance._container.RegisterTransient<IMethodInvocationDataCollector>(_collectorType, _collectorType.FullName);
-                    _configureInstance._profilerConfiguration.MethodDataCollectorMappings.AddMapping(new CollectorMapping
+                    _configureInstance._profilerConfiguration.DataCollectorMappings.AddMapping(new CollectorMapping
                     {
                         CollectorType = _collectorType,
                         ForAnyUnmappedType = true
@@ -292,7 +285,7 @@ namespace ProductionProfiler.Core.Configuration
 
             private bool MappingExists()
             {
-                if (_configureInstance._profilerConfiguration.MethodDataCollectorMappings.IsCollectorTypeMapped(_collectorType))
+                if (_configureInstance._profilerConfiguration.DataCollectorMappings.IsCollectorTypeMapped(_collectorType))
                 {
                     _configureInstance._profilerConfiguration.ReportException(new ProfilerConfigurationException(string.Format("IMethodInvocationDataCollector has already been registered for type {0}.".FormatWith(_collectorType.FullName))));
                     return true;

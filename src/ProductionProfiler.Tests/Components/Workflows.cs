@@ -103,7 +103,7 @@ namespace ProductionProfiler.Tests.Components
             {
                 log.Error(e);
             }
-           
+
             log.Debug("Completed workflow 3");
             return "done";
         }

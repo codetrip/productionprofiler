@@ -9,8 +9,7 @@ namespace ProductionProfiler.Core.Configuration
 {
     public class ProfilerConfiguration : IDoNotWantToBeProfiled
     {
-        internal Func<HttpContext, Stream> ResponseFilter { get; set; }
-        internal MethodDataCollectorMappings MethodDataCollectorMappings { get; set; }
+        internal DataCollectorMappings DataCollectorMappings { get; set; }
         internal Action<Exception> ReportException { get; set; }
         internal SamplingConfiguration SamplingConfiguration { get; set; }
 
@@ -20,7 +19,7 @@ namespace ProductionProfiler.Core.Configuration
 
         public ProfilerConfiguration()
         {
-            MethodDataCollectorMappings = new MethodDataCollectorMappings();
+            DataCollectorMappings = new DataCollectorMappings();
         }
 
         public IEnumerable<IProfilingTrigger> GetCoordinators(HttpContext context)

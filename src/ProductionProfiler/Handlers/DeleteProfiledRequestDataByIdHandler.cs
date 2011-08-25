@@ -16,8 +16,16 @@ namespace ProductionProfiler.Core.Handlers
 
         protected override JsonResponse DoHandleRequest(RequestInfo requestInfo)
         {
-            Guid id;
-            if (Guid.TryParse(requestInfo.Form.Get("Id"), out id))
+            Guid id = default(Guid);
+
+            try
+            {
+                id = new Guid(requestInfo.Form.Get("Id"));
+            }
+            catch (Exception)
+            {}
+
+            if (id != default(Guid))
             {
                 _urlToProfileRepository.DeleteProfiledRequestDataById(id);
                 _urlToProfileRepository.DeleteResponseById(id);

@@ -1,4 +1,6 @@
-﻿using Castle.DynamicProxy;
+﻿using System;
+using Castle.DynamicProxy;
+using ProductionProfiler.Core.Extensions;
 using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Profiling.Entities;
 
@@ -27,11 +29,20 @@ namespace ProductionProfiler.Core.IoC
 
                 ProfilerContext.Profiler.MethodEntry(methodInvocation);
 
-                invocation.Proceed();
-
-                methodInvocation.ReturnValue = invocation.ReturnValue;
-
-                ProfilerContext.Profiler.MethodExit(methodInvocation);
+                try
+                {
+                    invocation.Proceed();
+                    methodInvocation.ReturnValue = invocation.ReturnValue;
+                }
+                catch (Exception e)
+                {
+                    methodInvocation.Exception = e;
+                    throw;
+                }
+                finally
+                {
+                    ProfilerContext.Profiler.MethodExit(methodInvocation);
+                }
             }
         }
     }

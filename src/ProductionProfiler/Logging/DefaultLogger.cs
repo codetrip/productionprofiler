@@ -4,10 +4,10 @@ namespace ProductionProfiler.Core.Logging
 {
     public class DefaultLogger : ILogger
     {
-        public void StartProfiling()
+        public void Start()
         { }
 
-        public void StopProfiling()
+        public void Stop()
         { }
 
         public void Initialise()

@@ -10,6 +10,7 @@ namespace ProductionProfiler.Core.Profiling.Entities
         public object[] Arguments { get; set; }
         public string MethodName { get; set; }
         public object ReturnValue { get; set; }
+        public Exception Exception { get; set; }
         public List<DataCollection> MethodData { get; set; }
 
         public MethodInvocation()
