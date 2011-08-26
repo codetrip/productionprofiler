@@ -12,7 +12,7 @@ namespace ProductionProfiler.Core.Persistence
     /// </summary>
     internal class PersistenceWorkerQueue
     {
-        private readonly Thread _workerthread;
+        private readonly Thread _workerThread;
         private readonly object _syncLock = new object();
         private readonly Queue<IAsyncPersistable> _queue = new Queue<IAsyncPersistable>();
         private readonly EventWaitHandle _waitHandle = new AutoResetEvent(false);
@@ -21,12 +21,11 @@ namespace ProductionProfiler.Core.Persistence
         internal PersistenceWorkerQueue(IDictionary<Type, Action<IAsyncPersistable>> typeActionMappings)
         {
             _typeActionMappings = typeActionMappings;
-            _workerthread = new Thread(ProcessOutgoing)
+            _workerThread = new Thread(ProcessOutgoing)
             {
                 IsBackground = true
             };
-
-            _workerthread.Start();
+            _workerThread.Start();
         }
 
         internal void Enqueue(IAsyncPersistable data)
@@ -44,15 +43,14 @@ namespace ProductionProfiler.Core.Persistence
             {
                 IAsyncPersistable data = null;
 
-                lock (_syncLock)
+                if (_queue.Count > 0)
                 {
-                    if (_queue.Count > 0)
+                    lock (_syncLock)
                     {
-                        data = _queue.Dequeue();
-
-                        //if a null object is added to the queue, its a signal to stop the worker thread
-                        if (data == null) 
-                            return;
+                        if (_queue.Count > 0)
+                        {
+                            data = _queue.Dequeue();
+                        }
                     }
                 }
 

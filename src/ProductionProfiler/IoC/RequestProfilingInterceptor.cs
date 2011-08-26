@@ -11,6 +11,8 @@ namespace ProductionProfiler.Core.IoC
 
     public class RequestProfilingInterceptor : IRequestProfilingInterceptor
     {
+        private const string ExceptionCaptured = "exception_captured_by_profiler";
+
         public void Intercept(IInvocation invocation)
         {
             if (!ProfilerContext.Profiling)
@@ -36,7 +38,12 @@ namespace ProductionProfiler.Core.IoC
                 }
                 catch (Exception e)
                 {
-                    methodInvocation.Exception = e;
+                    //only log this exception once in the method in which it occured
+                    if (!e.Data.Contains(ExceptionCaptured))
+                    {
+                        methodInvocation.Exception = e;
+                        e.Data.Add(ExceptionCaptured, true);
+                    }
                     throw;
                 }
                 finally
