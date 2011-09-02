@@ -1,5 +1,4 @@
-﻿using System;
-using System.Configuration;
+﻿using System.Configuration;
 using System.IO;
 using System.Reflection;
 using System.Threading;
@@ -12,7 +11,6 @@ using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using ProductionProfiler.Core.Logging;
 using ProductionProfiler.Persistence.Mongo;
-using ProductionProfiler.Persistence.Raven;
 using ProductionProfiler.Tests.Components;
 using log4net.Config;
 using ProductionProfiler.Core.Caching;

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
 using ProductionProfiler.Core.Caching;
+using ProductionProfiler.Core.Configuration;
 using ProductionProfiler.Core.Extensions;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Profiling.Entities;
@@ -15,16 +16,24 @@ namespace ProductionProfiler.Core.Profiling.Triggers
     {
         private readonly IProfilerRepository _repository;
         private readonly IProfilerCacheEngine _profilerCacheEngine;
+        private readonly ProfilerConfiguration _configuration;
 
-        public UrlBasedProfilingTrigger(IProfilerRepository repository, IProfilerCacheEngine profilerCacheEngine)
+        public UrlBasedProfilingTrigger(IProfilerRepository repository, IProfilerCacheEngine profilerCacheEngine, ProfilerConfiguration configuration)
         {
             _profilerCacheEngine = profilerCacheEngine;
+            _configuration = configuration;
             _repository = repository;
         }
 
         public bool TriggerProfiling(HttpContext context)
         {
-            Trace("Determining whether to run the URL profiling coordinator...");
+            Trace("Determining whether to run the URL profiling trigger...");
+
+            if(!Enabled)
+            {
+                Trace("URL trigger is disabled, returning");
+                return false;
+            }
 
             List<UrlToProfile> urlsToProfile = _profilerCacheEngine.Get<List<UrlToProfile>>(Constants.CacheKeys.CurrentRequestsToProfile);
 
@@ -87,5 +96,14 @@ namespace ProductionProfiler.Core.Profiling.Triggers
         /// <param name="data"></param>
         public void AugmentProfiledRequestData(ProfiledRequestData data)
         {}
+
+        private bool Enabled
+        {
+            get
+            {
+                return _configuration.Settings.ContainsKey(ProfilerConfiguration.SettingKeys.UrlTriggerEnabled) &&
+                       _configuration.Settings[ProfilerConfiguration.SettingKeys.UrlTriggerEnabled] == "true";
+            }
+        }
     }
 }

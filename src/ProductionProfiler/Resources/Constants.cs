@@ -43,6 +43,8 @@ namespace ProductionProfiler.Core.Resources
             public const string Id = "id";
             public const string PageNumber = "pgno";
             public const string PageSize = "pgsz";
+            public const string ConfigKey = "key";
+            public const string ConfigValue = "value";
         }
 
         public static class Actions
@@ -50,6 +52,8 @@ namespace ProductionProfiler.Core.Resources
             public const string PreviewResults = "previewresults";
             public const string Results = "results";
             public const string ResultDetails = "resultsdetail";
+            public const string ViewConfigSettings = "viewcfg";
+            public const string SetConfigSettings = "setcfg";
         }
 
         public static class Urls
@@ -59,6 +63,7 @@ namespace ProductionProfiler.Core.Resources
             public const string ProfilerHandlerAction = "/profiler?handler={0}&action={1}";
             public const string ProfilerHandlerActionId = "/profiler?handler={0}&action={1}&id={2}";
             public const string ProfilerHandlerActionUrl = "/profiler?handler={0}&action={1}&url={2}";
+            public const string ProfilerHandlerConfiguration = "/profiler?handler=cfg&action=viewcfg";
         }
 
         public static class Handlers
@@ -70,6 +75,7 @@ namespace ProductionProfiler.Core.Resources
             public const string UpdateUrlToProfile = "upr";
             public const string DeleteUrlToProfileDataById = "dprid";
             public const string DeleteUrlToProfileDataByUrl = "dprurl";
+            public const string ConfigurationOverride = "cfg";
         }
     }
 }

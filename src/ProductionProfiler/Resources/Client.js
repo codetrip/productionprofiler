@@ -254,7 +254,7 @@ if (window.jQueryProfiler) {
                 '</table></form>';
 
                 if (data.Data.length > 0) {
-                    html += '<table><tr><th>Enable</th><th>Url</th><th>Profiled On</th><th>Elapsed</th><th>Server</th><th>Http Method</th><th>Profile Count</th><th>Delete</th><th>Update</th></tr>';
+                    html += '<table class="w1000"><tr><th>Enable</th><th>Url</th><th>Server</th><th>Profile Count</th><th>Delete</th><th>Update</th></tr>';
 
                     $.each(data.Data, function (idx, itm) {
                         var profilingCount = itm.ProfilingCount === null ? '' : itm.ProfilingCount;
@@ -264,10 +264,7 @@ if (window.jQueryProfiler) {
                         '<input name="Url" type="hidden" value="' + itm.Url + '" />' +
                         '<td><input name="Enabled" type="checkbox" ' + checked + ' value="true" /><input name="Enabled" type="hidden" value="false" /></td>' +
                         '<td>' + itm.Url + '</td>' +
-                        '<td>' + $.profiler.formatDate(itm.ProfiledOnUtc) + '</td>' +
-                        '<td>' + $.profiler.emptyIfNull(itm.ElapsedMilliseconds, 'ms') + '</td>' +
                         '<td><input name="Server" style="width:150px" type="text" value="' + $.profiler.emptyIfNull(itm.Server, '') + '" /></td>' +
-                        '<td>' + $.profiler.emptyIfNull(itm.HttpMethod, '') + '</td>' +
                         '<td><input name="ProfilingCount" style="width:50px" type="text" value="' + profilingCount + '" /></td>' +
                         '<td><input type="submit" value="Delete" name="Delete" class="btn delete" /></td>' +
                         '<td><input type="submit" value="Update" name="Update" class="btn" /></td>' +
@@ -300,7 +297,7 @@ if (window.jQueryProfiler) {
                 this.attachEvents();
             },
             renderResultsPreview: function (data) {
-                var html = '<table class="w1000"><tr><th>Url</th><th>CapturedOnUtc</th><th>ElapsedMilliseconds</th><th>Server</th><th>Delete</th></tr>'
+                var html = '<table class="w1000"><tr><th>Url</th><th>CapturedOnUtc</th><th>ElapsedMilliseconds</th><th>Server</th><th>Delete</th></tr>';
 
                 var encodedUrl;
                 $.each(data.Data, function (idx, itm) {
@@ -412,7 +409,7 @@ if (window.jQueryProfiler) {
                 html += method.MethodName;
                 if (method.Arguments !== null) {
                     var argLength = method.Arguments.length - 1;
-                    html += '('
+                    html += '(';
                     $.each(method.Arguments, function (idx, itm) {
                         html += "<a class='dataitemjson arg' id=" + idx + " href='#'>Argument " + (idx + 1) + "</a>";
                         if (idx < argLength)
@@ -423,14 +420,14 @@ if (window.jQueryProfiler) {
                 return html;
             },
             renderHeading: function (title) {
-                var html = '<div style="padding:5px 0px 15px 0px"><h1>' + title + '</h1><a class="heading" href="/profiler?handler=vpr">Profiled URLs</a><a class="heading" href="/profiler?handler=results&action=results">Profiler Results</a></div>'
+                var html = '<div style="padding:5px 0px 15px 0px"><h1>' + title + '</h1><a class="heading" href="/profiler?handler=vpr">Profiled URLs</a><a class="heading" href="/profiler?handler=results&action=results">Profiler Results</a><a class="heading" href="/profiler?handler=cfg&action=viewcfg">Configuration</a></div>';
                 this.title.html(html);
             },
             renderTable: function (layout, heading, data, divCss, tableCss, render) {
                 if (data.length > 0) {
                     this.html += '<div class="' + divCss + '">' + heading + '</div><table class="' + tableCss + '"><tr>';
-                    for (var heading in layout) {
-                        this.html += '<th>' + layout[heading] + '</th>'
+                    for (var head in layout) {
+                        this.html += '<th>' + layout[head] + '</th>';
                     }
                     this.html += '</tr>';
 
@@ -449,6 +446,24 @@ if (window.jQueryProfiler) {
                 html += pagingInfo.HasNextPage ? '<a href="' + url + '&pgno=' + (pagingInfo.PageNumber + 1) + '">next</a>' : 'next';
                 html += '</div></div></td></tr>';
                 return html;
+            },
+            renderConfiguration: function (config) {
+                var html = '<form action="/profiler?handler=cfg&action=setcfg" method="post">' +
+                    '<table class="w1000">' +
+                    '<tr><th>Configuration Property</th><th>Current Value</th></tr>';
+
+                for (var key in config) {
+                    html += '<tr><td>' + key + '</td><td><input name="cfg-' + key + '" style="width:250px" type="text" value="' + config[key] + '" /></td></tr>';
+                }
+
+                if (location.href.indexOf('s=1') !== -1) {
+                    html += '<tr><td colspan="2"><b>Configuration settings were updated successfully.</b></td></tr>';
+                }
+
+                html += '<tr><td colspan="2"><input type="submit" value="Update" class="btn" /></td></tr></table></form>';
+
+                this.container.html(html);
+                this.renderHeading("Profiler Configuration");
             }
         });
 
@@ -469,6 +484,11 @@ if (window.jQueryProfiler) {
                 case "resultsdetail":
                     {
                         $.viewengine.renderResultsDetail(profileData.Data);
+                        break;
+                    }
+                case "viewcfg":
+                    {
+                        $.viewengine.renderConfiguration(profileData.Data);
                         break;
                     }
                 default:

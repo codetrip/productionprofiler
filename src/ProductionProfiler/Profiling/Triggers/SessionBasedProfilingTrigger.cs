@@ -25,6 +25,12 @@ namespace ProductionProfiler.Core.Profiling.Triggers
 
         public bool TriggerProfiling(HttpContext context)
         {
+            if (!Enabled)
+            {
+                Trace("Session based trigger is disabled, returning false");
+                return false;
+            }
+
             if(_cookieManager.Get(SessionCookieName) != string.Empty)
             {
                 return true;
@@ -52,6 +58,15 @@ namespace ProductionProfiler.Core.Profiling.Triggers
             }
             catch (Exception)
             {}
+        }
+
+        private bool Enabled
+        {
+            get
+            {
+                return _configuration.Settings.ContainsKey(ProfilerConfiguration.SettingKeys.SessionTriggerEnabled) &&
+                       _configuration.Settings[ProfilerConfiguration.SettingKeys.SessionTriggerEnabled] == "true";
+            }
         }
     }
 }

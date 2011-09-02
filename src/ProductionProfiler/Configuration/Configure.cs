@@ -39,10 +39,13 @@ namespace ProductionProfiler.Core.Configuration
             {
                 _profilerConfiguration = new ProfilerConfiguration
                 {
-                    RequestFilter = req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty
+                    RequestFilter = req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty,
                 },
                 _container = container
             };
+
+            //enabled by default
+            config._profilerConfiguration.Settings.Add(ProfilerConfiguration.SettingKeys.ProfilerEnabled, "true");
 
             return new ExceptionConfiguration(config);
         }
@@ -192,6 +195,7 @@ namespace ProductionProfiler.Core.Configuration
         {
             _container.RegisterPerWebRequest<IRequestProfiler>(typeof(RequestProfiler));
             _container.RegisterSingletonInstance(_profilerConfiguration);
+
             _container.RegisterTransient<IRequestHandler>(typeof(UpdateUrlToProfileHandler), Constants.Handlers.UpdateUrlToProfile);
             _container.RegisterTransient<IRequestHandler>(typeof(ViewResultsRequestHandler), Constants.Handlers.Results);
             _container.RegisterTransient<IRequestHandler>(typeof(AddUrlToProfileHandler), Constants.Handlers.AddUrlToProfile);
@@ -199,6 +203,8 @@ namespace ProductionProfiler.Core.Configuration
             _container.RegisterTransient<IRequestHandler>(typeof(ViewResponseRequestHandler), Constants.Handlers.ViewResponse);
             _container.RegisterTransient<IRequestHandler>(typeof(DeleteProfiledDataByIdRequestHandler), Constants.Handlers.DeleteUrlToProfileDataById);
             _container.RegisterTransient<IRequestHandler>(typeof(DeleteProfiledDataByUrlRequestHandler), Constants.Handlers.DeleteUrlToProfileDataByUrl);
+            _container.RegisterTransient<IRequestHandler>(typeof(ConfigurationOverrideHandler), Constants.Handlers.ConfigurationOverride);
+
             _container.RegisterTransient<IAddUrlToProfileRequestBinder>(typeof(AddUrlToProfileRequestBinder));
             _container.RegisterTransient<IUpdateUrlToProfileRequestBinder>(typeof(UpdateUrlToProfileRequestBinder));
             _container.RegisterTransient<IMethodDataCollector>(typeof(MethodDataCollector));
@@ -220,7 +226,7 @@ namespace ProductionProfiler.Core.Configuration
                 new List<Type>(_typesToIgnore ?? new Type[0])
                 {
                     typeof (IDoNotWantToBeProfiled)
-                });
+                });          
         }
 
         #endregion
@@ -341,12 +347,14 @@ namespace ProductionProfiler.Core.Configuration
             public IFluentConfiguration ByUrl()
             {
                 _configureInstance._container.RegisterTransient<IProfilingTrigger>(typeof(UrlBasedProfilingTrigger), typeof(UrlBasedProfilingTrigger).Name);
+                _configureInstance._profilerConfiguration.Settings.Add(ProfilerConfiguration.SettingKeys.UrlTriggerEnabled, "true");
                 return _configureInstance;
             }
 
             public IFluentConfiguration BySession()
             {
                 _configureInstance._container.RegisterTransient<IProfilingTrigger>(typeof(SessionBasedProfilingTrigger), typeof(SessionBasedProfilingTrigger).Name);
+                _configureInstance._profilerConfiguration.Settings.Add(ProfilerConfiguration.SettingKeys.SessionTriggerEnabled, "true");
                 return _configureInstance;
             }
 
@@ -387,6 +395,7 @@ namespace ProductionProfiler.Core.Configuration
             {
                 _configureInstance._container.RegisterTransient<IProfilingTrigger>(typeof(SampleBasedProfilingTrigger), typeof(SampleBasedProfilingTrigger).Name);
                 _configureInstance._container.RegisterSingletonInstance(_samplingConfiguration);
+                _configureInstance._profilerConfiguration.Settings.Add(ProfilerConfiguration.SettingKeys.SamplingTriggerEnabled, "true");
                 return _configureInstance;
             }
         }

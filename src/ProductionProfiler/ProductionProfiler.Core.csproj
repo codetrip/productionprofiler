@@ -27,7 +27,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;PETAPOCO_NO_DYNAMIC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -93,6 +93,7 @@
     <Compile Include="Extensions\ObjectReflectionExtensions.cs" />
     <Compile Include="Extensions\StackExtensions.cs" />
     <Compile Include="Factory\HttpContextFactory.cs" />
+    <Compile Include="Handlers\ConfigurationOverrideHandler.cs" />
     <Compile Include="IoC\InjectAttribute.cs" />
     <Compile Include="IoC\RequestProfilingInterceptor.cs" />
     <Compile Include="Logging\AppendLoggingEventEventArgs.cs" />
