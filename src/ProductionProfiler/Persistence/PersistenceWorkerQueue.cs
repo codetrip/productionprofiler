@@ -10,7 +10,7 @@ namespace ProductionProfiler.Core.Persistence
     /// Implementation of a producer / consumer queue to process the persistence of 
     /// collected data to the underlying data store asynchronously via a background worker thread.
     /// </summary>
-    internal class PersistenceWorkerQueue
+    internal sealed class PersistenceWorkerQueue
     {
         private readonly Thread _workerThread;
         private readonly object _syncLock = new object();

@@ -6,11 +6,10 @@ using ProductionProfiler.Core.Profiling;
 
 namespace ProductionProfiler.Core.Configuration
 {
-    public class ProfilerConfiguration : IDoNotWantToBeProfiled
+    public sealed class ProfilerConfiguration : IDoNotWantToBeProfiled
     {
         internal DataCollectorMappings DataCollectorMappings { get; set; }
         internal Action<Exception> ReportException { get; set; }
-        internal SamplingConfiguration SamplingConfiguration { get; set; }
         internal Dictionary<string, string> Settings { get; set; }
         internal Func<HttpRequest, bool> RequestFilter { private get; set; }
         internal Func<HttpContext, bool> AuthoriseManagement { private get; set; }
@@ -51,6 +50,8 @@ namespace ProductionProfiler.Core.Configuration
             public const string UrlTriggerEnabled = "url.trigger.enabled";
             public const string SessionTriggerEnabled = "session.trigger.enabled";
             public const string SamplingTriggerEnabled = "sampling.trigger.enabled";
+            public const string SamplingPeriod = "sampling.period";
+            public const string SamplingFrequency = "sampling.frequency";
         }
     }
 }

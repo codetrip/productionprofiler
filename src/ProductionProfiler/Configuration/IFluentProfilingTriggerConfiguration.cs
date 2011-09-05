@@ -16,6 +16,6 @@ namespace ProductionProfiler.Core.Configuration
     {
         IFluentSampleProfilingTriggerConfiguration Every(TimeSpan frequency);
         IFluentSampleProfilingTriggerConfiguration For(TimeSpan period);
-        IFluentConfiguration Set();
+        IFluentConfiguration Enable();
     }
 }

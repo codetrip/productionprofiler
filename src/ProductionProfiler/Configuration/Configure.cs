@@ -46,6 +46,14 @@ namespace ProductionProfiler.Core.Configuration
 
             //enabled by default
             config._profilerConfiguration.Settings.Add(ProfilerConfiguration.SettingKeys.ProfilerEnabled, "true");
+            config._container.RegisterTransient<IProfilingTrigger>(typeof(UrlBasedProfilingTrigger), typeof(UrlBasedProfilingTrigger).Name);
+            config._container.RegisterTransient<IProfilingTrigger>(typeof(SessionBasedProfilingTrigger), typeof(SessionBasedProfilingTrigger).Name);
+            config._container.RegisterTransient<IProfilingTrigger>(typeof(SampleBasedProfilingTrigger), typeof(SampleBasedProfilingTrigger).Name);
+            config._profilerConfiguration.Settings.Add(ProfilerConfiguration.SettingKeys.UrlTriggerEnabled, "false");
+            config._profilerConfiguration.Settings.Add(ProfilerConfiguration.SettingKeys.SessionTriggerEnabled, "false");
+            config._profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.SamplingFrequency] = new TimeSpan(1, 0, 0).ToString();
+            config._profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.SamplingPeriod] = new TimeSpan(0, 0, 10).ToString();
+            config._profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.SamplingTriggerEnabled] = "false";
 
             return new ExceptionConfiguration(config);
         }
@@ -346,15 +354,13 @@ namespace ProductionProfiler.Core.Configuration
 
             public IFluentConfiguration ByUrl()
             {
-                _configureInstance._container.RegisterTransient<IProfilingTrigger>(typeof(UrlBasedProfilingTrigger), typeof(UrlBasedProfilingTrigger).Name);
-                _configureInstance._profilerConfiguration.Settings.Add(ProfilerConfiguration.SettingKeys.UrlTriggerEnabled, "true");
+                _configureInstance._profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.UrlTriggerEnabled] = "true";
                 return _configureInstance;
             }
 
             public IFluentConfiguration BySession()
             {
-                _configureInstance._container.RegisterTransient<IProfilingTrigger>(typeof(SessionBasedProfilingTrigger), typeof(SessionBasedProfilingTrigger).Name);
-                _configureInstance._profilerConfiguration.Settings.Add(ProfilerConfiguration.SettingKeys.SessionTriggerEnabled, "true");
+                _configureInstance._profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.SessionTriggerEnabled] = "true";
                 return _configureInstance;
             }
 
@@ -367,35 +373,27 @@ namespace ProductionProfiler.Core.Configuration
         public class FluentSampleProfilingTriggerConfiguration : IFluentSampleProfilingTriggerConfiguration
         {
             private readonly Configure _configureInstance;
-            private readonly SamplingConfiguration _samplingConfiguration;
 
             public FluentSampleProfilingTriggerConfiguration(Configure configureInstance)
             {
                 _configureInstance = configureInstance;
-                _samplingConfiguration = new SamplingConfiguration
-                {
-                    SampleFrequency = new TimeSpan(1, 0, 0),
-                    SamplePeriod = new TimeSpan(0, 0, 10)
-                };
             }
 
             public IFluentSampleProfilingTriggerConfiguration Every(TimeSpan frequency)
             {
-                _samplingConfiguration.SampleFrequency = frequency;
+                _configureInstance._profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.SamplingFrequency] = frequency.ToString();
                 return this;
             }
 
             public IFluentSampleProfilingTriggerConfiguration For(TimeSpan period)
             {
-                _samplingConfiguration.SamplePeriod = period;
+                _configureInstance._profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.SamplingPeriod] = period.ToString();
                 return this;
             }
 
-            public IFluentConfiguration Set()
+            public IFluentConfiguration Enable()
             {
-                _configureInstance._container.RegisterTransient<IProfilingTrigger>(typeof(SampleBasedProfilingTrigger), typeof(SampleBasedProfilingTrigger).Name);
-                _configureInstance._container.RegisterSingletonInstance(_samplingConfiguration);
-                _configureInstance._profilerConfiguration.Settings.Add(ProfilerConfiguration.SettingKeys.SamplingTriggerEnabled, "true");
+                _configureInstance._profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.SamplingTriggerEnabled] = "true";
                 return _configureInstance;
             }
         }

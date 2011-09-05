@@ -7,7 +7,7 @@ using ProductionProfiler.Core.Extensions;
 
 namespace ProductionProfiler.Core.Profiling.Triggers
 {
-    public class SessionBasedProfilingTrigger : ComponentBase, IProfilingTrigger
+    public sealed class SessionBasedProfilingTrigger : ComponentBase, IProfilingTrigger
     {
         private const string SessionCookieName = "profiler-session";
         private const string SessionCookieId = "id";

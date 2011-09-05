@@ -1,14 +1,12 @@
 ﻿
-using System.Collections.Generic;
 using ProductionProfiler.Core.Configuration;
 using ProductionProfiler.Core.Handlers.Entities;
 using ProductionProfiler.Core.Resources;
-using ProductionProfiler.Core.Extensions;
 using System.Linq;
 
 namespace ProductionProfiler.Core.Handlers
 {
-    public class ConfigurationOverrideHandler : RequestHandlerBase
+    public sealed class ConfigurationOverrideHandler : RequestHandlerBase
     {
         private readonly ProfilerConfiguration _configuration;
 

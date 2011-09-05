@@ -104,12 +104,6 @@ namespace ProductionProfiler.Tests.Components
                 log.Error("Error in workflow!", e);
             }
 
-            int zero2 = 0;
-            if (10 / zero2 == 0)
-            {
-                log.Debug("Devide by zero?");
-            }
-
             log.Debug("Completed workflow 3");
             return "done";
         }

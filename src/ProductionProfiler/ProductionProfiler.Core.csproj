@@ -84,7 +84,6 @@
     <Compile Include="Configuration\IFluentCollectorConfiguration.cs" />
     <Compile Include="Configuration\IFluentConfiguration.cs" />
     <Compile Include="Configuration\ProfilerConfigurationException.cs" />
-    <Compile Include="Configuration\SamplingConfiguration.cs" />
     <Compile Include="Dynamic\AssembliesInBinDirectoryLocator.cs" />
     <Compile Include="Dynamic\DynamicCodeGeneratorHelper.cs" />
     <Compile Include="Dynamic\PropertyMapper.cs" />

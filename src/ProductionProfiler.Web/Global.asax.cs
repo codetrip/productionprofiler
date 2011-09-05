@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.IO;
 using System.Reflection;
 using System.Threading;
@@ -99,15 +100,15 @@ namespace ProductionProfiler.Web
                     .ForTypesAssignableFrom(new []{typeof(IWorkflow)})
                 .CacheEngine<HttpRuntimeCacheEngine>()
                 .RequestFilter(req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty)
-                .Trigger
-                    .BySession()
-                .Trigger
-                    .ByUrl()
                 //.Trigger
-                //    .BySampling()
-                //        .Every(new TimeSpan(1, 0, 0))
-                //        .For(new TimeSpan(0, 0, 30))
-                //        .Set()
+                //    .BySession()
+                //.Trigger
+                //    .ByUrl()
+                .Trigger
+                    .BySampling()
+                        .Every(new TimeSpan(0, 0, 30))
+                        .For(new TimeSpan(0, 0, 30))
+                        .Enable()
                 .Initialise();
         }
 
