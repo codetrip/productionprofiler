@@ -4,6 +4,7 @@ using System.Text;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Persistence.Entities;
 using ProductionProfiler.Core.Profiling.Entities;
+using ProductionProfiler.Core.RequestTiming;
 using ProductionProfiler.Core.Serialization;
 using ProductionProfiler.Core.Extensions;
 using PetaPoco = ProductionProfiler.Core.Persistence;
@@ -226,6 +227,24 @@ namespace ProductionProfiler.Persistence.Sql
             }
         }
 
+        public void SaveTimedRequest(TimedRequest timedRequest)
+        {
+            if (_configuration.GenerateIds && timedRequest.Id != default(Guid))
+            {
+                timedRequest.Id = Guid.NewGuid();
+            }
+
+            using (var database = new Database(_configuration.ConnectionStringName))
+            {
+                database.Insert("{0}.TimedRequest".FormatWith(_configuration.SchemaName), "Id", false, timedRequest);
+            }
+        }
+
+        public Core.Persistence.Entities.Page<TimedRequest> GetLongRequests(PagingInfo paging)
+        {
+            throw new NotImplementedException();
+        }
+
         public ProfiledResponse GetResponseById(Guid id)
         {
             using (var database = new Database(_configuration.ConnectionStringName))
@@ -249,5 +268,6 @@ namespace ProductionProfiler.Persistence.Sql
                 database.Delete("{0}.ProfiledResponse".FormatWith(_configuration.SchemaName), "Url", null, url);
             }
         }
+
     }
 }

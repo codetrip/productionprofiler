@@ -13,6 +13,7 @@ using ProductionProfiler.Core.Logging;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Profiling.Triggers;
+using ProductionProfiler.Core.RequestTiming;
 using ProductionProfiler.Core.Resources;
 using ProductionProfiler.Core.Extensions;
 using ProductionProfiler.Core.Serialization;
@@ -54,7 +55,8 @@ namespace ProductionProfiler.Core.Configuration
             config._profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.SamplingFrequency] = new TimeSpan(1, 0, 0).ToString();
             config._profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.SamplingPeriod] = new TimeSpan(0, 0, 10).ToString();
             config._profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.SamplingTriggerEnabled] = "false";
-
+            config._profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.LongRequestThresholdMs] = "2000";
+            config._profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.TimeAllRequests] = "true";
             return new ExceptionConfiguration(config);
         }
 
@@ -202,6 +204,7 @@ namespace ProductionProfiler.Core.Configuration
         private void RegisterDependencies()
         {
             _container.RegisterPerWebRequest<IRequestProfiler>(typeof(RequestProfiler));
+            _container.RegisterPerWebRequest<IRequestTimer>(typeof(RequestTimer));
             _container.RegisterSingletonInstance(_profilerConfiguration);
 
             _container.RegisterTransient<IRequestHandler>(typeof(UpdateUrlToProfileHandler), Constants.Handlers.UpdateUrlToProfile);
@@ -212,6 +215,7 @@ namespace ProductionProfiler.Core.Configuration
             _container.RegisterTransient<IRequestHandler>(typeof(DeleteProfiledDataByIdRequestHandler), Constants.Handlers.DeleteUrlToProfileDataById);
             _container.RegisterTransient<IRequestHandler>(typeof(DeleteProfiledDataByUrlRequestHandler), Constants.Handlers.DeleteUrlToProfileDataByUrl);
             _container.RegisterTransient<IRequestHandler>(typeof(ConfigurationOverrideHandler), Constants.Handlers.ConfigurationOverride);
+            _container.RegisterTransient<IRequestHandler>(typeof(ViewLongRequestsHandler), Constants.Handlers.LongRequests);
 
             _container.RegisterTransient<IAddUrlToProfileRequestBinder>(typeof(AddUrlToProfileRequestBinder));
             _container.RegisterTransient<IUpdateUrlToProfileRequestBinder>(typeof(UpdateUrlToProfileRequestBinder));

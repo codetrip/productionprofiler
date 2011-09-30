@@ -6,6 +6,7 @@ using System.Text;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Persistence.Entities;
 using ProductionProfiler.Core.Profiling.Entities;
+using ProductionProfiler.Core.RequestTiming;
 using ProductionProfiler.Core.Serialization;
 using PetaPoco = ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Extensions;
@@ -203,6 +204,20 @@ namespace ProductionProfiler.Persistence.SQLite
             {
                 database.Insert("ProfiledResponse", "Id", false, response);
             }
+        }
+
+
+        public void SaveTimedRequest(TimedRequest timedRequest)
+        {
+            using (var database = new Database(_configuration.ConnectionStringName))
+            {
+                database.Insert("TimedRequest", "Id", false, timedRequest);
+            }
+        }
+
+        public Core.Persistence.Entities.Page<TimedRequest> GetLongRequests(PagingInfo paging)
+        {
+            throw new NotImplementedException();
         }
 
         public ProfiledResponse GetResponseById(Guid id)

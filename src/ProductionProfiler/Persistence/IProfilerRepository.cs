@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ProductionProfiler.Core.Persistence.Entities;
+using ProductionProfiler.Core.RequestTiming;
 using PE = ProductionProfiler.Core.Persistence.Entities;
 using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Profiling.Entities;
@@ -85,5 +86,8 @@ namespace ProductionProfiler.Core.Persistence
         /// </summary>
         /// <param name="url"></param>
         void DeleteResponseByUrl(string url);
+
+        void SaveTimedRequest(TimedRequest timedRequest);
+        PE.Page<TimedRequest> GetLongRequests(PagingInfo paging);
     }
 }

@@ -67,11 +67,11 @@ namespace ProductionProfiler.Persistence.Mongo
             return new E.Page<TResult>(page, new E.Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
         }
 
-        public E.Page<TResult> Distinct<T, TSort, TResult>(string keyName, E.PagingInfo pagingInfo, Func<TResult, TSort> sortExpression, bool sortAscending) where T : class, new()
+        public E.Page<TResult> Distinct<T, TSort, TResult>(string keyName, E.PagingInfo pagingInfo, Expression<Func<TResult, TSort>> sortExpression, bool sortAscending) where T : class, new()
         {
             var page = _mongo.GetCollection<T>()
                 .Distinct<TResult>(keyName)
-                .SetSort(sortExpression, sortAscending)
+                //.SetSort(sortExpression, sortAscending) TODO: work out best thing to do here - SetSort needs to run on IQueryable or it'll have to sort the whole thing in memory
                 .Skip((pagingInfo.PageNumber - 1) * pagingInfo.PageSize)
                 .Take(pagingInfo.PageSize)
                 .ToList();
@@ -108,7 +108,7 @@ namespace ProductionProfiler.Persistence.Mongo
             return new E.Page<T>(page, new E.Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
         }
 
-        public E.Page<T> Page<T, TSort>(E.PagingInfo pagingInfo, Func<T, TSort> sortExpression, bool sortAscending) where T : class, new()
+        public E.Page<T> Page<T, TSort>(E.PagingInfo pagingInfo, Expression<Func<T, TSort>> sortExpression, bool sortAscending) where T : class, new()
         {
             var page = Items<T>()
                 .SetSort(sortExpression, sortAscending)
@@ -122,37 +122,31 @@ namespace ProductionProfiler.Persistence.Mongo
             return new E.Page<T>(page, new E.Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
         }
 
-        public E.Page<T> Page<T, TSort>(E.PagingInfo pagingInfo, Expression<Func<T, bool>> expression, Func<T, TSort> sortExpression, bool sortAscending) where T : class, new()
+        public E.Page<T> Page<T, TSort>(E.PagingInfo pagingInfo, Expression<Func<T, bool>> expression = null, Expression<Func<T, TSort>> sortExpression = null, bool sortAscending = true) where T : class, new()
         {
-            var page = Items<T>()
-                .Where(expression)
-                .SetSort(sortExpression, sortAscending)
-                .Skip((pagingInfo.PageNumber - 1) * pagingInfo.PageSize)
-                .Take(pagingInfo.PageSize)
-                .ToList();
+            var page = Items<T>();
 
-            var count = Items<T>()
-                .Where(expression)
-                .Count();
+            if (expression != null)
+                page = page.Where(expression);
+            if (sortExpression != null)
+                page = page.SetSort(sortExpression, sortAscending);
+
+                page = page.Skip((pagingInfo.PageNumber - 1) * pagingInfo.PageSize)
+                .Take(pagingInfo.PageSize);
+
+            var itemsForCount = Items<T>();
+            if (expression != null)
+                itemsForCount = itemsForCount.Where(expression);
+            var count = itemsForCount.Count();
 
             return new E.Page<T>(page, new E.Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
         }
 
-        public E.Page<TResult> Page<T, TSort, TResult>(E.PagingInfo pagingInfo, Expression<Func<T, bool>> expression, Func<T, TSort> sortExpression, bool sortAscending, Func<T, TResult> selectExpression) where T : class, new()
+        public E.Page<TResult> Page<T, TSort, TResult>(E.PagingInfo pagingInfo, Func<T, TResult> selectExpression, Expression<Func<T, bool>> expression = null, Expression<Func<T, TSort>> sortExpression = null, bool sortAscending = true) where T : class, new()
         {
-            var page = Items<T>()
-                .Where(expression)
-                .SetSort(sortExpression, sortAscending)
-                .Select(selectExpression)
-                .Skip((pagingInfo.PageNumber - 1) * pagingInfo.PageSize)
-                .Take(pagingInfo.PageSize)
-                .ToList();
+            var page = Page<T, TSort>(pagingInfo, expression, sortExpression, sortAscending);
 
-            var count = Items<T>()
-                .Where(expression)
-                .Count();
-
-            return new E.Page<TResult>(page, new E.Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
+            return new E.Page<TResult>(page.Select(selectExpression), page.Pagination);
         }
 
         #endregion

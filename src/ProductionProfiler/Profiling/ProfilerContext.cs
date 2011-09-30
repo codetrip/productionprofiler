@@ -6,6 +6,7 @@ using ProductionProfiler.Core.Factory;
 using ProductionProfiler.Core.IoC;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Profiling.Entities;
+using ProductionProfiler.Core.RequestTiming;
 
 namespace ProductionProfiler.Core.Profiling
 {
@@ -26,8 +27,15 @@ namespace ProductionProfiler.Core.Profiling
             _persistenceWorkerQueue = new PersistenceWorkerQueue(new Dictionary<Type, Action<IAsyncPersistable>>
             {
                 {typeof(ProfiledRequestData), PersistProfiledRequestData},
-                {typeof(ProfiledResponse), PersistProfiledResponse}
+                {typeof(ProfiledResponse), PersistProfiledResponse},
+                {typeof(TimedRequest), PersistTimedRequest},
             });
+        }
+
+        private static void PersistTimedRequest(IAsyncPersistable data)
+        {
+            if (data is TimedRequest)
+                Container.Resolve<IProfilerRepository>().SaveTimedRequest(data as TimedRequest);
         }
 
         private static void PersistProfiledRequestData(IAsyncPersistable data)
@@ -84,6 +92,11 @@ namespace ProductionProfiler.Core.Profiling
         public static IRequestProfiler Profiler
         {
             get { return _container.Resolve<IRequestProfiler>(); }
+        }
+
+        public static IRequestTimer RequestTimer
+        {
+            get { return _container.Resolve<IRequestTimer>(); }
         }
     }
 }

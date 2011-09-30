@@ -93,6 +93,7 @@
     <Compile Include="Extensions\StackExtensions.cs" />
     <Compile Include="Factory\HttpContextFactory.cs" />
     <Compile Include="Handlers\ConfigurationOverrideHandler.cs" />
+    <Compile Include="Handlers\ViewLongRequestsHandler.cs" />
     <Compile Include="IoC\InjectAttribute.cs" />
     <Compile Include="IoC\RequestProfilingInterceptor.cs" />
     <Compile Include="Logging\AppendLoggingEventEventArgs.cs" />
@@ -160,6 +161,7 @@
     <Compile Include="Profiling\IRequestProfiler.cs" />
     <Compile Include="Handlers\Entities\ModelValidationError.cs" />
     <Compile Include="Profiling\Entities\MethodInvocation.cs" />
+    <Compile Include="RequestTiming\IRequestTimer.cs" />
     <Compile Include="Resources\Constants.cs" />
     <Compile Include="Modules\RequestProfilingModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

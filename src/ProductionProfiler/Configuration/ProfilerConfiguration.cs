@@ -15,6 +15,13 @@ namespace ProductionProfiler.Core.Configuration
         internal Func<HttpContext, bool> AuthoriseManagement { private get; set; }
         internal Func<string, bool> AuthoriseSession { private get; set; }
 
+        public bool TimeAllRequests
+        {
+            get { return Settings.ContainsKey(SettingKeys.TimeAllRequests) && Settings[SettingKeys.TimeAllRequests] == "true";}
+        }
+
+        public long LongRequestThresholdMs { get; set; }
+
         public ProfilerConfiguration()
         {
             DataCollectorMappings = new DataCollectorMappings();
@@ -46,12 +53,14 @@ namespace ProductionProfiler.Core.Configuration
 
         public static class SettingKeys
         {
+            public const string TimeAllRequests = "timer.on";
             public const string ProfilerEnabled = "profiler.enabled";
             public const string UrlTriggerEnabled = "url.trigger.enabled";
             public const string SessionTriggerEnabled = "session.trigger.enabled";
             public const string SamplingTriggerEnabled = "sampling.trigger.enabled";
             public const string SamplingPeriod = "sampling.period";
             public const string SamplingFrequency = "sampling.frequency";
+            public const string LongRequestThresholdMs = "longrequest.threshold";
         }
     }
 }

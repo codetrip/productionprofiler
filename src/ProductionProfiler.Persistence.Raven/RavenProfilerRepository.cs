@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Persistence.Entities;
 using ProductionProfiler.Core.Profiling.Entities;
+using ProductionProfiler.Core.RequestTiming;
 using Raven.Client.Document;
 using Raven.Client.Linq;
 using System.Linq;
@@ -216,6 +217,20 @@ namespace ProductionProfiler.Persistence.Raven
                 session.Store(response);
                 session.SaveChanges();
             }
+        }
+
+        public void SaveTimedRequest(TimedRequest timedRequest)
+        {
+            using (var session = _database.OpenSession())
+            {
+                session.Store(timedRequest);
+                session.SaveChanges();
+            }
+        }
+
+        public Core.Persistence.Entities.Page<TimedRequest> GetLongRequests(PagingInfo paging)
+        {
+            throw new NotImplementedException();
         }
 
         public ProfiledResponse GetResponseById(Guid id)

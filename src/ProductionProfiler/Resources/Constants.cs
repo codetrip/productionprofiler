@@ -54,6 +54,7 @@ namespace ProductionProfiler.Core.Resources
             public const string ResultDetails = "resultsdetail";
             public const string ViewConfigSettings = "viewcfg";
             public const string SetConfigSettings = "setcfg";
+            public const string ViewLongRequests = "viewlongrequests";
         }
 
         public static class Urls
@@ -76,6 +77,7 @@ namespace ProductionProfiler.Core.Resources
             public const string DeleteUrlToProfileDataById = "dprid";
             public const string DeleteUrlToProfileDataByUrl = "dprurl";
             public const string ConfigurationOverride = "cfg";
+            public const string LongRequests = "longrequests";
         }
     }
 }

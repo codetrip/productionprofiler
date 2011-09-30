@@ -281,6 +281,18 @@ if (window.jQueryProfiler) {
                 this.renderHeading("Profiled URLs");
                 this.attachEvents();
             },
+            renderLongUrls: function (data) {
+                this.renderTable(
+                    ['Url', 'Timestamp', 'Duration'],
+                    'Long Running Urls',
+                    data,
+                    '',
+                    '',
+                    null,
+                    function (itm) { return [itm.Url, itm.RequestUtc, itm.DurationMs]; }
+                );
+                this.container.html(this.html);
+            },
             renderResults: function (data) {
                 var html = '<table class="w800"><tr><th>Url</th><th>Delete</th></tr>'
 
@@ -423,13 +435,21 @@ if (window.jQueryProfiler) {
                 var html = '<div style="padding:5px 0px 15px 0px"><h1>' + title + '</h1><a class="heading" href="/profiler?handler=vpr">Profiled URLs</a><a class="heading" href="/profiler?handler=results&action=results">Profiler Results</a><a class="heading" href="/profiler?handler=cfg&action=viewcfg">Configuration</a></div>';
                 this.title.html(html);
             },
-            renderTable: function (layout, heading, data, divCss, tableCss, render) {
+            renderTable: function (layout, heading, data, divCss, tableCss, render, getTds) {
                 if (data.length > 0) {
                     this.html += '<div class="' + divCss + '">' + heading + '</div><table class="' + tableCss + '"><tr>';
                     for (var head in layout) {
                         this.html += '<th>' + layout[head] + '</th>';
                     }
                     this.html += '</tr>';
+
+                    render = render || function (itm) {
+                        this.html += "<tr>";
+                        $.each(getTds(itm), function (idx, td) {
+                            this.html += "<td>" + td + "</td>";
+                        });
+                        return this.html += '</tr>';
+                    }.bind(this);
 
                     $.each(data, function (idx, itm) {
                         render(itm);
@@ -489,6 +509,11 @@ if (window.jQueryProfiler) {
                 case "viewcfg":
                     {
                         $.viewengine.renderConfiguration(profileData.Data);
+                        break;
+                    }
+                case "viewlongrequests":
+                    {
+                        $.viewengine.renderLongUrls(profileData.Data);
                         break;
                     }
                 default:

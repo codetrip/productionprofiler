@@ -32,6 +32,11 @@ namespace ProductionProfiler.Core.Modules
                         ProfilerContext.Profiler.Start(context, coordinatorsForCurrentRequest);
                     }
                 }
+
+                if (ProfilerContext.Configuration.TimeAllRequests)
+                {
+                    ProfilerContext.RequestTimer.Start(context);
+                }
             }
             catch(Exception ex)
             {
@@ -55,7 +60,10 @@ namespace ProductionProfiler.Core.Modules
 
             try
             {
-                ProfilerContext.Profiler.Stop(((HttpApplication)sender).Context.Response);
+                var context = ((HttpApplication) sender).Context;
+                ProfilerContext.Profiler.Stop(context.Response);
+                if (ProfilerContext.Configuration.TimeAllRequests)
+                    ProfilerContext.RequestTimer.Stop(context);
             }
             catch (Exception ex)
             {

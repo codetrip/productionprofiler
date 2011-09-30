@@ -4,6 +4,7 @@ using System.Linq;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Persistence.Entities;
 using ProductionProfiler.Core.Profiling.Entities;
+using ProductionProfiler.Core.RequestTiming;
 using PE = ProductionProfiler.Core.Persistence.Entities;
 
 namespace ProductionProfiler.Persistence.Mongo
@@ -117,15 +118,28 @@ namespace ProductionProfiler.Persistence.Mongo
             }
         }
 
+        public void SaveTimedRequest(TimedRequest timedRequest)
+        {
+            using (var session = MongoSession.Connect(UrlToProfileDataDatabaseName, _configuration.Server, _configuration.Port))
+            {
+                session.Save(timedRequest);
+            }
+        }
+
+        public PE.Page<TimedRequest> GetLongRequests(PagingInfo paging)
+        {
+            using (var session = MongoSession.Connect(UrlToProfileDataDatabaseName, _configuration.Server, _configuration.Port))
+            {
+                return session.Page<TimedRequest, DateTime>(paging, sortExpression: tr => tr.RequestUtc, sortAscending: false);
+            }
+        }
+
         public PE.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo)
         {
             using (MongoSession session = MongoSession.Connect(UrlToProfileDataDatabaseName, _configuration.Server, _configuration.Port))
             {
                 return session.Page<ProfiledRequestData, DateTime, ProfiledRequestDataPreview>(
                     pagingInfo,
-                    app => app.Url == url,
-                    app => app.CapturedOnUtc,
-                    false,
                     t => new ProfiledRequestDataPreview
                     {
                         CapturedOnUtc = t.CapturedOnUtc,
@@ -133,7 +147,10 @@ namespace ProductionProfiler.Persistence.Mongo
                         Id = t.Id,
                         Server = t.Server,
                         Url = t.Url
-                    });
+                    },
+                    app => app.Url == url,
+                    app => app.CapturedOnUtc,
+                    false);
             }
         }
 
@@ -143,9 +160,6 @@ namespace ProductionProfiler.Persistence.Mongo
             {
                 return session.Page<ProfiledRequestData, DateTime, ProfiledRequestDataPreview>(
                     pagingInfo,
-                    app => app.SessionId == sessionId,
-                    app => app.CapturedOnUtc,
-                    false,
                     t => new ProfiledRequestDataPreview
                     {
                         CapturedOnUtc = t.CapturedOnUtc,
@@ -153,7 +167,10 @@ namespace ProductionProfiler.Persistence.Mongo
                         Id = t.Id,
                         Server = t.Server,
                         Url = t.Url
-                    });
+                    },
+                    app => app.SessionId == sessionId,
+                    app => app.CapturedOnUtc,
+                    false);
             }
         }
 
@@ -163,9 +180,6 @@ namespace ProductionProfiler.Persistence.Mongo
             {
                 return session.Page<ProfiledRequestData, DateTime, ProfiledRequestDataPreview>(
                     pagingInfo,
-                    app => app.SessionUserId == sessionUserId,
-                    app => app.CapturedOnUtc,
-                    false,
                     t => new ProfiledRequestDataPreview
                     {
                         CapturedOnUtc = t.CapturedOnUtc,
@@ -173,7 +187,10 @@ namespace ProductionProfiler.Persistence.Mongo
                         Id = t.Id,
                         Server = t.Server,
                         Url = t.Url
-                    });
+                    },
+                    app => app.SessionUserId == sessionUserId,
+                    app => app.CapturedOnUtc,
+                    false);
             }
         }
 
@@ -183,9 +200,6 @@ namespace ProductionProfiler.Persistence.Mongo
             {
                 return session.Page<ProfiledRequestData, DateTime, ProfiledRequestDataPreview>(
                     pagingInfo,
-                    app => app.SamplingId == samplingId,
-                    app => app.CapturedOnUtc,
-                    false,
                     t => new ProfiledRequestDataPreview
                     {
                         CapturedOnUtc = t.CapturedOnUtc,
@@ -193,7 +207,10 @@ namespace ProductionProfiler.Persistence.Mongo
                         Id = t.Id,
                         Server = t.Server,
                         Url = t.Url
-                    });
+                    },
+                    app => app.SamplingId == samplingId,
+                    app => app.CapturedOnUtc,
+                    false);
             }
         }
 
