@@ -27,7 +27,7 @@ namespace ProductionProfiler.Core.RequestTiming.Entities
 
         public string FriendlyRequestLocal
         {
-            get { return RequestUtc.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss"); }
+            get { return RequestUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"); }
         }
 
         public DateTime RequestUtc { get; set; }
