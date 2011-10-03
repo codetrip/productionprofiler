@@ -61,3 +61,5 @@ a.ret, a.arg {font-style:italic; }
 .pages {display:inline-block;}
 .prevpage {float:left;display:inline-block;}
 .nextpage {float:right;display:inline-block;}
+
+.popup { position: fixed;top: 30px;left: 30%;background: #E8EEF4;}

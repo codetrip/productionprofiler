@@ -2,6 +2,7 @@
 using System.Text;
 using System.Web;
 using System.Web.Script.Serialization;
+using ProductionProfiler.Core.Configuration;
 using ProductionProfiler.Core.Handlers.Entities;
 using ProductionProfiler.Core.Resources;
 
@@ -9,6 +10,8 @@ namespace ProductionProfiler.Core.Handlers
 {
     public abstract class RequestHandlerBase : IRequestHandler
     {
+        public ProfilerConfiguration Config { protected get; set; }
+
         public void HandleRequest(HttpContext context, RequestInfo requestInfo)
         {
             var jsonResponse = DoHandleRequest(requestInfo);
@@ -25,12 +28,16 @@ namespace ProductionProfiler.Core.Handlers
 
             StringBuilder response = new StringBuilder();
             response.AppendFormat("<html><head>");
-            response.AppendFormat("<link href=\"/Content/Resources.Css.css\" rel=\"stylesheet\" type=\"text/css\" />");
+
+            //response.AppendFormat("<link href=\"/Content/Resources.Css.css\" rel=\"stylesheet\" type=\"text/css\" />");
+            response.AppendFormat("<link href=\"profiler?resource=Css.css&contenttype={0}\" rel=\"stylesheet\" type=\"text/css\" />", HttpUtility.UrlEncode("text/css"));
+
             response.AppendFormat("</head><body><span id='title'></span>");
             response.AppendFormat("<script type='text/javascript'>var profileData = {0}, profilePath = '{1}', profileAction = '{2}';</script>", json, path, requestInfo.Action);
-            //response.AppendFormat("<link href=\"profiler?resource=Css.css&contenttype={0}\" rel=\"stylesheet\" type=\"text/css\" />", HttpUtility.UrlEncode("text/css"));
-            response.AppendFormat("<script type='text/javascript' src='/Content/Resources.Client.js'></script>");
-            //response.AppendFormat("<script type='text/javascript' src='profiler?resource=Client.js&contenttype={0}'></script>", HttpUtility.UrlEncode("application/javascript"));
+            
+            //response.AppendFormat("<script type='text/javascript' src='/Content/Resources.Client.js'></script>");
+            response.AppendFormat("<script type='text/javascript' src='profiler?resource=Client.js&contenttype={0}'></script>", HttpUtility.UrlEncode("application/javascript"));
+            
             response.AppendFormat("<div id=\"profiler\" class=\"container\"></div></body></html>");
 
             if (context.Request.Headers.Get(Constants.HttpHeaders.AcceptEncoding) != null && context.Request.Headers.Get(Constants.HttpHeaders.AcceptEncoding).Contains(Constants.RequestEncoding.GZip))
