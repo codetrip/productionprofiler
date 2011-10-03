@@ -10,7 +10,7 @@ namespace ProductionProfiler.Core.Handlers
 {
     public class ResourceRequestHandler : IRequestHandler
     {
-        private static readonly DateTime _assemblyLastModified = new FileInfo(typeof (ResourceRequestHandler).Assembly.Location).LastWriteTime;
+        private static readonly DateTime _assemblyLastModified = new FileInfo(typeof (ResourceRequestHandler).Assembly.Location).LastWriteTimeUtc;
 
         public void HandleRequest(HttpContext context, RequestInfo requestInfo)
         {
