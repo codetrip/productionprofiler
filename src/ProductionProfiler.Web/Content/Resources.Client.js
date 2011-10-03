@@ -122,6 +122,11 @@ b[0] && b[0].ownerDocument || c); var h = [], i; for (var j = 0, k; (k = a[j]) !
 
 var jQueryProfiler = {};
 
+var lastId = 0;
+var nextId = function() {
+    return ++lastId;
+};
+
 if (window.jQueryProfiler) {
 
     (function () {
@@ -156,6 +161,31 @@ if (window.jQueryProfiler) {
                         return false;
                     }
                 });
+                $('body').delegate('.closePopUp', 'click', function (e) {
+                    $(this).closest('.popup').remove();
+                });
+            },
+            attachGenericEvents: function () {
+                this.container.delegate('.confirm', 'click', function (e) {
+                    if (!confirm('Are you sure you wish to do this?')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            },
+            attachLongRequestEvents: function () {
+                $('.profileThis').click(function (evt) {
+                    var data = document[$(this).attr('id')];
+                    var popUpHtml =
+                        '<div id="profileUrlPopUp" class="popup"><form method="post" action="/profiler?handler=apr">' +
+                            '<p>Server (or leave blank): <input type="text" name="server" value="@@SERVER@@" /></p>' +
+                            '<p>URL (supports regex): <input type="text" name="url" value="@@URL@@" /></p>' +
+                            '<p>Profile Count: <input type="text" name="ProfilingCount" value="5" /></p>' +
+                            '<p><input type="submit" value="Profile This URL" /><button type="button" class="closePopUp">Cancel</button></p>' +
+                            '</form></div>';
+                    $('body').append(popUpHtml.replace('@@SERVER@@', data.server).replace('@@URL@@', data.url));
+                }
+                );
             },
             attachDetailEvents: function () {
                 this.container.find("tr.togglechild").click(function (e) {
@@ -282,16 +312,24 @@ if (window.jQueryProfiler) {
                 this.attachEvents();
             },
             renderLongUrls: function (data) {
+                this.html = "";
+                data.Paging.baseUrl = '/profiler?handler=longrequests&action=viewlongrequests';
                 this.renderTable(
-                    ['Url', 'Timestamp', 'Duration'],
+                    ['Url', 'Server', 'Timestamp', 'Duration', 'Actions'],
                     'Long Running Urls',
-                    data,
+                    data.Data,
                     '',
                     '',
                     null,
-                    function (itm) { return [itm.Url, itm.RequestUtc, itm.DurationMs]; }
+                    function (itm) { return [itm.UrlPathAndQuery, itm.Server, itm.FriendlyRequestLocal, itm.DurationMs, { __buttons: [{ __cssClass: 'profileThis', url: itm.UrlPathAndQuery, server: itm.Server, text: 'Profile'}]}]; },
+                    data.Paging
                 );
+                this.html += '<form action="/profiler?handler=clearlongrequests" method="post"><input type="submit" value="Clear All Requests" class="confirm"/></form>';
                 this.container.html(this.html);
+                this.renderHeading('Long running requests');
+                this.attachEvents();
+                this.attachLongRequestEvents();
+
             },
             renderResults: function (data) {
                 var html = '<table class="w800"><tr><th>Url</th><th>Delete</th></tr>'
@@ -432,10 +470,10 @@ if (window.jQueryProfiler) {
                 return html;
             },
             renderHeading: function (title) {
-                var html = '<div style="padding:5px 0px 15px 0px"><h1>' + title + '</h1><a class="heading" href="/profiler?handler=vpr">Profiled URLs</a><a class="heading" href="/profiler?handler=results&action=results">Profiler Results</a><a class="heading" href="/profiler?handler=cfg&action=viewcfg">Configuration</a></div>';
+                var html = '<div style="padding:5px 0px 15px 0px"><h1>' + title + '</h1><a class="heading" href="/profiler?handler=vpr">URLs to Profile</a><a class="heading" href="/profiler?handler=results&action=results">Profiler Results</a><a class="heading" href="/profiler?handler=longrequests&action=viewlongrequests">Long-running Requests</a><a class="heading" href="/profiler?handler=cfg&action=viewcfg">Configuration</a></div>';
                 this.title.html(html);
             },
-            renderTable: function (layout, heading, data, divCss, tableCss, render, getTds) {
+            renderTable: function (layout, heading, data, divCss, tableCss, render, getTds, paging) {
                 if (data.length > 0) {
                     this.html += '<div class="' + divCss + '">' + heading + '</div><table class="' + tableCss + '"><tr>';
                     for (var head in layout) {
@@ -443,21 +481,48 @@ if (window.jQueryProfiler) {
                     }
                     this.html += '</tr>';
 
-                    render = render || function (itm) {
-                        this.html += "<tr>";
-                        $.each(getTds(itm), function (idx, td) {
-                            this.html += "<td>" + td + "</td>";
-                        }.bind(this));
-                        return this.html += '</tr>';
-                    } .bind(this);
+                    render = render || this.getDefaultRenderTds(getTds).bind(this);
 
+                    var colCount = 0;
                     $.each(data, function (idx, itm) {
-                        render(itm);
+                        var itemColCount = render(itm);
+                        if (itemColCount > colCount)
+                            colCount = itemColCount;
                     });
+
+                    if (paging) {
+                        this.html += this.renderPaging(paging, colCount, paging.baseUrl);
+                    }
 
                     this.html += '</table>';
                 }
             },
+
+            getDefaultRenderTds: function (getTds) {
+                return function (itm) {
+                    var colCount = 0;
+                    this.html += "<tr>";
+                    $.each(getTds(itm), function (idx, td) {
+                        this.html += "<td>";
+                        if (td.__buttons) {
+                            $.each(td.__buttons, function (idx, button) {
+                                var id = "btn_" + nextId();
+                                this.html += '<button class="' + button.__cssClass + '" id="' + id + '">' + button.text + '</button>';
+                                document[id] = button;
+                                colCount++;
+                            } .bind(this));
+                        }
+                        else {
+                            colCount++;
+                            this.html += td;
+                        }
+                        this.html += "</td>";
+                    } .bind(this));
+                    this.html += '</tr>';
+                    return colCount;
+                };
+            },
+
             renderPaging: function (pagingInfo, colspan, url) {
                 var html = '<tr><td class="pagingcell" colspan="' + colspan + '"><div class="paging"><div class="prevpage">';
                 html += pagingInfo.HasPreviousPage ? '<a href="' + url + '&pgno=' + (pagingInfo.PageNumber - 1) + '">previous</a>' : 'previous';
@@ -513,7 +578,7 @@ if (window.jQueryProfiler) {
                     }
                 case "viewlongrequests":
                     {
-                        $.viewengine.renderLongUrls(profileData.Data);
+                        $.viewengine.renderLongUrls(profileData);
                         break;
                     }
                 default:
@@ -522,6 +587,7 @@ if (window.jQueryProfiler) {
                         break;
                     }
             }
+            $.viewengine.attachGenericEvents();
         });
 
     })(jQueryProfiler);

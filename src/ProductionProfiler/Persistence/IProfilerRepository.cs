@@ -89,5 +89,6 @@ namespace ProductionProfiler.Core.Persistence
 
         void SaveTimedRequest(TimedRequest timedRequest);
         PE.Page<TimedRequest> GetLongRequests(PagingInfo paging);
+        void DeleteAllTimedRequests();
     }
 }

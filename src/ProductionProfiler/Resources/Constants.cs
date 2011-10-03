@@ -78,6 +78,7 @@ namespace ProductionProfiler.Core.Resources
             public const string DeleteUrlToProfileDataByUrl = "dprurl";
             public const string ConfigurationOverride = "cfg";
             public const string LongRequests = "longrequests";
+            public const string ClearLongRequests = "clearlongrequests";
         }
     }
 }

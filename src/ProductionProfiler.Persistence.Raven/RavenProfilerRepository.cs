@@ -233,6 +233,11 @@ namespace ProductionProfiler.Persistence.Raven
             throw new NotImplementedException();
         }
 
+        public void DeleteAllTimedRequests()
+        {
+            throw new NotImplementedException();
+        }
+
         public ProfiledResponse GetResponseById(Guid id)
         {
             using (var session = _database.OpenSession())

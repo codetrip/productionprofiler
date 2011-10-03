@@ -33,7 +33,7 @@ namespace ProductionProfiler.Core.Modules
                     }
                 }
 
-                if (ProfilerContext.Configuration.TimeAllRequests)
+                if (ProfilerContext.Configuration.ShouldTimeRequest(context.Request))
                 {
                     ProfilerContext.RequestTimer.Start(context);
                 }

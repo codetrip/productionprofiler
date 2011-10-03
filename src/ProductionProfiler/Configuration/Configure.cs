@@ -216,6 +216,7 @@ namespace ProductionProfiler.Core.Configuration
             _container.RegisterTransient<IRequestHandler>(typeof(DeleteProfiledDataByUrlRequestHandler), Constants.Handlers.DeleteUrlToProfileDataByUrl);
             _container.RegisterTransient<IRequestHandler>(typeof(ConfigurationOverrideHandler), Constants.Handlers.ConfigurationOverride);
             _container.RegisterTransient<IRequestHandler>(typeof(ViewLongRequestsHandler), Constants.Handlers.LongRequests);
+            _container.RegisterTransient<IRequestHandler>(typeof(ClearLongRequestsHandler), Constants.Handlers.ClearLongRequests);
 
             _container.RegisterTransient<IAddUrlToProfileRequestBinder>(typeof(AddUrlToProfileRequestBinder));
             _container.RegisterTransient<IUpdateUrlToProfileRequestBinder>(typeof(UpdateUrlToProfileRequestBinder));

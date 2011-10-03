@@ -134,6 +134,14 @@ namespace ProductionProfiler.Persistence.Mongo
             }
         }
 
+        public void DeleteAllTimedRequests()
+        {
+            using (var session = MongoSession.Connect(UrlToProfileDataDatabaseName, _configuration.Server, _configuration.Port))
+            {
+                session.DeleteAll<TimedRequest>();
+            }
+        }
+
         public PE.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo)
         {
             using (MongoSession session = MongoSession.Connect(UrlToProfileDataDatabaseName, _configuration.Server, _configuration.Port))

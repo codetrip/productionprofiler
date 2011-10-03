@@ -220,6 +220,11 @@ namespace ProductionProfiler.Persistence.SQLite
             throw new NotImplementedException();
         }
 
+        public void DeleteAllTimedRequests()
+        {
+            throw new NotImplementedException();
+        }
+
         public ProfiledResponse GetResponseById(Guid id)
         {
             using (var database = new Database(_configuration.ConnectionStringName))

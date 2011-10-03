@@ -20,7 +20,7 @@ namespace ProductionProfiler.Core.Configuration
             get { return Settings.ContainsKey(SettingKeys.TimeAllRequests) && Settings[SettingKeys.TimeAllRequests] == "true";}
         }
 
-        public long LongRequestThresholdMs { get; set; }
+        public long LongRequestThresholdMs { get { return long.Parse(Settings[SettingKeys.LongRequestThresholdMs]); } }
 
         public ProfilerConfiguration()
         {
@@ -61,6 +61,13 @@ namespace ProductionProfiler.Core.Configuration
             public const string SamplingPeriod = "sampling.period";
             public const string SamplingFrequency = "sampling.frequency";
             public const string LongRequestThresholdMs = "longrequest.threshold";
+        }
+
+        public bool ShouldTimeRequest(HttpRequest request)
+        {
+            return Settings.ContainsKey(SettingKeys.ProfilerEnabled) &&
+                   Settings[SettingKeys.ProfilerEnabled] == "true" &&
+                   !request.RawUrl.Contains("/profiler");
         }
     }
 }
