@@ -7,6 +7,7 @@ using ProductionProfiler.Core.IoC;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Profiling.Entities;
 using ProductionProfiler.Core.RequestTiming;
+using ProductionProfiler.Core.RequestTiming.Entities;
 
 namespace ProductionProfiler.Core.Profiling
 {

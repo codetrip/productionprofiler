@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ProductionProfiler.Core.Persistence.Entities;
 using ProductionProfiler.Core.RequestTiming;
+using ProductionProfiler.Core.RequestTiming.Entities;
 using PE = ProductionProfiler.Core.Persistence.Entities;
 using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Profiling.Entities;

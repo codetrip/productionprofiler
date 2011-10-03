@@ -128,6 +128,19 @@ namespace ProductionProfiler.Core.Configuration
             return this;
         }
 
+        IFluentConfiguration IFluentConfiguration.TimeAllRequests(int longRequestThresholdMs)
+        {
+            _profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.TimeAllRequests] = "true";
+            _profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.LongRequestThresholdMs] = longRequestThresholdMs.ToString();
+            return this;
+        }
+
+        IFluentConfiguration IFluentConfiguration.DoNotTimeAllRequests()
+        {
+            _profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.LongRequestThresholdMs] = "false";
+            return this;
+        }
+
         #region Collectors
 
         public IFluentConfiguration AuthoriseManagement(Func<HttpContext, bool> authorisedForManagement)

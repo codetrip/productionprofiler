@@ -163,6 +163,7 @@
     <Compile Include="Handlers\Entities\ModelValidationError.cs" />
     <Compile Include="Profiling\Entities\MethodInvocation.cs" />
     <Compile Include="RequestTiming\IRequestTimer.cs" />
+    <Compile Include="RequestTiming\Entities\TimedRequest.cs" />
     <Compile Include="Resources\Constants.cs" />
     <Compile Include="Modules\RequestProfilingModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -5,6 +5,7 @@ using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Persistence.Entities;
 using ProductionProfiler.Core.Profiling.Entities;
 using ProductionProfiler.Core.RequestTiming;
+using ProductionProfiler.Core.RequestTiming.Entities;
 using PE = ProductionProfiler.Core.Persistence.Entities;
 
 namespace ProductionProfiler.Persistence.Mongo

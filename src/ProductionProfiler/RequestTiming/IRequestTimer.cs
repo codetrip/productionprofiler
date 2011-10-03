@@ -1,10 +1,9 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Web;
 using ProductionProfiler.Core.Configuration;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Profiling;
-using ProductionProfiler.Core.Profiling.Entities;
+using ProductionProfiler.Core.RequestTiming.Entities;
 
 namespace ProductionProfiler.Core.RequestTiming
 {
@@ -17,8 +16,8 @@ namespace ProductionProfiler.Core.RequestTiming
     public class RequestTimer : IRequestTimer
     {
         private readonly Stopwatch _sw = new Stopwatch();
-        private IProfilerRepository _repository;
-        private ProfilerConfiguration _configuration;
+        private readonly IProfilerRepository _repository;
+        private readonly ProfilerConfiguration _configuration;
 
         public RequestTimer(IProfilerRepository repository, ProfilerConfiguration configuration)
         {
@@ -39,35 +38,5 @@ namespace ProductionProfiler.Core.RequestTiming
                 _repository.SaveTimedRequest(new TimedRequest(context.Request.Url.ToString(), _sw.ElapsedMilliseconds));
             
         }
-    }
-
-    [Serializable]
-    public class TimedRequest : IAsyncPersistable
-    {
-        public TimedRequest(string url, long durationMs) :this()
-        {
-            Url = url;
-            DurationMs = durationMs;
-            RequestUtc = DateTime.UtcNow;
-            Server = Environment.MachineName;
-            UrlPathAndQuery = new Uri(url).PathAndQuery;
-        }
-
-        public TimedRequest()
-        {
-            Id = Guid.NewGuid();
-        }
-        public Guid Id { get; set; }
-        public string Url { get; set; }
-        public string UrlPathAndQuery { get; set; }
-        public long DurationMs { get; set; }
-        public string Server { get; set; }
-
-        public string FriendlyRequestLocal
-        {
-            get { return RequestUtc.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss"); }
-        }
-
-        public DateTime RequestUtc { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Persistence.Entities;
 using ProductionProfiler.Core.Profiling.Entities;
 using ProductionProfiler.Core.RequestTiming;
+using ProductionProfiler.Core.RequestTiming.Entities;
 using Raven.Client.Document;
 using Raven.Client.Linq;
 using System.Linq;

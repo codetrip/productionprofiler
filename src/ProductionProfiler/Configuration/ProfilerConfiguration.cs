@@ -65,7 +65,8 @@ namespace ProductionProfiler.Core.Configuration
 
         public bool ShouldTimeRequest(HttpRequest request)
         {
-            return Settings.ContainsKey(SettingKeys.ProfilerEnabled) &&
+            return TimeAllRequests &&
+                   Settings.ContainsKey(SettingKeys.ProfilerEnabled) &&
                    Settings[SettingKeys.ProfilerEnabled] == "true" &&
                    !request.RawUrl.Contains("/profiler");
         }

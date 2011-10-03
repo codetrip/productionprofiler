@@ -42,6 +42,8 @@ namespace ProductionProfiler.Core.Configuration
         IFluentConfiguration AuthoriseManagement(Func<HttpContext, bool> authorisedForManagement);
         IFluentConfiguration AuthoriseSession(Func<string, bool> authoriseSession);
         IFluentConfiguration CollectMethodDataForTypes(IEnumerable<Type> typesToCollectMethodDataFor);
+        IFluentConfiguration TimeAllRequests(int durationThresholdMs);
+        IFluentConfiguration DoNotTimeAllRequests();
         IFluentProfilingTriggerConfiguration Trigger { get; }
         IFluentCollectorConfiguration AddMethodInvocationDataCollector<T>() where T : IMethodInvocationDataCollector;
         void Initialise();
