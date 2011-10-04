@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using log4net;
 using log4net.Core;
 using log4net.Repository.Hierarchy;
@@ -13,9 +14,12 @@ namespace ProductionProfiler.Core.Logging
     {
         private static readonly IList<Log4NetProfilingAppender> _profilingAppenders = new List<Log4NetProfilingAppender>();
         private MethodData _currentMethod;
+        //we only want to know about logging that pertains to the thread of the web request
+        private int _threadId;
 
         public void Start()
         {
+            _threadId = Thread.CurrentThread.ManagedThreadId;
             foreach (var appender in _profilingAppenders)
                 appender.AppendLoggingEvent += ProfilingAppenderAppendLoggingEvent;
         }
@@ -45,7 +49,7 @@ namespace ProductionProfiler.Core.Logging
                 }
             }
 
-            Hierarchy repository = LogManager.GetRepository() as Hierarchy;
+            var repository = LogManager.GetRepository() as Hierarchy;
 
             if (repository != null)
             {
@@ -61,7 +65,7 @@ namespace ProductionProfiler.Core.Logging
 
         private void ProfilingAppenderAppendLoggingEvent(object sender, AppendLoggingEventEventArgs e)
         {
-            if (_currentMethod != null)
+            if (_currentMethod != null && _threadId == Thread.CurrentThread.ManagedThreadId)
             {
                 _currentMethod.Messages.Add(e.LoggingEvent.ToLogMessage(_currentMethod.Elapsed()));
 
