@@ -31,12 +31,13 @@ namespace ProductionProfiler.Core.Handlers
 
             //response.AppendFormat("<link href=\"/Content/Resources.Css.css\" rel=\"stylesheet\" type=\"text/css\" />");
             response.AppendFormat("<link href=\"profiler?resource=Css.css&contenttype={0}\" rel=\"stylesheet\" type=\"text/css\" />", HttpUtility.UrlEncode("text/css"));
+            response.AppendFormat("<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js'></script>");
+
+            //response.AppendFormat("<script type='text/javascript' src='/Content/Resources.Client.js'></script>");
+            response.AppendFormat("<script type='text/javascript' src='profiler?resource=Client.js&contenttype={0}'></script>", HttpUtility.UrlEncode("application/javascript"));
 
             response.AppendFormat("</head><body><span id='title'></span>");
             response.AppendFormat("<script type='text/javascript'>var profileData = {0}, profilePath = '{1}', profileAction = '{2}';</script>", json, path, requestInfo.Action);
-            
-            //response.AppendFormat("<script type='text/javascript' src='/Content/Resources.Client.js'></script>");
-            response.AppendFormat("<script type='text/javascript' src='profiler?resource=Client.js&contenttype={0}'></script>", HttpUtility.UrlEncode("application/javascript"));
             
             response.AppendFormat("<div id=\"profiler\" class=\"container\"></div></body></html>");
 

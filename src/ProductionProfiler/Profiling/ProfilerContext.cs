@@ -36,19 +36,46 @@ namespace ProductionProfiler.Core.Profiling
         private static void PersistTimedRequest(IAsyncPersistable data)
         {
             if (data is TimedRequest)
-                Container.Resolve<IProfilerRepository>().SaveTimedRequest(data as TimedRequest);
+            {
+                try
+                {
+                    Container.Resolve<IProfilerRepository>().SaveTimedRequest(data as TimedRequest);
+                }
+                catch (Exception e)
+                {
+                    Configuration.ReportException(e);
+                }
+            }  
         }
 
         private static void PersistProfiledRequestData(IAsyncPersistable data)
         {
             if (data is ProfiledRequestData)
-                Container.Resolve<IProfilerRepository>().SaveProfiledRequestData(data as ProfiledRequestData);
+            {
+                try
+                {
+                    Container.Resolve<IProfilerRepository>().SaveProfiledRequestData(data as ProfiledRequestData);
+                }
+                catch (Exception e)
+                {
+                    Configuration.ReportException(e);
+                }
+            }
         }
 
         private static void PersistProfiledResponse(IAsyncPersistable data)
         {
             if (data is ProfiledResponse)
-                Container.Resolve<IProfilerRepository>().SaveResponse(data as ProfiledResponse);
+            {
+                try
+                {
+                    Container.Resolve<IProfilerRepository>().SaveResponse(data as ProfiledResponse);
+                }
+                catch (Exception e)
+                {
+                    Configuration.ReportException(e);
+                }
+            }
         }
 
         public static ProfilerConfiguration Configuration

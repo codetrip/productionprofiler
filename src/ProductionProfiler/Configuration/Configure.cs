@@ -137,7 +137,7 @@ namespace ProductionProfiler.Core.Configuration
 
         IFluentConfiguration IFluentConfiguration.DoNotTimeAllRequests()
         {
-            _profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.LongRequestThresholdMs] = "false";
+            _profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.TimeAllRequests] = "false";
             return this;
         }
 

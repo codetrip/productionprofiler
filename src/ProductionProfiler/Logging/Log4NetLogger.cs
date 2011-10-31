@@ -53,6 +53,7 @@ namespace ProductionProfiler.Core.Logging
 
             if (repository != null)
             {
+                System.Diagnostics.Trace.Write("LOG4NET CONFIGURATION CHANGED");
                 repository.Configured = true;
                 repository.RaiseConfigurationChanged(EventArgs.Empty);
             }

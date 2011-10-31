@@ -51,6 +51,11 @@ namespace ProductionProfiler.Core.Configuration
                    (RequestFilter == null || (RequestFilter != null && RequestFilter(request)));
         }
 
+        public bool ShouldTimeRequest(HttpRequest request)
+        {
+            return TimeAllRequests && ShouldProfileRequest(request);
+        }
+
         public static class SettingKeys
         {
             public const string TimeAllRequests = "timer.on";
@@ -61,14 +66,6 @@ namespace ProductionProfiler.Core.Configuration
             public const string SamplingPeriod = "sampling.period";
             public const string SamplingFrequency = "sampling.frequency";
             public const string LongRequestThresholdMs = "longrequest.threshold";
-        }
-
-        public bool ShouldTimeRequest(HttpRequest request)
-        {
-            return TimeAllRequests &&
-                   Settings.ContainsKey(SettingKeys.ProfilerEnabled) &&
-                   Settings[SettingKeys.ProfilerEnabled] == "true" &&
-                   !request.RawUrl.Contains("/profiler");
         }
     }
 }

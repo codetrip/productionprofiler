@@ -8,14 +8,16 @@ namespace ProductionProfiler.Core.Profiling.Triggers
 {
     public sealed class SampleBasedProfilingTrigger : ComponentBase, IProfilingTrigger
     {
-        private static Timer _timer;
+        private static Timer _periodTimer;
+        private static Timer _frequencyTimer;
         private static readonly SampleContext _context;
         private static readonly object _syncLock = new object();
 
         static SampleBasedProfilingTrigger()
         {
             _context = new SampleContext();
-            _timer = new Timer(EnableOrDisableSampling, _context, Frequency, Period);
+            _periodTimer = new Timer(PeriodTrigger, _context, Period, Period);
+            _frequencyTimer = new Timer(FrequencyTrigger, _context, Frequency, Frequency); 
         }
 
         public bool TriggerProfiling(HttpContext context)
@@ -26,12 +28,12 @@ namespace ProductionProfiler.Core.Profiling.Triggers
                 return false;
             }
 
-            return _context.Enabled;
+            return _context.PeriodEnabled;
         }
 
         public void AugmentProfiledRequestData(ProfiledRequestData data)
         {
-            if (_context.Enabled)
+            if (_context.FrequencyEnabled)
                 data.SamplingId = _context.SampleId;
         }
 
@@ -60,27 +62,43 @@ namespace ProductionProfiler.Core.Profiling.Triggers
             }
         }
 
-        private static void EnableOrDisableSampling(object stateInfo)
+        private static void FrequencyTrigger(object stateInfo)
         {
             lock(_syncLock)
             {
-                System.Diagnostics.Trace.Write("EnableOrDisableSampling Invoked");
-
                 if (_context != null)
                 {
-                    System.Diagnostics.Trace.Write("Context.Enabled = " + _context.Enabled);
-                    System.Diagnostics.Trace.Write("Context.SampleId = " + _context.SampleId);
+                    _context.DoneForPeriod = false;
+                    _context.FrequencyEnabled = !_context.FrequencyEnabled;
+                    System.Diagnostics.Trace.Write("FrequencyEnabled:=" + _context.FrequencyEnabled);
+                }
+            }
+        }
 
-                    if (_context.Enabled)
+        private static void PeriodTrigger(object stateInfo)
+        {
+            lock (_syncLock)
+            {
+                if (_context != null)
+                {
+                    if (_context.FrequencyEnabled)
                     {
-                        _context.Enabled = false;
-                        _context.SampleId = Guid.Empty;
+                        if (_context.PeriodEnabled || _context.DoneForPeriod)
+                        {
+                            _context.PeriodEnabled = false;
+                            _context.SampleId = Guid.Empty;
+                        }
+                        else 
+                        {
+                            _context.PeriodEnabled = true;
+                            _context.SampleId = Guid.NewGuid();
+                            _context.DoneForPeriod = true;
+                        }
                     }
-                    else
-                    {
-                        _context.Enabled = true;
-                        _context.SampleId = Guid.NewGuid();
-                    }
+
+                    System.Diagnostics.Trace.Write("Context.PeriodEnabled = " + _context.PeriodEnabled);
+                    System.Diagnostics.Trace.Write("Context.DoneForPeriod = " + _context.DoneForPeriod);
+                    System.Diagnostics.Trace.Write("Context.SampleId = " + _context.SampleId);
                 }
             }
         }
@@ -88,12 +106,16 @@ namespace ProductionProfiler.Core.Profiling.Triggers
         private class SampleContext
         {
             public Guid SampleId { get; set; }
-            public bool Enabled { get; set; }
+            public bool FrequencyEnabled { get; set; }
+            public bool PeriodEnabled { get; set; }
+            public bool DoneForPeriod { get; set; }
 
             public SampleContext()
             {
                 SampleId = Guid.NewGuid();
-                Enabled = false;
+                FrequencyEnabled = false;
+                PeriodEnabled = false;
+                DoneForPeriod = false;
             }
         }
     }

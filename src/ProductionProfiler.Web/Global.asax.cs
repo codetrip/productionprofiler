@@ -11,7 +11,9 @@ using Castle.MicroKernel.Releasers;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
 using ProductionProfiler.Core.Logging;
+using ProductionProfiler.Core.Serialization;
 using ProductionProfiler.Persistence.Mongo;
+using ProductionProfiler.Persistence.Sql;
 using ProductionProfiler.Tests.Components;
 using log4net.Config;
 using ProductionProfiler.Core.Caching;
@@ -92,23 +94,26 @@ namespace ProductionProfiler.Web
             Configure.With(container)
                 .HandleExceptionsVia(e => System.Diagnostics.Trace.Write(e.Format()))
                 .Logger(new Log4NetLogger())
-                .DataProvider(new MongoPersistenceProvider("localhost", 27017))
+                .DataProvider(new MongoPersistenceProvider("127.0.0.1", 27017))
                 .HttpRequestDataCollector<BasicHttpRequestDataCollector>()
                 .HttpResponseDataCollector<BasicHttpResponseDataCollector>()
+                .TypesToIntercept(new[] { typeof(IWorkflow) })
+                .TypesToIgnore(new[] { typeof(IController) })
                 .CollectMethodDataForTypes(new[] { typeof(IWorkflow) })
                 .AddMethodInvocationDataCollector<WorkflowMethodInvocationDataCollector>()
                     .ForTypesAssignableFrom(new []{typeof(IWorkflow)})
                 .CacheEngine<HttpRuntimeCacheEngine>()
                 .RequestFilter(req => Path.GetExtension(req.Url.AbsolutePath) == string.Empty)
-                //.Trigger
-                //    .BySession()
-                //.Trigger
-                //    .ByUrl()
+                .Trigger
+                    .BySession()
+                .Trigger
+                    .ByUrl()
                 .Trigger
                     .BySampling()
                         .Every(new TimeSpan(0, 0, 30))
-                        .For(new TimeSpan(0, 0, 30))
+                        .For(new TimeSpan(0, 0, 5))
                         .Enable()
+                .Serializer<JsonSerializer>()
                 .Initialise();
         }
 
