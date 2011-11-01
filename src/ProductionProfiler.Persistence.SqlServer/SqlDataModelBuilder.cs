@@ -115,7 +115,7 @@ namespace ProductionProfiler.Persistence.Sql
 	                    [Url] [varchar](900) NOT NULL,
 	                    [Data] [varbinary](max) NOT NULL,
                         [CapturedOnUtc] [DATETIME] NOT NULL
-                    CONSTRAINT PK_UrlToProfileData PRIMARY KEY NONCLUSTERED 
+                    CONSTRAINT PK_ProfiledRequestData PRIMARY KEY NONCLUSTERED 
                     (
 	                    [Id] ASC
                     )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
@@ -155,6 +155,26 @@ namespace ProductionProfiler.Persistence.Sql
                     (
 	                    [Url] ASC
                     )
+                END
+                GO
+            ".FormatWith(schema));
+
+            script.Append(
+                @"
+                IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}].[TimedRequest]') AND type in (N'U'))
+                BEGIN
+                    CREATE TABLE [{0}].[TimedRequest](
+	                    [Id] [uniqueidentifier] NOT NULL,
+	                    [Url] [varchar](900) NOT NULL,
+	                    [UrlPathAndQuery] [varchar](900) NULL,
+	                    [DurationMs] BIGINT NULL,
+	                    [Server] [varchar](128) NULL,
+	                    [RequestUtc] DATETIME NULL
+                    CONSTRAINT PK_TimedRequestId PRIMARY KEY NONCLUSTERED 
+                    (
+	                    [Id] ASC
+                    )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+                    ) ON [PRIMARY]
                 END
                 GO
             ".FormatWith(schema));

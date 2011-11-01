@@ -243,12 +243,23 @@ namespace ProductionProfiler.Persistence.Sql
 
         public Core.Persistence.Entities.Page<TimedRequest> GetLongRequests(PagingInfo paging)
         {
-            throw new NotImplementedException();
+            using (var database = new Database(_configuration.ConnectionStringName))
+            {
+                var results = database.Page<TimedRequest>(
+                    paging.PageNumber,
+                    paging.PageSize,
+                    "SELECT * FROM TimedRequest ORDER BY RequestUtc DESC");
+
+                return new Core.Persistence.Entities.Page<TimedRequest>(results.Items, new Pagination(paging.PageSize, paging.PageNumber, (int)results.TotalItems));
+            }
         }
 
         public void DeleteAllTimedRequests()
         {
-            throw new NotImplementedException();
+            using (var database = new Database(_configuration.ConnectionStringName))
+            {
+                database.Delete("DELETE FROM dbo.TimedRequest");
+            }
         }
 
         public ProfiledResponse GetResponseById(Guid id)

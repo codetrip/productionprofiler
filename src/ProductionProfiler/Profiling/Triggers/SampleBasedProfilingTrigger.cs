@@ -15,9 +15,9 @@ namespace ProductionProfiler.Core.Profiling.Triggers
 
         static SampleBasedProfilingTrigger()
         {
-            _context = new SampleContext();
-            _periodTimer = new Timer(PeriodTrigger, _context, Period, Period);
-            _frequencyTimer = new Timer(FrequencyTrigger, _context, Frequency, Frequency); 
+            //_context = new SampleContext();
+            //_periodTimer = new Timer(PeriodTrigger, _context, Period, Period);
+            //_frequencyTimer = new Timer(FrequencyTrigger, _context, Frequency, Frequency); 
         }
 
         public bool TriggerProfiling(HttpContext context)
@@ -28,13 +28,13 @@ namespace ProductionProfiler.Core.Profiling.Triggers
                 return false;
             }
 
-            return _context.PeriodEnabled;
+            return false;// _context.PeriodEnabled;
         }
 
         public void AugmentProfiledRequestData(ProfiledRequestData data)
         {
-            if (_context.FrequencyEnabled)
-                data.SamplingId = _context.SampleId;
+            //if (_context.FrequencyEnabled)
+            //    data.SamplingId = _context.SampleId;
         }
 
         private bool Enabled
