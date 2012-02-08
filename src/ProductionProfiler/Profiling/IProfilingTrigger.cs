@@ -1,5 +1,6 @@
 ﻿
 using System.Web;
+using ProductionProfiler.Core.Modules;
 using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Core.Profiling
@@ -20,5 +21,9 @@ namespace ProductionProfiler.Core.Profiling
         /// </summary>
         /// <param name="data"></param>
         void AugmentProfiledRequestData(ProfiledRequestData data);
+        /// <summary>
+        /// After doing all the profiling, has this trigger decided it wants to veto persistence for this request?
+        /// </summary>
+        bool VetoPersistence(RequestProfileContext context);
     }
 }

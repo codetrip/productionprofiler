@@ -1,9 +1,9 @@
 ﻿
 (function ($) { $.fn.CenterIt = function (options) { var defaults = { ignorechildren: true }; var settings = $.extend({}, defaults, options); var control = $(this); control.show(); $(document).ready(function () { CenterItem(); }); $(window).resize(function () { CenterItem(); }); function CenterItem() { var controlHeight = 0; var controlWidth = 0; if (settings.ignorechildren) { controlHeight = control.height(); controlWidth = control.width(); } else { var children = control.children(); for (var i = 0; i < children.length; i++) { if (children[i].style.display != 'none') { controlHeight = children[i].clientHeight; controlWidth = children[i].clientWidth; } } } var controlMarginCSS = control.css("margin"); var controlPaddingCSS = control.css("padding"); if (controlMarginCSS != null) { controlMarginCSS = controlMarginCSS.replace(/auto/gi, '0'); controlMarginCSS = controlMarginCSS.replace(/px/gi, ''); controlMarginCSS = controlMarginCSS.replace(/pt/gi, ''); } var totalMargin = ""; if (controlMarginCSS != "" && controlMarginCSS != null) { totalMargin = controlMarginCSS.split(' '); } var horizontalMargin = 0; var verticalMargin = 0; if (totalMargin != "NaN") { if (totalMargin.length > 0) { horizontalMargin = parseInt(totalMargin[1]) + parseInt(totalMargin[3]); verticalMargin = parseInt(totalMargin[2]) + parseInt(totalMargin[2]); } } if (controlPaddingCSS != null) { controlPaddingCSS = controlPaddingCSS.replace(/auto/gi, '0'); controlPaddingCSS = controlPaddingCSS.replace(/px/gi, ''); controlPaddingCSS = controlPaddingCSS.replace(/pt/gi, ''); } var totalPadding = ""; if (controlPaddingCSS != "" && controlPaddingCSS != null) { totalPadding = controlPaddingCSS.split(' '); } var horizontalPadding = 0; var verticalPadding = 0; if (totalPadding != "NaN") { if (totalPadding.length > 0) { horizontalPadding = parseInt(totalPadding[1]) + parseInt(totalPadding[3]); verticalPadding = parseInt(totalPadding[2]) + parseInt(totalPadding[2]); } } if (verticalMargin == "NaN" || isNaN(verticalMargin)) { verticalMargin = 0; } if (verticalPadding == "NaN" || isNaN(verticalPadding)) { verticalPadding = 0; } var windowHeight = $(window).height(); var windowWidth = $(window).width(); if ($.browser.msie && $.browser.version.substr(0, 1) < 7) { control.css("position", "absolute"); } else { control.css("position", "fixed"); } control.css("height", controlHeight + "px"); control.css("width", controlWidth + "px"); control.css("top", ((windowHeight - (controlHeight + verticalMargin + verticalPadding)) / 2) + "px"); control.css("left", ((windowWidth - (controlWidth + horizontalMargin + horizontalPadding)) / 2) + "px"); } } })(jQuery);
 
-(function($) {
+(function ($) {
 
-    $.fn.jsonviewer = function(settings) {
+    $.fn.jsonviewer = function (settings) {
         var config =
         {
             'type_prefix': false,
@@ -18,7 +18,7 @@
         if (settings)
             $.extend(config, settings);
 
-        this.each(function(key, element) {
+        this.each(function (key, element) {
             format_value(element, config['json_name'], config['json_data'], config, true);
         });
 
@@ -67,21 +67,21 @@
         this._type = this.get_type(value);
     };
 
-    TypeHandler.prototype.type = function() { return this._type; };
+    TypeHandler.prototype.type = function () { return this._type; };
 
-    TypeHandler.prototype.get_type = function(value) {
+    TypeHandler.prototype.get_type = function (value) {
         var base_type = typeof value;
         var result = "unsupported";
         switch (base_type) {
-        case "number": result = base_type; break;
-        case "string": result = base_type; break;
-        case "boolean": result = base_type; break;
-        case "object":
-            if (Number.prototype.isPrototypeOf(value)) { result = "number"; break; }
-            if (String.prototype.isPrototypeOf(value)) { result = "string"; break; }
-            if (Date.prototype.isPrototypeOf(value)) { result = "date"; break; }
-            if (Array.prototype.isPrototypeOf(value)) { result = "array"; break; }
-            if (Object.prototype.isPrototypeOf(value)) { result = "object"; break; }
+            case "number": result = base_type; break;
+            case "string": result = base_type; break;
+            case "boolean": result = base_type; break;
+            case "object":
+                if (Number.prototype.isPrototypeOf(value)) { result = "number"; break; }
+                if (String.prototype.isPrototypeOf(value)) { result = "string"; break; }
+                if (Date.prototype.isPrototypeOf(value)) { result = "date"; break; }
+                if (Array.prototype.isPrototypeOf(value)) { result = "array"; break; }
+                if (Object.prototype.isPrototypeOf(value)) { result = "object"; break; }
         }
         return result;
     };
@@ -243,16 +243,18 @@ if (window.jQueryProfiler) {
             renderUrlToProfiles: function (data) {
                 currentHtml = '<form action="/profiler?handler=apr" method="post">' +
                 '<table class="w1000">' +
-                '<tr><th>Url to profile (Supports Regular Expressions)</th><th>Server</th><th>Profile Count</th><th></th></tr>' +
+                '<tr><th>Url to profile (Supports Regular Expressions)</th><th>Server</th><th>Profile Count</th><th>Threshold For Recording (ms)</th><th></th></tr>' +
                 '<tr><td><input id="Url" name="Url" style="width:625px" type="text" value="" /></td>' +
                 '<td><input name="Server" style="width:200px" type="text" value="" /></td>' +
                 '<td><input name="ProfilingCount" maxlength="4" style="width:75px" type="text" value="" /></td>' +
+                '<td><input name="ThresholdForRecordingMs" maxlength="4" style="width:75px" type="text" value="" /></td>' +
                 '<td><input type="submit" value="Add" class="btn" /></td></tr>' +
                 '</table></form>';
 
                 if (data.Data.length > 0) {
-                    currentHtml += '<table class="w1000"><tr><th>Enable</th><th>Url</th><th>Server</th><th>Profile Count</th><th>Delete</th><th>Update</th></tr>';
+                    currentHtml += '<table class="w1000"><tr><th>Enable</th><th>Url</th><th>Server</th><th>Profile Count</th><th>Threshold For Recording (ms)</th><th>Delete</th><th>Update</th></tr>';
 
+                    //these forms broken in Firefox
                     $.each(data.Data, function (idx, itm) {
                         var profilingCount = itm.ProfilingCount === null ? '' : itm.ProfilingCount;
                         var checked = itm.Enabled ? 'checked="checked"' : '';
@@ -263,6 +265,7 @@ if (window.jQueryProfiler) {
                         '<td>' + itm.Url + '</td>' +
                         '<td><input name="Server" style="width:150px" type="text" value="' + $.profiler.emptyIfNull(itm.Server, '') + '" /></td>' +
                         '<td><input name="ProfilingCount" style="width:50px" type="text" value="' + profilingCount + '" /></td>' +
+                        '<td><input name="ThresholdForRecordingMs" style="width:50px" type="text" value="' + (itm.ThresholdForRecordingMs || '') + '" /></td>' +
                         '<td><input type="submit" value="Delete" name="Delete" class="btn delete" /></td>' +
                         '<td><input type="submit" value="Update" name="Update" class="btn" /></td>' +
                         '</form></tr>';
@@ -388,8 +391,8 @@ if (window.jQueryProfiler) {
                     currentHtml += '<tr class="hidden"><td style="padding-left:' + (padding + 5) + 'px" colspan="6">';
 
                     if (hasLogMessages) {
-                        $.viewengine.renderTable(["Logged at", "Level", "Error"], "Messages", method.Messages, "rh-nested", "nested hidden", function (message) {
-                            currentHtml += '<tr><td style="width:80px">' + message.Milliseconds + 'ms</td><td style="width:100px">' + message.Level + '</td><td>' + message.Message + '</td></tr>';
+                        $.viewengine.renderTable(["Logged at", "Logger", "Level", "Error"], "Messages", method.Messages, "rh-nested", "nested hidden", function (message) {
+                            currentHtml += '<tr><td style="width:80px">' + message.Milliseconds + 'ms</td><td style="width:80px">' + message.Logger + '</td><td style="width:100px">' + message.Level + '</td><td>' + message.Message + '</td></tr>';
                         });
                     }
 

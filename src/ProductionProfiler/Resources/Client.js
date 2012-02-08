@@ -243,16 +243,18 @@ if (window.jQueryProfiler) {
             renderUrlToProfiles: function (data) {
                 currentHtml = '<form action="/profiler?handler=apr" method="post">' +
                 '<table class="w1000">' +
-                '<tr><th>Url to profile (Supports Regular Expressions)</th><th>Server</th><th>Profile Count</th><th></th></tr>' +
+                '<tr><th>Url to profile (Supports Regular Expressions)</th><th>Server</th><th>Profile Count</th><th>Threshold For Recording (ms)</th><th></th></tr>' +
                 '<tr><td><input id="Url" name="Url" style="width:625px" type="text" value="" /></td>' +
                 '<td><input name="Server" style="width:200px" type="text" value="" /></td>' +
                 '<td><input name="ProfilingCount" maxlength="4" style="width:75px" type="text" value="" /></td>' +
+                '<td><input name="ThresholdForRecordingMs" maxlength="4" style="width:75px" type="text" value="" /></td>' +
                 '<td><input type="submit" value="Add" class="btn" /></td></tr>' +
                 '</table></form>';
 
                 if (data.Data.length > 0) {
-                    currentHtml += '<table class="w1000"><tr><th>Enable</th><th>Url</th><th>Server</th><th>Profile Count</th><th>Delete</th><th>Update</th></tr>';
+                    currentHtml += '<table class="w1000"><tr><th>Enable</th><th>Url</th><th>Server</th><th>Profile Count</th><th>Threshold For Recording (ms)</th><th>Delete</th><th>Update</th></tr>';
 
+                    //these forms broken in Firefox
                     $.each(data.Data, function (idx, itm) {
                         var profilingCount = itm.ProfilingCount === null ? '' : itm.ProfilingCount;
                         var checked = itm.Enabled ? 'checked="checked"' : '';
@@ -263,6 +265,7 @@ if (window.jQueryProfiler) {
                         '<td>' + itm.Url + '</td>' +
                         '<td><input name="Server" style="width:150px" type="text" value="' + $.profiler.emptyIfNull(itm.Server, '') + '" /></td>' +
                         '<td><input name="ProfilingCount" style="width:50px" type="text" value="' + profilingCount + '" /></td>' +
+                        '<td><input name="ThresholdForRecordingMs" style="width:50px" type="text" value="' + (itm.ThresholdForRecordingMs || '') + '" /></td>' +
                         '<td><input type="submit" value="Delete" name="Delete" class="btn delete" /></td>' +
                         '<td><input type="submit" value="Update" name="Update" class="btn" /></td>' +
                         '</form></tr>';
@@ -388,8 +391,8 @@ if (window.jQueryProfiler) {
                     currentHtml += '<tr class="hidden"><td style="padding-left:' + (padding + 5) + 'px" colspan="6">';
 
                     if (hasLogMessages) {
-                        $.viewengine.renderTable(["Logged at", "Level", "Error"], "Messages", method.Messages, "rh-nested", "nested hidden", function (message) {
-                            currentHtml += '<tr><td style="width:80px">' + message.Milliseconds + 'ms</td><td style="width:100px">' + message.Level + '</td><td>' + message.Message + '</td></tr>';
+                        $.viewengine.renderTable(["Logged at", "Logger", "Level", "Error"], "Messages", method.Messages, "rh-nested", "nested hidden", function (message) {
+                            currentHtml += '<tr><td style="width:80px">' + message.Milliseconds + 'ms</td><td style="width:80px">' + message.Logger + '</td><td style="width:100px">' + message.Level + '</td><td>' + message.Message + '</td></tr>';
                         });
                     }
 

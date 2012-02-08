@@ -11,5 +11,6 @@ namespace ProductionProfiler.Core.Handlers.Entities
         public string Server { get; set; }
         public bool Delete { get; set; }
         public bool Enabled { get; set; }
+        public int? ThresholdForRecordingMs { get; set; }
     }
 }

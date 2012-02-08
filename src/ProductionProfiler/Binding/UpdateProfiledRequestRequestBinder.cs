@@ -24,6 +24,9 @@ namespace ProductionProfiler.Core.Binding
             UrlToProfile.Server = formParams.Get("Server");
             UrlToProfile.ProfilingCount = formParams.Get("ProfilingCount").IsNullOrEmpty() ? (int?)null : int.Parse(formParams.Get("ProfilingCount"));
             UrlToProfile.Enabled = formParams.Get("Enabled").Contains("true");
+            UrlToProfile.ThresholdForRecordingMs = formParams.Get("ThresholdForRecordingMs").IsNullOrEmpty()
+                                                       ? (int?) null
+                                                       : int.Parse(formParams.Get("ThresholdForRecordingMs"));
 
             return UrlToProfile;
         }

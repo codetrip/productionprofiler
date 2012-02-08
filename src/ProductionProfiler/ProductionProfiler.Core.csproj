@@ -44,8 +44,8 @@
     <Reference Include="log4net">
       <HintPath>..\..\lib\Log4net\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json.Net35">
-      <HintPath>..\..\lib\Json.NET\Newtonsoft.Json.Net35.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\lib\Json.NET\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -103,6 +103,7 @@
     <Compile Include="Logging\Log4NetLogger.cs" />
     <Compile Include="Logging\Log4NetProfilingAppender.cs" />
     <Compile Include="Logging\LoggingEventExtensions.cs" />
+    <Compile Include="Profiling\RequestProfileContext.cs" />
     <Compile Include="Persistence\PersistenceWorkerQueue.cs" />
     <Compile Include="Persistence\PetaPoco.cs" />
     <Compile Include="Profiling\Entities\IAsyncPersistable.cs" />

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
 using ProductionProfiler.Core.Configuration;
+using ProductionProfiler.Core.Modules;
 using ProductionProfiler.Core.Profiling.Entities;
 using ProductionProfiler.Core.Web;
 using ProductionProfiler.Core.Extensions;
@@ -58,6 +59,11 @@ namespace ProductionProfiler.Core.Profiling.Triggers
             }
             catch (Exception)
             {}
+        }
+
+        public bool VetoPersistence(RequestProfileContext context)
+        {
+            return false;
         }
 
         private bool Enabled

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Web;
 using ProductionProfiler.Core.Auditing;
 using ProductionProfiler.Core.Profiling;
+using ProductionProfiler.Core.Resources;
 
 namespace ProductionProfiler.Core.Modules
 {
@@ -19,23 +20,26 @@ namespace ProductionProfiler.Core.Modules
             if (!ProfilerContext.Initialised)
                 return;
 
-            var context = ((HttpApplication)sender).Context;
+            var httpContext = ((HttpApplication)sender).Context;
 
             try
             {
-                if (ProfilerContext.Configuration.ShouldProfileRequest(context.Request))
+                if (ProfilerContext.Configuration.ShouldProfileRequest(httpContext.Request))
                 {
-                    var coordinatorsForCurrentRequest = ProfilerContext.Configuration.GetCoordinators(context);
+                    var coordinatorsForCurrentRequest = ProfilerContext.Configuration.GetCoordinators(httpContext).ToList();
+
+                    var requestProfileContext = new RequestProfileContext(httpContext, coordinatorsForCurrentRequest);
+                    httpContext.Items[Constants.RequestProfileContextHttpContextItemKey] = requestProfileContext;
 
                     if (coordinatorsForCurrentRequest.Any())
                     {
-                        ProfilerContext.Profiler.Start(context, coordinatorsForCurrentRequest);
+                        ProfilerContext.Profiler.Start(new RequestProfileContext(httpContext, coordinatorsForCurrentRequest));
                     }
                 }
 
-                if (ProfilerContext.Configuration.ShouldTimeRequest(context.Request))
+                if (ProfilerContext.Configuration.ShouldTimeRequest(httpContext.Request))
                 {
-                    ProfilerContext.RequestTimer.Start(context);
+                    ProfilerContext.RequestTimer.Start(httpContext);
                 }
             }
             catch(Exception ex)
@@ -44,7 +48,7 @@ namespace ProductionProfiler.Core.Modules
 
                 try
                 {
-                    ProfilerContext.Profiler.Stop(context.Response);
+                    ProfilerContext.Profiler.Stop();
                 }
                 catch (Exception innerEx)
                 {
@@ -60,10 +64,11 @@ namespace ProductionProfiler.Core.Modules
 
             try
             {
-                var context = ((HttpApplication) sender).Context;
-                ProfilerContext.Profiler.Stop(context.Response);
+                var httpContext = ((HttpApplication) sender).Context;
+                
+                ProfilerContext.Profiler.Stop();
                 if (ProfilerContext.Configuration.TimeAllRequests)
-                    ProfilerContext.RequestTimer.Stop(context);
+                    ProfilerContext.RequestTimer.Stop(httpContext);
             }
             catch (Exception ex)
             {

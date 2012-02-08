@@ -19,6 +19,10 @@ namespace ProductionProfiler.Core.Profiling.Entities
         /// </summary>
         public string Server { get; set; }
         /// <summary>
+        /// If set, the minimum length of the URL for the info to be persisted.
+        /// </summary>
+        public int? ThresholdForRecordingMs { get; set; }
+        /// <summary>
         /// Is this enabled for profiling?
         /// </summary>
         public bool Enabled { get; set; }

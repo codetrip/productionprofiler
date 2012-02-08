@@ -50,6 +50,7 @@ namespace ProductionProfiler.Core.Handlers
                     storedRequest.ProfilingCount = request.ProfilingCount.Value;
                     storedRequest.Server = request.Server;
                     storedRequest.Enabled = request.Enabled;
+                    storedRequest.ThresholdForRecordingMs = request.ThresholdForRecordingMs;
 
                     _repository.SaveUrlToProfile(storedRequest);
                 }

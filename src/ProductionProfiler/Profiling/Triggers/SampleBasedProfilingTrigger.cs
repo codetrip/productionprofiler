@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Web;
 using ProductionProfiler.Core.Configuration;
+using ProductionProfiler.Core.Modules;
 using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Core.Profiling.Triggers
@@ -35,6 +36,11 @@ namespace ProductionProfiler.Core.Profiling.Triggers
         {
             //if (_context.FrequencyEnabled)
             //    data.SamplingId = _context.SampleId;
+        }
+
+        public bool VetoPersistence(RequestProfileContext context)
+        {
+            return false;
         }
 
         private bool Enabled

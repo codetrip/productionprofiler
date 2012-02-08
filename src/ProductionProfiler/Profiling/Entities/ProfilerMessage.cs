@@ -8,5 +8,6 @@ namespace ProductionProfiler.Core.Profiling.Entities
         public long Milliseconds { get; set; }
         public string Message { get; set; }
         public string Level { get; set; }
+        public string Logger { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using System.Web;
 using ProductionProfiler.Core.Caching;
 using ProductionProfiler.Core.Configuration;
 using ProductionProfiler.Core.Extensions;
+using ProductionProfiler.Core.Modules;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Profiling.Entities;
 using ProductionProfiler.Core.Resources;
@@ -56,6 +57,8 @@ namespace ProductionProfiler.Core.Profiling.Triggers
                 var requestToProfile = urlsToProfile.FirstOrDefault(
                     req => (req.Server.IsNullOrEmpty() || req.Server == Environment.MachineName) && Regex.IsMatch(currentUrl, string.Format("^{0}$", req.Url)));
 
+                context.Items[Constants.UrlToProfileHttpContextItemKey] = requestToProfile;
+
                 if (requestToProfile != null)
                 {
                     Trace("...Found a match, decrementing the profiling count");
@@ -96,6 +99,14 @@ namespace ProductionProfiler.Core.Profiling.Triggers
         /// <param name="data"></param>
         public void AugmentProfiledRequestData(ProfiledRequestData data)
         {}
+
+        public bool VetoPersistence(RequestProfileContext context)
+        {
+            var urlToProfile = context.HttpContext.Items[Constants.UrlToProfileHttpContextItemKey] as UrlToProfile;
+
+            return urlToProfile != null &&
+                   urlToProfile.ThresholdForRecordingMs.GetValueOrDefault() > context.RequestDuration.TotalMilliseconds;
+        }
 
         private bool Enabled
         {

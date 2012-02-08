@@ -7,6 +7,7 @@ using ProductionProfiler.Core.Collectors;
 using ProductionProfiler.Core.Configuration;
 using ProductionProfiler.Core.Extensions;
 using ProductionProfiler.Core.Logging;
+using ProductionProfiler.Core.Modules;
 using ProductionProfiler.Core.Profiling.Entities;
 
 namespace ProductionProfiler.Core.Profiling
@@ -21,8 +22,7 @@ namespace ProductionProfiler.Core.Profiling
         private readonly ILogger _logger;
         private readonly Guid _requestId;
         private ProfiledRequestData _profileData;
-        private Stopwatch _watch;
-        private IEnumerable<IProfilingTrigger> _coordinators;
+        private RequestProfileContext _context;
 
         public RequestProfiler(IHttpRequestDataCollector httpRequestDataCollector, 
             IHttpResponseDataCollector httpResponseDataCollector, 
@@ -38,12 +38,12 @@ namespace ProductionProfiler.Core.Profiling
             _configuration = configuration;
         }
 
-        public void Start(HttpContext context, IEnumerable<IProfilingTrigger> coordinators)
+        public void Start(RequestProfileContext context)
         {
             ProfilerContext.Profiling = true;
-            _coordinators = coordinators;
+            _context = context;
 
-            Trace("Started profiling for Url:={0}, Request Id:={1}, Server:={2}...", context.Request.RawUrl, _requestId, Environment.MachineName);
+            Trace("Started profiling for Url:={0}, Request Id:={1}, Server:={2}...", context.HttpContext.Request.RawUrl, _requestId, Environment.MachineName);
 
             try
             {
@@ -51,34 +51,35 @@ namespace ProductionProfiler.Core.Profiling
 
                 _profileData = new ProfiledRequestData
                 {
-                    Url = context.Request.RawUrl.ToLowerInvariant(),
+                    Url = context.HttpContext.Request.RawUrl.ToLowerInvariant(),
                     CapturedOnUtc = DateTime.UtcNow,
                     Server = Environment.MachineName,
-                    ClientIpAddress = context.Request.ClientIpAddress(),
-                    Ajax = context.Request.IsAjaxRequest(),
+                    ClientIpAddress = context.HttpContext.Request.ClientIpAddress(),
+                    Ajax = context.HttpContext.Request.IsAjaxRequest(),
                     Id = _requestId
                 };
 
                 //add data from the configured IHttpRequestDataCollector
-                _profileData.RequestData.AddIfNotNull(_httpRequestDataCollector.Collect(context.Request));
+                _profileData.RequestData.AddIfNotNull(_httpRequestDataCollector.Collect(context.HttpContext.Request));
 
                 //set up our response filter to capture the full response
                 //bug in asp.net 3.5 requires you to read the response Filter before you set it!
-                var f = context.Response.Filter;
-                context.Response.Filter = new StoreResponseFilter(context.Response.Filter);
+                var f = context.HttpContext.Response.Filter;
+                context.HttpContext.Response.Filter = new StoreResponseFilter(context.HttpContext.Response.Filter);
 
-                _watch = Stopwatch.StartNew();
+                _context.StartTiming();
+                
             }
             catch (Exception e)
             {
                 Error(e);
-                Stop(context.Response);
+                Stop();
             } 
             
             Trace("Start profiling complete");
         }
 
-        public void Stop(HttpResponse response)
+        public void Stop()
         {
             if (!ProfilerContext.Profiling)
             {
@@ -93,16 +94,18 @@ namespace ProductionProfiler.Core.Profiling
             {
                 _logger.Stop();
 
-                if(_watch != null)
+                _profileData.ElapsedMilliseconds = (long)_context.RequestDuration.TotalMilliseconds;
+
+                if (_context.Coordinators.Any(coordinator => coordinator.VetoPersistence(_context)))
                 {
-                    _watch.Stop();
-                    _profileData.ElapsedMilliseconds = _watch.ElapsedMilliseconds;
+                    Trace("Coordinator {0} says Skip Persistence.  Ending.");
+                    return;
                 }
 
                 //add data from the configured IHttpRequestDataCollector
-                _profileData.ResponseData.AddIfNotNull(_httpResponseDataCollector.Collect(response));
+                _profileData.ResponseData.AddIfNotNull(_httpResponseDataCollector.Collect(_context.HttpContext.Response));
 
-                var responseFilter = response.Filter as IResponseFilter;
+                var responseFilter = _context.HttpContext.Response.Filter as IResponseFilter;
                 if (responseFilter != null)
                 {
                     ProfilerContext.EnqueueForPersistence(new ProfiledResponse
@@ -114,7 +117,7 @@ namespace ProductionProfiler.Core.Profiling
                 }
 
                 //allow the coordinators that have been enabled for this request to augment to profile data before we save it.
-                foreach (var coordinator in _coordinators)
+                foreach (var coordinator in _context.Coordinators)
                 {
                     coordinator.AugmentProfiledRequestData(_profileData);
                 }
@@ -175,11 +178,11 @@ namespace ProductionProfiler.Core.Profiling
             catch(Exception e)
             {
                 Error(e);
-                method.Exceptions.AddException(e, _watch.ElapsedMilliseconds);
+                method.Exceptions.AddException(e, (long) _context.RequestDuration.TotalMilliseconds);
             }
             finally
             {
-                method.Start(_watch.ElapsedMilliseconds);
+                method.Start((long) _context.RequestDuration.TotalMilliseconds);
                 _logger.CurrentMethod = method;
                 _methodStack.Push(method);
             }
@@ -196,12 +199,12 @@ namespace ProductionProfiler.Core.Profiling
             try
             {
                 currentMethod = _methodStack.Pop();
-                currentMethod.Stop( _watch.ElapsedMilliseconds);
+                currentMethod.Stop((long) _context.RequestDuration.TotalMilliseconds);
 
                 //if an exception was thrown by the method, log it here
                 if (invocation.Exception != null)
                 {
-                    currentMethod.Exceptions.AddException(invocation.Exception, _watch.ElapsedMilliseconds);
+                    currentMethod.Exceptions.AddException(invocation.Exception, (long)_context.RequestDuration.TotalMilliseconds);
                 }
 
                 if (_configuration.DataCollectorMappings.HasMappings())

@@ -3,9 +3,10 @@ namespace ProductionProfiler.Core.Resources
 {
     public static class Constants
     {
-        public const string RequestProfileContextKey = "RequestProfiler";
         public const string ProfilingAppender = "ProfilingAppender";
         public const string Stopwatch = "Stopwatch";
+        public const string RequestProfileContextHttpContextItemKey = "____ProdProf:RequestProfileContext";
+        public const string UrlToProfileHttpContextItemKey = "____ProdProf:UrlToProfile";
 
         public static class HttpMethods
         {

@@ -9,6 +9,7 @@ namespace ProductionProfiler.Core.Logging
         {
             return new ProfilerMessage
             {
+                Logger = loggingEvent.LoggerName,
                 Message = loggingEvent.RenderedMessage,
                 Milliseconds = elapsedMillseconds,
                 Level = loggingEvent.Level.ToString()
