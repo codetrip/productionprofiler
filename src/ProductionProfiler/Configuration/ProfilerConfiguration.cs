@@ -28,7 +28,7 @@ namespace ProductionProfiler.Core.Configuration
             Settings = new Dictionary<string, string>();
         }
 
-        public IEnumerable<IProfilingTrigger> GetCoordinators(HttpContext context)
+        public IEnumerable<IProfilingTrigger> GetTriggers(HttpContext context)
         {
             return ProfilerContext.Container.ResolveAll<IProfilingTrigger>().Where(pm => pm.TriggerProfiling(context));
         }

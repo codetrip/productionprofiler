@@ -26,14 +26,14 @@ namespace ProductionProfiler.Core.Modules
             {
                 if (ProfilerContext.Configuration.ShouldProfileRequest(httpContext.Request))
                 {
-                    var coordinatorsForCurrentRequest = ProfilerContext.Configuration.GetCoordinators(httpContext).ToList();
+                    var profilingTriggersForCurrentRequest = ProfilerContext.Configuration.GetTriggers(httpContext).ToList();
 
-                    var requestProfileContext = new RequestProfileContext(httpContext, coordinatorsForCurrentRequest);
+                    var requestProfileContext = new RequestProfileContext(httpContext, profilingTriggersForCurrentRequest);
                     httpContext.Items[Constants.RequestProfileContextHttpContextItemKey] = requestProfileContext;
 
-                    if (coordinatorsForCurrentRequest.Any())
+                    if (profilingTriggersForCurrentRequest.Any())
                     {
-                        ProfilerContext.Profiler.Start(new RequestProfileContext(httpContext, coordinatorsForCurrentRequest));
+                        ProfilerContext.Profiler.Start(new RequestProfileContext(httpContext, profilingTriggersForCurrentRequest));
                     }
                 }
 
