@@ -17,14 +17,14 @@ namespace ProductionProfiler.IoC.StructureMap
             _container = container;
         }
 
-        public void RegisterTransient<T>(Type implementation, string name = null)
+        public void RegisterTransient<T>(Type implementation, string name = null) where T : class
         {
             _container.Configure(c => c.For(typeof(T))
                 .Use(implementation)
                 .ConditionalName(name));
         }
 
-        public void RegisterSingleton<T>(Type implementation, string name = null)
+        public void RegisterSingleton<T>(Type implementation, string name = null) where T : class
         {
             _container.Configure(c => c.For(typeof(T))
                 .Singleton()
@@ -32,7 +32,7 @@ namespace ProductionProfiler.IoC.StructureMap
                 .ConditionalName(name));
         }
 
-        public void RegisterPerWebRequest<T>(Type implementation, string name = null)
+        public void RegisterPerWebRequest<T>(Type implementation, string name = null) where T : class
         {
             _container.Configure(c => c.For(typeof(T))
                 .HybridHttpOrThreadLocalScoped()
@@ -40,7 +40,7 @@ namespace ProductionProfiler.IoC.StructureMap
                 .ConditionalName(name));
         }
 
-        public void RegisterSingletonInstance<T>(T instance)
+        public void RegisterSingletonInstance<T>(T instance) where T : class
         {
             _container.Configure(c => c.ForSingletonOf<T>().Add(instance));
         }

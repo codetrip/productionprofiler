@@ -1,9 +1,7 @@
 ﻿
 using System.IO;
-using Castle.Facilities.FactorySupport;
 using Castle.MicroKernel.Releasers;
 using Castle.Windsor;
-using Castle.Windsor.Configuration.Interpreters;
 using NUnit.Framework;
 using ProductionProfiler.Core.Caching;
 using ProductionProfiler.Core.Collectors;
@@ -30,7 +28,6 @@ namespace ProductionProfiler.Tests
         protected void ConfigureWithCastle()
         {
             var container = new WindsorContainer();
-            container.AddFacility<FactorySupportFacility>();
             container.Kernel.ReleasePolicy = new NoTrackingReleasePolicy();
 
             Configure.With(new WindsorProfilerContainer(container))

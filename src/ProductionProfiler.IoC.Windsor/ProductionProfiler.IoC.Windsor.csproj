@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ProductionProfiler.IoC.Windsor</RootNamespace>
     <AssemblyName>ProductionProfiler.IoC.Windsor</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -41,14 +41,8 @@
     <Reference Include="Castle.Core">
       <HintPath>..\..\lib\Castle\Castle.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Castle.Services.Logging.log4netIntegration">
-      <HintPath>..\..\lib\Castle\Castle.Services.Logging.log4netIntegration.dll</HintPath>
-    </Reference>
     <Reference Include="Castle.Windsor">
       <HintPath>..\..\lib\Castle\Castle.Windsor.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.Windsor.Lifestyles">
-      <HintPath>..\..\lib\Castle\Castle.Windsor.Lifestyles.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

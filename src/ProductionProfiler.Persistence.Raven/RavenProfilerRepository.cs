@@ -5,9 +5,9 @@ using ProductionProfiler.Core.Persistence.Entities;
 using ProductionProfiler.Core.Profiling.Entities;
 using ProductionProfiler.Core.RequestTiming;
 using ProductionProfiler.Core.RequestTiming.Entities;
+using System.Linq;
 using Raven.Client.Document;
 using Raven.Client.Linq;
-using System.Linq;
 
 namespace ProductionProfiler.Persistence.Raven
 {
@@ -43,7 +43,7 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                return session.Query<UrlToProfile>(UrlToProfileIndexName).Where(r => r.Url == url).FirstOrDefault();
+                return Queryable.Where(session.Query<UrlToProfile>(UrlToProfileIndexName), r => r.Url == url).FirstOrDefault();
             }
         }
 
@@ -51,9 +51,7 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                return session.Query<UrlToProfile>(UrlToProfileIndexName)
-                    .Where(req => req.Enabled)
-                    .Where(req => req.ProfilingCount == null || req.ProfilingCount > 0)
+                return Queryable.Where(Queryable.Where(session.Query<UrlToProfile>(UrlToProfileIndexName), req => req.Enabled), req => req.ProfilingCount == null || req.ProfilingCount > 0)
                     .ToList();
             }
         }
@@ -86,7 +84,7 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                var item = session.Query<UrlToProfile>(UrlToProfileIndexName).Where(r => r.Url == url).FirstOrDefault();
+                var item = Queryable.Where(session.Query<UrlToProfile>(UrlToProfileIndexName), r => r.Url == url).FirstOrDefault();
 
                 if (item != null)
                 {
@@ -120,7 +118,7 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                return session.Query<ProfiledRequestData>(UrlToProfileDataIndexName).Where(r => r.Id == id).FirstOrDefault();
+                return Queryable.Where(session.Query<ProfiledRequestData>(UrlToProfileDataIndexName), r => r.Id == id).FirstOrDefault();
             }
         }
 
@@ -128,7 +126,7 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                var item = session.Query<ProfiledRequestData>(UrlToProfileDataIndexName).Where(r => r.Id == id).FirstOrDefault();
+                var item = Queryable.Where(session.Query<ProfiledRequestData>(UrlToProfileDataIndexName), r => r.Id == id).FirstOrDefault();
 
                 if (item != null)
                 {
@@ -203,7 +201,7 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                foreach (var document in session.Query<ProfiledRequestData>(UrlToProfileDataIndexName).Where(r => r.Url == url))
+                foreach (var document in Queryable.Where(session.Query<ProfiledRequestData>(UrlToProfileDataIndexName), r => r.Url == url))
                 {
                     session.Delete(document);
                 }
@@ -243,7 +241,7 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                return session.Query<ProfiledResponse>(ProfiledResponseIndexName).Where(r => r.Id == id).FirstOrDefault();
+                return Queryable.Where(session.Query<ProfiledResponse>(ProfiledResponseIndexName), r => r.Id == id).FirstOrDefault();
             }
         }
 
@@ -251,7 +249,7 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                var item = session.Query<ProfiledResponse>(ProfiledResponseIndexName).Where(r => r.Id == id).FirstOrDefault();
+                var item = Queryable.Where(session.Query<ProfiledResponse>(ProfiledResponseIndexName), r => r.Id == id).FirstOrDefault();
 
                 if (item != null)
                 {
@@ -265,7 +263,7 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                foreach (var document in session.Query<ProfiledResponse>(ProfiledResponseIndexName).Where(r => r.Url == url))
+                foreach (var document in Queryable.Where(session.Query<ProfiledResponse>(ProfiledResponseIndexName), r => r.Url == url))
                 {
                     session.Delete(document);
                 }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using ProductionProfiler.Core.Profiling;
+using ProductionProfiler.Core.Profiling.Entities;
+using ProductionProfiler.Core.Resources;
 
 namespace ProductionProfiler.Core.Configuration
 {
@@ -54,6 +56,17 @@ namespace ProductionProfiler.Core.Configuration
         public bool ShouldTimeRequest(HttpRequest request)
         {
             return TimeAllRequests && ShouldProfileRequest(request);
+        }
+
+        public ProfiledRequestData GetCurrentProfiledData()
+        {
+            //put a function on here to allow for locations other than HttpContext to have the data.
+            var context =
+                HttpContext.Current != null 
+                ? HttpContext.Current.Items[Constants.RequestProfileContextHttpContextItemKey] as RequestProfileContext
+                : null;
+
+            return context != null ? context.ProfiledRequestData : null;
         }
 
         public static class SettingKeys

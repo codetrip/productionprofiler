@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ProductionProfiler.Persistence.Raven</RootNamespace>
     <AssemblyName>ProductionProfiler.Persistence.Raven</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -38,20 +38,11 @@
     <AssemblyOriginatorKeyFile>..\..\tools\profiler.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MissingBitsFromClientProfile">
-      <HintPath>..\..\lib\Raven\MissingBitsFromClientProfile.dll</HintPath>
+    <Reference Include="Raven.Abstractions">
+      <HintPath>..\..\lib\Raven\Raven.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json.Net35">
-      <HintPath>..\..\lib\Json.NET\Newtonsoft.Json.Net35.dll</HintPath>
-    </Reference>
-    <Reference Include="Raven.Abstractions-3.5">
-      <HintPath>..\..\lib\Raven\Raven.Abstractions-3.5.dll</HintPath>
-    </Reference>
-    <Reference Include="Raven.Client.Lightweight-3.5">
-      <HintPath>..\..\lib\Raven\Raven.Client.Lightweight-3.5.dll</HintPath>
-    </Reference>
-    <Reference Include="Raven.Json-3.5">
-      <HintPath>..\..\lib\Raven\Raven.Json-3.5.dll</HintPath>
+    <Reference Include="Raven.Client.Lightweight">
+      <HintPath>..\..\lib\Raven\Raven.Client.Lightweight.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

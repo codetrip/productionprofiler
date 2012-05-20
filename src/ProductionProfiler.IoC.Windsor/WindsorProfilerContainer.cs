@@ -15,7 +15,7 @@ namespace ProductionProfiler.IoC.Windsor
             _container = container;
         }
 
-        public void RegisterTransient<T>(Type implementation, string name = null)
+        public void RegisterTransient<T>(Type implementation, string name = null) where T : class
         {
             _container.Register(Component.For<T>()
                 .LifeStyle.Transient
@@ -23,7 +23,7 @@ namespace ProductionProfiler.IoC.Windsor
                 .ImplementedBy(implementation));
         }
 
-        public void RegisterSingleton<T>(Type implementation, string name = null)
+        public void RegisterSingleton<T>(Type implementation, string name = null) where T : class
         {
             _container.Register(Component.For<T>()
                 .LifeStyle.Singleton
@@ -31,15 +31,15 @@ namespace ProductionProfiler.IoC.Windsor
                 .ImplementedBy(implementation));
         }
 
-        public void RegisterPerWebRequest<T>(Type implementation, string name = null)
+        public void RegisterPerWebRequest<T>(Type implementation, string name = null) where T : class
         {
             _container.Register(Component.For<T>()
-                .LifeStyle.HybridPerWebRequestPerThread()
+                .LifeStyle.PerWebRequest //GT: changed this from contrib Hybrid PerWebRequest/PerThread
                 .ConditionalName(name)
                 .ImplementedBy(implementation));
         }
 
-        public void RegisterSingletonInstance<T>(T instance)
+        public void RegisterSingletonInstance<T>(T instance) where T : class
         {
             _container.Register(Component.For<T>()
                 .LifeStyle.Singleton
@@ -75,7 +75,7 @@ namespace ProductionProfiler.IoC.Windsor
 
     public static class ContainerExtensions
     {
-        public static ComponentRegistration<T> ConditionalName<T>(this ComponentRegistration<T> registration, string name)
+        public static ComponentRegistration<T> ConditionalName<T>(this ComponentRegistration<T> registration, string name) where T : class
         {
             if (name != null)
                 registration.Named(name);

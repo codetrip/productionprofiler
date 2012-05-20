@@ -28,6 +28,6 @@ namespace ProductionProfiler.Core.Profiling
         public HttpContext HttpContext { get; private set; }
         public IEnumerable<IProfilingTrigger> Coordinators { get; private set; }
         public TimeSpan RequestDuration { get { return _stopwatch.Elapsed; } }
-        public UrlToProfile UrlToProfileSelector { get; set; }
+        public ProfiledRequestData ProfiledRequestData { get; set; }
     }
 }

@@ -67,6 +67,8 @@ namespace ProductionProfiler.Core.Profiling
                 var f = context.HttpContext.Response.Filter;
                 context.HttpContext.Response.Filter = new StoreResponseFilter(context.HttpContext.Response.Filter);
 
+                context.ProfiledRequestData = _profileData;
+
                 _context.StartTiming();
                 
             }
