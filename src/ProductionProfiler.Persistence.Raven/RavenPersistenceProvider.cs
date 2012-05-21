@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using ProductionProfiler.Core.IoC;
 using ProductionProfiler.Core.Persistence;
 using Raven.Abstractions.Indexing;
+using Raven.Client;
 using Raven.Client.Document;
 
 namespace ProductionProfiler.Persistence.Raven
 {
     public class RavenPersistenceProvider : IPersistenceProvider
     {
-        private DocumentStore _documentStore;
+        private IDocumentStore _documentStore;
         private readonly RavenConfiguration _ravenConfiguration;
 
         public RavenPersistenceProvider(string ravenEndpoint)

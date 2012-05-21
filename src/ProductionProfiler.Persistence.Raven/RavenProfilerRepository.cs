@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Persistence.Entities;
 using ProductionProfiler.Core.Profiling.Entities;
 using ProductionProfiler.Core.RequestTiming;
 using ProductionProfiler.Core.RequestTiming.Entities;
 using System.Linq;
+using Raven.Client;
 using Raven.Client.Document;
 using Raven.Client.Linq;
 
@@ -17,9 +19,9 @@ namespace ProductionProfiler.Persistence.Raven
         public const string UrlToProfileDataIndexName = "UrlToProfileDataIndex";
         public const string ProfiledResponseIndexName = "ProfiledResponseIndex";
 
-        private readonly DocumentStore _database;
+        private readonly IDocumentStore _database;
 
-        public RavenProfilerRepository(DocumentStore database)
+        public RavenProfilerRepository(IDocumentStore database)
         {
             _database = database;
         }
@@ -28,14 +30,16 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                var documentQuery = session.Advanced.LuceneQuery<UrlToProfile>(UrlToProfileIndexName)
-                    .Skip((pagingInfo.PageNumber - 1) * pagingInfo.PageSize)
-                    .Take(pagingInfo.PageSize)
-                    .WaitForNonStaleResults(new TimeSpan(0, 0, 3));
+                RavenQueryStatistics stats;
+                var documentQuery = session.Query<UrlToProfile>()
+                    .Customize(c => c.WaitForNonStaleResults(new TimeSpan(0, 0, 3)))
+                    .Statistics(out stats)
+                    .Skip((pagingInfo.PageNumber - 1)*pagingInfo.PageSize)
+                    .Take(pagingInfo.PageSize);
 
                 return new Core.Persistence.Entities.Page<UrlToProfile>(
                     documentQuery.ToList(), 
-                    new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, documentQuery.QueryResult.TotalResults));
+                    new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, stats.TotalResults));
             }
         }
 
@@ -43,7 +47,7 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                return Queryable.Where(session.Query<UrlToProfile>(UrlToProfileIndexName), r => r.Url == url).FirstOrDefault();
+                return Queryable.Where(session.Query<UrlToProfile>(), r => r.Url == url).FirstOrDefault();
             }
         }
 
@@ -51,7 +55,8 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                return Queryable.Where(Queryable.Where(session.Query<UrlToProfile>(UrlToProfileIndexName), req => req.Enabled), req => req.ProfilingCount == null || req.ProfilingCount > 0)
+                return session.Query<UrlToProfile>()
+                    .Where(req => req.Enabled && (req.ProfilingCount == null || req.ProfilingCount > 0))
                     .ToList();
             }
         }
@@ -84,7 +89,7 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                var item = Queryable.Where(session.Query<UrlToProfile>(UrlToProfileIndexName), r => r.Url == url).FirstOrDefault();
+                var item = Queryable.Where(session.Query<UrlToProfile>(), r => r.Url == url).FirstOrDefault();
 
                 if (item != null)
                 {
@@ -98,19 +103,16 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                var documentQuery = session.Query<ProfiledRequestData>(UrlToProfileDataIndexName)
-                    .Distinct()
-                    .Select(r => r.Url);
-
-                var count = documentQuery.Count();
-                var items = documentQuery
+                //TODO: need map-reduce for this (to get distinct)
+                var items = session.Query<ProfiledRequestData>()
+                    .Select(r => r.Url)
                     .Skip((pagingInfo.PageNumber - 1)*pagingInfo.PageSize)
                     .Take(pagingInfo.PageSize)
                     .ToList();
 
                 return new Core.Persistence.Entities.Page<string>(
                     items,
-                    new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, count));
+                    new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, items.Count));
             }
         }
 
@@ -118,7 +120,7 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                return Queryable.Where(session.Query<ProfiledRequestData>(UrlToProfileDataIndexName), r => r.Id == id).FirstOrDefault();
+                return session.Load<ProfiledRequestData>(id);
             }
         }
 
@@ -126,7 +128,7 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                var item = Queryable.Where(session.Query<ProfiledRequestData>(UrlToProfileDataIndexName), r => r.Id == id).FirstOrDefault();
+                var item = session.Load<ProfiledRequestData>(id);
 
                 if (item != null)
                 {
@@ -147,61 +149,55 @@ namespace ProductionProfiler.Persistence.Raven
 
         public Core.Persistence.Entities.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewByUrl(string url, PagingInfo pagingInfo)
         {
-            using (var session = _database.OpenSession())
-            {
-                var linqQuery = session.Query<ProfiledRequestData>(UrlToProfileDataIndexName).Where(r => r.Url == url);
-                return DoGetPreview(linqQuery, pagingInfo);
-            }
+            return DoGetPreview(r => r.Url == url, pagingInfo);
         }
 
         public Core.Persistence.Entities.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewBySessionId(Guid sessionId, PagingInfo pagingInfo)
         {
-            using (var session = _database.OpenSession())
-            {
-                var linqQuery = session.Query<ProfiledRequestData>(UrlToProfileDataIndexName).Where(r => r.SessionId == sessionId);
-                return DoGetPreview(linqQuery, pagingInfo);
-            }
+            return DoGetPreview(r => r.SessionId == sessionId, pagingInfo);
         }
 
         public Core.Persistence.Entities.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewBySessionUserId(string sessionUserId, PagingInfo pagingInfo)
         {
-            using (var session = _database.OpenSession())
-            {
-                var linqQuery = session.Query<ProfiledRequestData>(UrlToProfileDataIndexName).Where(r => r.SessionUserId == sessionUserId);
-                return DoGetPreview(linqQuery, pagingInfo);
-            }
+            return DoGetPreview(r => r.SessionUserId == sessionUserId, pagingInfo);
         }
 
         public Core.Persistence.Entities.Page<ProfiledRequestDataPreview> GetProfiledRequestDataPreviewBySamplingId(Guid samplingId, PagingInfo pagingInfo)
         {
-            using (var session = _database.OpenSession())
-            {
-                var linqQuery = session.Query<ProfiledRequestData>(UrlToProfileDataIndexName).Where(r => r.SamplingId == samplingId);
-                return DoGetPreview(linqQuery, pagingInfo);
-            }
+            return DoGetPreview(r => r.SamplingId == samplingId, pagingInfo);
         }
 
-        private Core.Persistence.Entities.Page<ProfiledRequestDataPreview> DoGetPreview(IRavenQueryable<ProfiledRequestData> linqQuery, PagingInfo pagingInfo)
+        private Core.Persistence.Entities.Page<ProfiledRequestDataPreview> DoGetPreview(Expression<Func<ProfiledRequestData, bool>> whereClause, PagingInfo pagingInfo)
         {
-            var pagination = new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, linqQuery.Count());
-            var results = linqQuery.OrderByDescending(r => r.CapturedOnUtc)
-                .Select(r => new ProfiledRequestDataPreview
-                {
-                    CapturedOnUtc = r.CapturedOnUtc,
-                    ElapsedMilliseconds = r.ElapsedMilliseconds,
-                    Id = r.Id,
-                    Server = r.Server,
-                    Url = r.Url
-                }).Skip((pagingInfo.PageNumber - 1) * pagingInfo.PageSize).Take(pagingInfo.PageSize);
+            using (var session = _database.OpenSession())
+            {
+                RavenQueryStatistics stats;
+                var q = session.Query<ProfiledRequestData>()
+                    .Where(whereClause)
+                    .OrderByDescending(r => r.CapturedOnUtc)
+                    .Statistics(out stats)
+                    .Skip((pagingInfo.PageNumber - 1)*pagingInfo.PageSize)
+                    .Take(pagingInfo.PageSize)
+                    .Select(r => new ProfiledRequestDataPreview
+                                     {
+                                         CapturedOnUtc = r.CapturedOnUtc,
+                                         ElapsedMilliseconds = r.ElapsedMilliseconds,
+                                         Id = r.Id,
+                                         Server = r.Server,
+                                         Url = r.Url
+                                     });
 
-            return new Core.Persistence.Entities.Page<ProfiledRequestDataPreview>(results.ToList(), pagination);
+                var pagination = new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, stats.TotalResults);
+
+                return new Core.Persistence.Entities.Page<ProfiledRequestDataPreview>(q.ToList(), pagination);
+            }
         }
 
         public void DeleteProfiledRequestDataByUrl(string url)
         {
             using (var session = _database.OpenSession())
             {
-                foreach (var document in Queryable.Where(session.Query<ProfiledRequestData>(UrlToProfileDataIndexName), r => r.Url == url))
+                foreach (var document in session.Query<ProfiledRequestData>().Where(r => r.Url == url))
                 {
                     session.Delete(document);
                 }
@@ -241,7 +237,7 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                return Queryable.Where(session.Query<ProfiledResponse>(ProfiledResponseIndexName), r => r.Id == id).FirstOrDefault();
+                return session.Load<ProfiledResponse>(id);
             }
         }
 
@@ -249,7 +245,7 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                var item = Queryable.Where(session.Query<ProfiledResponse>(ProfiledResponseIndexName), r => r.Id == id).FirstOrDefault();
+                var item = session.Load<ProfiledResponse>(id);
 
                 if (item != null)
                 {
@@ -263,7 +259,7 @@ namespace ProductionProfiler.Persistence.Raven
         {
             using (var session = _database.OpenSession())
             {
-                foreach (var document in Queryable.Where(session.Query<ProfiledResponse>(ProfiledResponseIndexName), r => r.Url == url))
+                foreach (var document in session.Query<ProfiledResponse>().Where(r => r.Url == url))
                 {
                     session.Delete(document);
                 }
