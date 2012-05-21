@@ -33,7 +33,7 @@ namespace ProductionProfiler.Core.Modules
 
                     if (profilingTriggersForCurrentRequest.Any())
                     {
-                        ProfilerContext.Profiler.Start(new RequestProfileContext(httpContext, profilingTriggersForCurrentRequest));
+                        ProfilerContext.Profiler.Start(requestProfileContext);
                     }
                 }
 
