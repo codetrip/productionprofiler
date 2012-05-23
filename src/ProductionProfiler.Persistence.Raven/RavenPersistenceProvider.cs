@@ -5,6 +5,7 @@ using ProductionProfiler.Core.Persistence;
 using Raven.Abstractions.Indexing;
 using Raven.Client;
 using Raven.Client.Document;
+using Raven.Client.Indexes;
 
 namespace ProductionProfiler.Persistence.Raven
 {
@@ -36,46 +37,7 @@ namespace ProductionProfiler.Persistence.Raven
         /// </summary>
         public void Initialise()
         {
-            _documentStore.DatabaseCommands.PutIndex("UrlToProfileIndex", new IndexDefinition
-            {
-                Map = "from doc in docs.UrlToProfiles select new { ProfilingCount = doc.ProfilingCount, Enabled = doc.Enabled, Url = doc.Url, __document_id = doc.__document_id }",
-                Fields = new List<string>(new []{ "ProfilingCount" }),
-                Indexes = new Dictionary<string, FieldIndexing>
-                {
-                    {"ProfilingCount", FieldIndexing.No}
-                },
-                Stores = new Dictionary<string, FieldStorage>
-                {
-                    {"ProfilingCount", FieldStorage.Yes}
-                },
-                SortOptions = new Dictionary<string, SortOptions>
-                {
-                    {"ProfilingCount", SortOptions.Long } 
-                }
-            });
-
-            _documentStore.DatabaseCommands.PutIndex("UrlToProfileDataIndex", new IndexDefinition
-            {
-                Map = "from doc in docs.UrlToProfileDatas select new { Id = doc.Id, CapturedOnUtc = doc.CapturedOnUtc, Url = doc.Url, __document_id = doc.__document_id }",
-                Fields = new List<string>(new[] { "CapturedOnUtc" }),
-                Indexes = new Dictionary<string, FieldIndexing>
-                {
-                    {"CapturedOnUtc", FieldIndexing.No}
-                },
-                Stores = new Dictionary<string, FieldStorage>
-                {
-                    {"CapturedOnUtc", FieldStorage.Yes}
-                },
-                SortOptions = new Dictionary<string, SortOptions>
-                {
-                    {"CapturedOnUtc", SortOptions.String } 
-                }
-            });
-
-            _documentStore.DatabaseCommands.PutIndex("ProfiledResponseIndex", new IndexDefinition
-            {
-                Map = "from doc in docs.ProfiledResponses select new { Id = doc.Id, __document_id = doc.__document_id, Url = doc.Url }"
-            });
+            IndexCreation.CreateIndexes(GetType().Assembly, _documentStore);
         }
     }
 }

@@ -45,6 +45,7 @@
       <HintPath>..\..\lib\Raven\Raven.Client.Lightweight.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -52,6 +53,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ProfiledRequestCount.cs" />
+    <Compile Include="ProfiledRequestData_CountsByUrl.cs" />
     <Compile Include="RavenProfilerRepository.cs" />
     <Compile Include="RavenPersistenceProvider.cs" />
     <Compile Include="RavenConfiguration.cs" />

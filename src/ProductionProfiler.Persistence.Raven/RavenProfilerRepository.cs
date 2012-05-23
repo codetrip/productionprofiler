@@ -15,10 +15,6 @@ namespace ProductionProfiler.Persistence.Raven
 {
     public class RavenProfilerRepository : IProfilerRepository
     {
-        public const string UrlToProfileIndexName = "UrlToProfileIndex";
-        public const string UrlToProfileDataIndexName = "UrlToProfileDataIndex";
-        public const string ProfiledResponseIndexName = "ProfiledResponseIndex";
-
         private readonly IDocumentStore _database;
 
         public RavenProfilerRepository(IDocumentStore database)
@@ -104,14 +100,16 @@ namespace ProductionProfiler.Persistence.Raven
             using (var session = _database.OpenSession())
             {
                 //TODO: need map-reduce for this (to get distinct)
-                var items = session.Query<ProfiledRequestData>()
-                    .Select(r => r.Url)
+                RavenQueryStatistics stats;
+                var items = session.Query<ProfiledRequestCount, ProfiledRequestsByUrl>()
+                    .Statistics(out stats)
+                    .OrderByDescending(url => url.MostRecentUtc)
                     .Skip((pagingInfo.PageNumber - 1)*pagingInfo.PageSize)
                     .Take(pagingInfo.PageSize)
                     .ToList();
 
                 return new Core.Persistence.Entities.Page<string>(
-                    items,
+                    items.Select(i => i.Url),
                     new Pagination(pagingInfo.PageSize, pagingInfo.PageNumber, items.Count));
             }
         }
