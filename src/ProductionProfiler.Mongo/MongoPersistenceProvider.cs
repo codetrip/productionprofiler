@@ -1,5 +1,4 @@
 ﻿using System;
-using Norm.Protocol.Messages;
 using ProductionProfiler.Core.IoC;
 using ProductionProfiler.Core.Persistence;
 using ProductionProfiler.Core.Profiling.Entities;
@@ -32,12 +31,12 @@ namespace ProductionProfiler.Persistence.Mongo
         {
             using (MongoSession session = MongoSession.Connect(MongoProfilerRepository.UrlToProfileDatabaseName, _mongoConfiguration.Server, _mongoConfiguration.Port))
             {
-                session.CreateIndex<UrlToProfile, string>(u => u.Url, "UrlToProfile_url", true, IndexOption.Ascending);
+                session.CreateIndex<UrlToProfile>("Url", true, true);
             }
 
             using (MongoSession session = MongoSession.Connect(MongoProfilerRepository.UrlToProfileDataDatabaseName, _mongoConfiguration.Server, _mongoConfiguration.Port))
             {
-                session.CreateIndex<ProfiledRequestData, string>(u => u.Url, "UrlToProfiledata_url", false, IndexOption.Ascending);
+                session.CreateIndex<ProfiledRequestData>("Url", true, false);
             }
         }
     }

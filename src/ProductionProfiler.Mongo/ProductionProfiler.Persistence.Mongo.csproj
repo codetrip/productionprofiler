@@ -38,9 +38,11 @@
     <AssemblyOriginatorKeyFile>..\..\tools\profiler.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Norm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f158f7900376a27d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\NoRM\Norm.dll</HintPath>
+    <Reference Include="MongoDB.Bson">
+      <HintPath>..\..\lib\MongoDB\MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver">
+      <HintPath>..\..\lib\MongoDB\MongoDB.Driver.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MongoConfiguration.cs" />
+    <Compile Include="MongoDatabaseExtensions.cs" />
     <Compile Include="MongoPersistenceProvider.cs" />
     <Compile Include="MongoProfilerRepository.cs" />
     <Compile Include="MongoSession.cs" />
