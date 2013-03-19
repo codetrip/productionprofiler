@@ -1,0 +1,15 @@
+E:\Repositories\productionprofiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\ProductionProfiler.Persistence.Sql.dll
+E:\Repositories\productionprofiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\ProductionProfiler.Persistence.Sql.pdb
+E:\Repositories\productionprofiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\ProductionProfiler.Core.dll
+E:\Repositories\productionprofiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\Castle.Core.dll
+E:\Repositories\productionprofiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\log4net.dll
+E:\Repositories\productionprofiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\Newtonsoft.Json.dll
+E:\Repositories\productionprofiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\ProductionProfiler.Core.pdb
+E:\Repositories\productionprofiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\Castle.Core.pdb
+E:\Repositories\productionprofiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\Castle.Core.xml
+E:\Repositories\productionprofiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\log4net.xml
+E:\Repositories\productionprofiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\Newtonsoft.Json.pdb
+E:\Repositories\productionprofiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\Newtonsoft.Json.xml
+E:\Repositories\productionprofiler\src\ProductionProfiler.Persistence.SqlServer\obj\Release\ResolveAssemblyReference.cache
+E:\Repositories\productionprofiler\src\ProductionProfiler.Persistence.SqlServer\obj\Release\ProductionProfiler.Persistence.Sql.dll
+E:\Repositories\productionprofiler\src\ProductionProfiler.Persistence.SqlServer\obj\Release\ProductionProfiler.Persistence.Sql.pdb

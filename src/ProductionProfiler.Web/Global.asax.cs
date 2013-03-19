@@ -144,14 +144,14 @@ namespace ProductionProfiler.Web
             _container.Register(
                 AllTypes.FromAssembly(Assembly.GetExecutingAssembly())
                     .BasedOn<IController>()
-                    .Configure(c => c.LifestyleTransient()));
+                    .Configure(c => c.LifeStyle.Transient));
 
             _container.Register(AllTypes.FromAssembly(typeof(IWorkflow).Assembly)
                 .BasedOn(typeof(IWorkflow<,>))
                     .WithService
                     .FromInterface(typeof(IWorkflow<,>))
                 .If(t => true)
-                .Configure(c => c.LifestyleTransient()));
+                .Configure(c => c.LifeStyle.Transient));
         }
     }
 }

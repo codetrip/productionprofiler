@@ -23,7 +23,8 @@ namespace ProductionProfiler.IoC.Windsor
         {
             if (ProfilerContext.Profiling)
             {
-                return ShouldIntercept(model.Services);
+                
+                return ShouldIntercept(model.Service);
             }
 
             return false;
@@ -33,7 +34,7 @@ namespace ProductionProfiler.IoC.Windsor
         {
             if (ProfilerContext.Profiling)
             {
-                if (!ShouldIntercept(model.Services))
+                if (!ShouldIntercept(model.Service))
                     return interceptors;
 
                 if (interceptors.Length == 0)
@@ -48,13 +49,9 @@ namespace ProductionProfiler.IoC.Windsor
             return interceptors;
         }
 
-        private bool ShouldIntercept(IEnumerable<Type> serviceTypes)
+        private bool ShouldIntercept(Type serviceType)
         {
-            return _typesToIntercept == null 
-                || 
-                serviceTypes.Any(serviceType => 
-                _typesToIntercept.Any(t => t.IsAssignableFrom(serviceType)) 
-                && !_typesToIgnore.Any(t => t.IsAssignableFrom(serviceType)));
+            return (_typesToIntercept == null || _typesToIntercept.Any(t => t.IsAssignableFrom(serviceType))) && !_typesToIgnore.Any(t => t.IsAssignableFrom(serviceType));
         }
     }
 }

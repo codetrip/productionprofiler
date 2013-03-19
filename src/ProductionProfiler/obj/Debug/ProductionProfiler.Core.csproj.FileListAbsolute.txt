@@ -1,0 +1,13 @@
+E:\Repositories\productionprofiler\src\ProductionProfiler\bin\Debug\ProductionProfiler.Core.dll
+E:\Repositories\productionprofiler\src\ProductionProfiler\bin\Debug\ProductionProfiler.Core.pdb
+E:\Repositories\productionprofiler\src\ProductionProfiler\bin\Debug\Castle.Core.dll
+E:\Repositories\productionprofiler\src\ProductionProfiler\bin\Debug\log4net.dll
+E:\Repositories\productionprofiler\src\ProductionProfiler\bin\Debug\Newtonsoft.Json.dll
+E:\Repositories\productionprofiler\src\ProductionProfiler\bin\Debug\Castle.Core.pdb
+E:\Repositories\productionprofiler\src\ProductionProfiler\bin\Debug\Castle.Core.xml
+E:\Repositories\productionprofiler\src\ProductionProfiler\bin\Debug\log4net.xml
+E:\Repositories\productionprofiler\src\ProductionProfiler\bin\Debug\Newtonsoft.Json.pdb
+E:\Repositories\productionprofiler\src\ProductionProfiler\bin\Debug\Newtonsoft.Json.xml
+E:\Repositories\productionprofiler\src\ProductionProfiler\obj\Debug\ResolveAssemblyReference.cache
+E:\Repositories\productionprofiler\src\ProductionProfiler\obj\Debug\ProductionProfiler.Core.dll
+E:\Repositories\productionprofiler\src\ProductionProfiler\obj\Debug\ProductionProfiler.Core.pdb
