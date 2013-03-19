@@ -101,7 +101,7 @@ namespace ProductionProfiler.Persistence.Raven
             {
                 //TODO: need map-reduce for this (to get distinct)
                 RavenQueryStatistics stats;
-                var items = session.Query<ProfiledRequestCount, ProfiledRequestsByUrl>()
+                var items = session.Query<ProfiledRequestCount, ProfiledRequestData_CountsByUrl>()
                     .Statistics(out stats)
                     .OrderByDescending(url => url.MostRecentUtc)
                     .Skip((pagingInfo.PageNumber - 1)*pagingInfo.PageSize)
