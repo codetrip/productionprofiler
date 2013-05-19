@@ -13,10 +13,10 @@ namespace ProductionProfiler.Core.Profiling
     {
         private readonly Stopwatch _stopwatch;
 
-        public RequestProfileContext(HttpContext httpContext, IEnumerable<IProfilingTrigger> coordinatorsForCurrentRequest)
+        public RequestProfileContext(HttpContext httpContext, IEnumerable<IProfilingTrigger> triggersForCurrentRequest)
         {
             HttpContext = httpContext;
-            Coordinators = coordinatorsForCurrentRequest;
+            Triggers = triggersForCurrentRequest;
             _stopwatch = new Stopwatch();
         }
 
@@ -26,7 +26,7 @@ namespace ProductionProfiler.Core.Profiling
         }
 
         public HttpContext HttpContext { get; private set; }
-        public IEnumerable<IProfilingTrigger> Coordinators { get; private set; }
+        public IEnumerable<IProfilingTrigger> Triggers { get; private set; }
         public TimeSpan RequestDuration { get { return _stopwatch.Elapsed; } }
         public ProfiledRequestData ProfiledRequestData { get; set; }
     }

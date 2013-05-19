@@ -1,0 +1,17 @@
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SQLite\bin\Release\ProductionProfiler.Persistence.SQLite.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SQLite\bin\Release\ProductionProfiler.Persistence.SQLite.pdb
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SQLite\bin\Release\ProductionProfiler.Core.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SQLite\bin\Release\System.Data.SQLite.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SQLite\bin\Release\System.Data.SQLite.Linq.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SQLite\bin\Release\Castle.Core.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SQLite\bin\Release\log4net.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SQLite\bin\Release\Newtonsoft.Json.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SQLite\bin\Release\ProductionProfiler.Core.pdb
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SQLite\bin\Release\System.Data.SQLite.pdb
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SQLite\bin\Release\System.Data.SQLite.Linq.pdb
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SQLite\bin\Release\Castle.Core.xml
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SQLite\bin\Release\log4net.xml
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SQLite\bin\Release\Newtonsoft.Json.xml
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SQLite\obj\Release\ProductionProfiler.Persistence.SQLite.csprojResolveAssemblyReference.cache
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SQLite\obj\Release\ProductionProfiler.Persistence.SQLite.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SQLite\obj\Release\ProductionProfiler.Persistence.SQLite.pdb

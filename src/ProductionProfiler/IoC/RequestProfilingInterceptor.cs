@@ -1,6 +1,5 @@
 ﻿using System;
 using Castle.DynamicProxy;
-using ProductionProfiler.Core.Extensions;
 using ProductionProfiler.Core.Profiling;
 using ProductionProfiler.Core.Profiling.Entities;
 

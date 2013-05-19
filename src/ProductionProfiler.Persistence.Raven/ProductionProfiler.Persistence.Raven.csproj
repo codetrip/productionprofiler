@@ -38,11 +38,13 @@
     <AssemblyOriginatorKeyFile>..\..\tools\profiler.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Raven.Abstractions">
-      <HintPath>..\..\lib\Raven\Raven.Abstractions.dll</HintPath>
+    <Reference Include="Raven.Abstractions, Version=2.0.3.0, Culture=neutral, PublicKeyToken=37f41c7f99471593, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\RavenDB.Client.2.0.2360\lib\net40\Raven.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Raven.Client.Lightweight">
-      <HintPath>..\..\lib\Raven\Raven.Client.Lightweight.dll</HintPath>
+    <Reference Include="Raven.Client.Lightweight, Version=2.0.3.0, Culture=neutral, PublicKeyToken=37f41c7f99471593, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\RavenDB.Client.2.0.2360\lib\net40\Raven.Client.Lightweight.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -54,7 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ProfiledRequestCount.cs" />
-    <Compile Include="ProfiledRequestData_CountsByUrl.cs" />
+    <Compile Include="ProfiledRequestDataCountsByUrl.cs" />
     <Compile Include="RavenProfilerRepository.cs" />
     <Compile Include="RavenPersistenceProvider.cs" />
     <Compile Include="RavenConfiguration.cs" />
@@ -65,6 +67,9 @@
       <Project>{767A9F14-9537-48A1-95B6-A1D753E1DA4E}</Project>
       <Name>ProductionProfiler.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

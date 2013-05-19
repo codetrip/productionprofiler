@@ -1,0 +1,15 @@
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.StructureMap\bin\Debug\ProductionProfiler.IoC.StructureMap.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.StructureMap\bin\Debug\ProductionProfiler.IoC.StructureMap.pdb
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.StructureMap\bin\Debug\Castle.Core.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.StructureMap\bin\Debug\ProductionProfiler.Core.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.StructureMap\bin\Debug\StructureMap.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.StructureMap\bin\Debug\log4net.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.StructureMap\bin\Debug\Newtonsoft.Json.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.StructureMap\bin\Debug\ProductionProfiler.Core.pdb
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.StructureMap\bin\Debug\Castle.Core.xml
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.StructureMap\bin\Debug\StructureMap.xml
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.StructureMap\bin\Debug\log4net.xml
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.StructureMap\bin\Debug\Newtonsoft.Json.xml
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.StructureMap\obj\Debug\ProductionProfiler.IoC.StructureMap.csprojResolveAssemblyReference.cache
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.StructureMap\obj\Debug\ProductionProfiler.IoC.StructureMap.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.StructureMap\obj\Debug\ProductionProfiler.IoC.StructureMap.pdb

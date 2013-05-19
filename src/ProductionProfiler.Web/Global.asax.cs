@@ -95,7 +95,6 @@ namespace ProductionProfiler.Web
             Configure.With(container)
                 .HandleExceptionsVia(e => System.Diagnostics.Trace.Write(e.Format()))
                 .Logger(new Log4NetLogger())
-                //.DataProvider(new MongoPersistenceProvider("127.0.0.1", 27017))
                 .DataProvider(new RavenPersistenceProvider("http://dev-raven.errordite.com"))
                 .HttpRequestDataCollector<BasicHttpRequestDataCollector>()
                 .HttpResponseDataCollector<BasicHttpResponseDataCollector>()

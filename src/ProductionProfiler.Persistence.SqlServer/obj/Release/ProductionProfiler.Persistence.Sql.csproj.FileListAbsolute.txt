@@ -1,0 +1,13 @@
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\ProductionProfiler.Persistence.Sql.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\ProductionProfiler.Persistence.Sql.pdb
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\ProductionProfiler.Core.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\Castle.Core.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\log4net.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\Newtonsoft.Json.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\ProductionProfiler.Core.pdb
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\Castle.Core.xml
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\log4net.xml
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Release\Newtonsoft.Json.xml
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\obj\Release\ProductionProfiler.Persistence.Sql.csprojResolveAssemblyReference.cache
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\obj\Release\ProductionProfiler.Persistence.Sql.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\obj\Release\ProductionProfiler.Persistence.Sql.pdb

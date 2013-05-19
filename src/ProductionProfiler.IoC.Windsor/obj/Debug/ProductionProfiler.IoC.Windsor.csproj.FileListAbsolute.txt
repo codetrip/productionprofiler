@@ -1,0 +1,15 @@
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.Windsor\bin\Debug\ProductionProfiler.IoC.Windsor.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.Windsor\bin\Debug\ProductionProfiler.IoC.Windsor.pdb
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.Windsor\bin\Debug\Castle.Core.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.Windsor\bin\Debug\Castle.Windsor.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.Windsor\bin\Debug\ProductionProfiler.Core.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.Windsor\bin\Debug\log4net.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.Windsor\bin\Debug\Newtonsoft.Json.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.Windsor\bin\Debug\ProductionProfiler.Core.pdb
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.Windsor\bin\Debug\Castle.Core.xml
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.Windsor\bin\Debug\Castle.Windsor.xml
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.Windsor\bin\Debug\log4net.xml
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.Windsor\bin\Debug\Newtonsoft.Json.xml
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.Windsor\obj\Debug\ProductionProfiler.IoC.Windsor.csprojResolveAssemblyReference.cache
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.Windsor\obj\Debug\ProductionProfiler.IoC.Windsor.dll
+C:\Dev\Repositories\Profiler\src\ProductionProfiler.IoC.Windsor\obj\Debug\ProductionProfiler.IoC.Windsor.pdb

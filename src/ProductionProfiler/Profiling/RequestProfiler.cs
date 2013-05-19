@@ -98,7 +98,7 @@ namespace ProductionProfiler.Core.Profiling
 
                 _profileData.ElapsedMilliseconds = (long)_context.RequestDuration.TotalMilliseconds;
 
-                if (_context.Coordinators.Any(coordinator => coordinator.VetoPersistence(_context)))
+                if (_context.Triggers.Any(coordinator => coordinator.VetoPersistence(_context)))
                 {
                     Trace("Coordinator {0} says Skip Persistence.  Ending.");
                     return;
@@ -119,7 +119,7 @@ namespace ProductionProfiler.Core.Profiling
                 }
 
                 //allow the coordinators that have been enabled for this request to augment to profile data before we save it.
-                foreach (var coordinator in _context.Coordinators)
+                foreach (var coordinator in _context.Triggers)
                 {
                     coordinator.AugmentProfiledRequestData(_profileData);
                 }
