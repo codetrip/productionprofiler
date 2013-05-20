@@ -15,8 +15,8 @@ th { padding: 6px 5px; text-align: left; background-color: #e8eef4; border: soli
 
 .rh, .rh-selected { font-weight:bold; text-transform:uppercase; padding:5px; }
 .rh-nested, .rh-nested-selected { font-weight:normal; text-transform:uppercase; padding:5px; }
-.rh, .rh-nested { background: url(profiler?resource=Plus.gif&contenttype=image/gif) 7 7 no-repeat; padding:5px 5px 5px 22px; cursor:pointer; border: solid 1px #BDBDBD; margin-bottom:5px; }
-.rh-selected, .rh-nested-selected {margin-bottom:0px; background: url(profiler?resource=Minus.gif&contenttype=image/gif) 7 7 no-repeat; padding:5px 5px 5px 22px;  cursor:pointer; border-top: solid 1px #BDBDBD; border-left: solid 1px #BDBDBD; border-right: solid 1px #BDBDBD;}
+.rh, .rh-nested { background: url(profiler?resource=Plus.gif&contenttype=image/gif) 7px 7px no-repeat; padding:5px 5px 5px 22px; cursor:pointer; border: solid 1px #BDBDBD; margin-bottom:5px; }
+.rh-selected, .rh-nested-selected {margin-bottom:0px; background: url(profiler?resource=Minus.gif&contenttype=image/gif) 7px 7px no-repeat; padding:5px 5px 5px 22px;  cursor:pointer; border-top: solid 1px #BDBDBD; border-left: solid 1px #BDBDBD; border-right: solid 1px #BDBDBD;}
 .rh-nested, .rh-nested-selected { background-color:#fff;}
 
 a:link { color: #696969; text-decoration: underline; }
@@ -30,7 +30,7 @@ a.heading:hover { color: #696969; text-decoration: none; }
 a.heading:active { color: #696969; }
 
 h1, h2, h3, h4, h5, h6 { font-size: 1.5em; font-family: Arial, Helvetica, sans-serif; }
-h1 { font-size: 2em; padding-bottom: 10; margin-bottom: 0; font-weight:bold }
+h1 { font-size: 2em; padding-bottom: 10px; margin-bottom: 0; font-weight:bold }
 h2 { padding: 0 0 10px 0; }
 h3 { font-size: 1.2em; }
 h4 { font-size: 1.1em; }

@@ -11,3 +11,16 @@ C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\De
 C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\obj\Debug\ProductionProfiler.Persistence.Sql.csprojResolveAssemblyReference.cache
 C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\obj\Debug\ProductionProfiler.Persistence.Sql.dll
 C:\Dev\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\obj\Debug\ProductionProfiler.Persistence.Sql.pdb
+C:\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Debug\ProductionProfiler.Persistence.Sql.dll
+C:\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Debug\ProductionProfiler.Persistence.Sql.pdb
+C:\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Debug\ProductionProfiler.Core.dll
+C:\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Debug\Castle.Core.dll
+C:\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Debug\log4net.dll
+C:\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Debug\Newtonsoft.Json.dll
+C:\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Debug\ProductionProfiler.Core.pdb
+C:\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Debug\Castle.Core.xml
+C:\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Debug\log4net.xml
+C:\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\bin\Debug\Newtonsoft.Json.xml
+C:\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\obj\Debug\ProductionProfiler.Persistence.Sql.csprojResolveAssemblyReference.cache
+C:\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\obj\Debug\ProductionProfiler.Persistence.Sql.dll
+C:\Repositories\Profiler\src\ProductionProfiler.Persistence.SqlServer\obj\Debug\ProductionProfiler.Persistence.Sql.pdb

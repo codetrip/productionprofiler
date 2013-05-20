@@ -8,21 +8,24 @@ using ProductionProfiler.Core.RequestTiming.Entities;
 using System.Linq;
 using Raven.Client;
 using Raven.Client.Linq;
+using ProductionProfiler.Core.Extensions;
 
 namespace ProductionProfiler.Persistence.Raven
 {
     public class RavenProfilerRepository : IProfilerRepository
     {
-        private readonly IDocumentStore _database;
+		private readonly IDocumentStore _database;
+		private readonly RavenConfiguration _ravenConfiguration;
 
-        public RavenProfilerRepository(IDocumentStore database)
+        public RavenProfilerRepository(IDocumentStore database, RavenConfiguration ravenConfiguration)
         {
-            _database = database;
+	        _database = database;
+	        _ravenConfiguration = ravenConfiguration;
         }
 
-        public Core.Persistence.Entities.Page<UrlToProfile> GetUrlsToProfile(PagingInfo pagingInfo)
+	    public Core.Persistence.Entities.Page<UrlToProfile> GetUrlsToProfile(PagingInfo pagingInfo)
         {
-            using (var session = _database.OpenSession())
+            using (var session = _ravenConfiguration.DatabaseName.IsNullOrEmpty() ? _database.OpenSession() : _database.OpenSession(_ravenConfiguration.DatabaseName))
             {
                 RavenQueryStatistics stats;
                 var documentQuery = session.Query<UrlToProfile>()
@@ -39,7 +42,7 @@ namespace ProductionProfiler.Persistence.Raven
 
         public UrlToProfile GetUrlToProfile(string url)
         {
-            using (var session = _database.OpenSession())
+			using (var session = _ravenConfiguration.DatabaseName.IsNullOrEmpty() ? _database.OpenSession() : _database.OpenSession(_ravenConfiguration.DatabaseName))
             {
                 return Queryable.Where(session.Query<UrlToProfile>(), r => r.Url == url).FirstOrDefault();
             }
@@ -47,7 +50,7 @@ namespace ProductionProfiler.Persistence.Raven
 
         public List<UrlToProfile> GetCurrentUrlsToProfile()
         {
-            using (var session = _database.OpenSession())
+			using (var session = _ravenConfiguration.DatabaseName.IsNullOrEmpty() ? _database.OpenSession() : _database.OpenSession(_ravenConfiguration.DatabaseName))
             {
                 return session.Query<UrlToProfile>()
                     .Where(req => req.Enabled && (req.ProfilingCount == null || req.ProfilingCount > 0))
@@ -57,7 +60,7 @@ namespace ProductionProfiler.Persistence.Raven
 
         public void SaveUrlToProfile(UrlToProfile urlToProfile)
         {
-            using (var session = _database.OpenSession())
+			using (var session = _ravenConfiguration.DatabaseName.IsNullOrEmpty() ? _database.OpenSession() : _database.OpenSession(_ravenConfiguration.DatabaseName))
             {
                 // HRB: removed this code as it's causing problems ("Error: Attempted to associated a different object with id"),
                 // and it's not necessary - Raven will simply overwrite the stored profile, which is what we want.
@@ -81,7 +84,7 @@ namespace ProductionProfiler.Persistence.Raven
 
         public void DeleteUrlToProfile(string url)
         {
-            using (var session = _database.OpenSession())
+			using (var session = _ravenConfiguration.DatabaseName.IsNullOrEmpty() ? _database.OpenSession() : _database.OpenSession(_ravenConfiguration.DatabaseName))
             {
                 var item = Queryable.Where(session.Query<UrlToProfile>(), r => r.Url == url).FirstOrDefault();
 
@@ -95,7 +98,7 @@ namespace ProductionProfiler.Persistence.Raven
 
         public Core.Persistence.Entities.Page<string> GetDistinctUrlsToProfile(PagingInfo pagingInfo)
         {
-            using (var session = _database.OpenSession())
+			using (var session = _ravenConfiguration.DatabaseName.IsNullOrEmpty() ? _database.OpenSession() : _database.OpenSession(_ravenConfiguration.DatabaseName))
             {
                 //TODO: need map-reduce for this (to get distinct)
                 RavenQueryStatistics stats;
@@ -114,7 +117,7 @@ namespace ProductionProfiler.Persistence.Raven
 
         public ProfiledRequestData GetProfiledRequestDataById(Guid id)
         {
-            using (var session = _database.OpenSession())
+			using (var session = _ravenConfiguration.DatabaseName.IsNullOrEmpty() ? _database.OpenSession() : _database.OpenSession(_ravenConfiguration.DatabaseName))
             {
                 return session.Load<ProfiledRequestData>(id);
             }
@@ -122,7 +125,7 @@ namespace ProductionProfiler.Persistence.Raven
 
         public void DeleteProfiledRequestDataById(Guid id)
         {
-            using (var session = _database.OpenSession())
+			using (var session = _ravenConfiguration.DatabaseName.IsNullOrEmpty() ? _database.OpenSession() : _database.OpenSession(_ravenConfiguration.DatabaseName))
             {
                 var item = session.Load<ProfiledRequestData>(id);
 
@@ -136,7 +139,7 @@ namespace ProductionProfiler.Persistence.Raven
 
         public void SaveProfiledRequestData(ProfiledRequestData data)
         {
-            using (var session = _database.OpenSession())
+			using (var session = _ravenConfiguration.DatabaseName.IsNullOrEmpty() ? _database.OpenSession() : _database.OpenSession(_ravenConfiguration.DatabaseName))
             {
                 session.Store(data);
                 session.SaveChanges();
@@ -165,7 +168,7 @@ namespace ProductionProfiler.Persistence.Raven
 
         private Core.Persistence.Entities.Page<ProfiledRequestDataPreview> DoGetPreview(Expression<Func<ProfiledRequestData, bool>> whereClause, PagingInfo pagingInfo)
         {
-            using (var session = _database.OpenSession())
+			using (var session = _ravenConfiguration.DatabaseName.IsNullOrEmpty() ? _database.OpenSession() : _database.OpenSession(_ravenConfiguration.DatabaseName))
             {
                 RavenQueryStatistics stats;
                 var q = session.Query<ProfiledRequestData>()
@@ -191,7 +194,7 @@ namespace ProductionProfiler.Persistence.Raven
 
         public void DeleteProfiledRequestDataByUrl(string url)
         {
-            using (var session = _database.OpenSession())
+			using (var session = _ravenConfiguration.DatabaseName.IsNullOrEmpty() ? _database.OpenSession() : _database.OpenSession(_ravenConfiguration.DatabaseName))
             {
                 foreach (var document in session.Query<ProfiledRequestData>().Where(r => r.Url == url))
                 {
@@ -203,7 +206,7 @@ namespace ProductionProfiler.Persistence.Raven
 
         public void SaveResponse(ProfiledResponse response)
         {
-            using (var session = _database.OpenSession())
+			using (var session = _ravenConfiguration.DatabaseName.IsNullOrEmpty() ? _database.OpenSession() : _database.OpenSession(_ravenConfiguration.DatabaseName))
             {
                 session.Store(response);
                 session.SaveChanges();
@@ -212,7 +215,7 @@ namespace ProductionProfiler.Persistence.Raven
 
         public void SaveTimedRequest(TimedRequest timedRequest)
         {
-            using (var session = _database.OpenSession())
+			using (var session = _ravenConfiguration.DatabaseName.IsNullOrEmpty() ? _database.OpenSession() : _database.OpenSession(_ravenConfiguration.DatabaseName))
             {
                 session.Store(timedRequest);
                 session.SaveChanges();
@@ -221,17 +224,33 @@ namespace ProductionProfiler.Persistence.Raven
 
         public Core.Persistence.Entities.Page<TimedRequest> GetLongRequests(PagingInfo paging)
         {
-            throw new NotImplementedException();
+			using (var session = _ravenConfiguration.DatabaseName.IsNullOrEmpty() ? _database.OpenSession() : _database.OpenSession(_ravenConfiguration.DatabaseName))
+			{
+				RavenQueryStatistics stats;
+				var items = session.Query<TimedRequest>()
+					.Statistics(out stats)
+					.Skip((paging.PageNumber - 1) * paging.PageSize)
+					.Take(paging.PageSize)
+					.ToList();
+
+				return new Core.Persistence.Entities.Page<TimedRequest>(items, new Pagination(paging.PageSize, paging.PageNumber, items.Count));
+			}
         }
 
         public void DeleteAllTimedRequests()
         {
-            throw new NotImplementedException();
+			using (var session = _ravenConfiguration.DatabaseName.IsNullOrEmpty() ? _database.OpenSession() : _database.OpenSession(_ravenConfiguration.DatabaseName))
+			{
+				foreach (var timedRequest in session.Query<TimedRequest>())
+				{
+					session.Delete(timedRequest);
+				}
+			}
         }
 
         public ProfiledResponse GetResponseById(Guid id)
         {
-            using (var session = _database.OpenSession())
+			using (var session = _ravenConfiguration.DatabaseName.IsNullOrEmpty() ? _database.OpenSession() : _database.OpenSession(_ravenConfiguration.DatabaseName))
             {
                 return session.Load<ProfiledResponse>(id);
             }
@@ -239,7 +258,7 @@ namespace ProductionProfiler.Persistence.Raven
 
         public void DeleteResponseById(Guid id)
         {
-            using (var session = _database.OpenSession())
+			using (var session = _ravenConfiguration.DatabaseName.IsNullOrEmpty() ? _database.OpenSession() : _database.OpenSession(_ravenConfiguration.DatabaseName))
             {
                 var item = session.Load<ProfiledResponse>(id);
 
@@ -253,7 +272,7 @@ namespace ProductionProfiler.Persistence.Raven
 
         public void DeleteResponseByUrl(string url)
         {
-            using (var session = _database.OpenSession())
+			using (var session = _ravenConfiguration.DatabaseName.IsNullOrEmpty() ? _database.OpenSession() : _database.OpenSession(_ravenConfiguration.DatabaseName))
             {
                 foreach (var document in session.Query<ProfiledResponse>().Where(r => r.Url == url))
                 {

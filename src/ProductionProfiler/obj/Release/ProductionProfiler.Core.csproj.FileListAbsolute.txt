@@ -9,3 +9,14 @@ C:\Dev\Repositories\Profiler\src\ProductionProfiler\bin\Release\Newtonsoft.Json.
 C:\Dev\Repositories\Profiler\src\ProductionProfiler\obj\Release\ProductionProfiler.Core.csprojResolveAssemblyReference.cache
 C:\Dev\Repositories\Profiler\src\ProductionProfiler\obj\Release\ProductionProfiler.Core.dll
 C:\Dev\Repositories\Profiler\src\ProductionProfiler\obj\Release\ProductionProfiler.Core.pdb
+C:\Repositories\Profiler\src\ProductionProfiler\bin\Release\ProductionProfiler.Core.dll
+C:\Repositories\Profiler\src\ProductionProfiler\bin\Release\ProductionProfiler.Core.pdb
+C:\Repositories\Profiler\src\ProductionProfiler\bin\Release\Castle.Core.dll
+C:\Repositories\Profiler\src\ProductionProfiler\bin\Release\log4net.dll
+C:\Repositories\Profiler\src\ProductionProfiler\bin\Release\Newtonsoft.Json.dll
+C:\Repositories\Profiler\src\ProductionProfiler\bin\Release\Castle.Core.xml
+C:\Repositories\Profiler\src\ProductionProfiler\bin\Release\log4net.xml
+C:\Repositories\Profiler\src\ProductionProfiler\bin\Release\Newtonsoft.Json.xml
+C:\Repositories\Profiler\src\ProductionProfiler\obj\Release\ProductionProfiler.Core.csprojResolveAssemblyReference.cache
+C:\Repositories\Profiler\src\ProductionProfiler\obj\Release\ProductionProfiler.Core.dll
+C:\Repositories\Profiler\src\ProductionProfiler\obj\Release\ProductionProfiler.Core.pdb

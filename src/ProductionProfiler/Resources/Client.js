@@ -166,12 +166,12 @@ if (window.jQueryProfiler) {
                     var padding = parseInt(currentRow.attr("data-padding"));
 
                     if (row.hasClass("hidden")) {
-                        currentRow.find('td:first').attr("style", 'cursor:pointer; background: url(/profiler?resource=Plus.gif&contenttype=image/gif) ' + (padding - 10) + ' 7 no-repeat; padding-left:' + padding + '"');
+                        currentRow.find('td:first').attr("style", 'cursor:pointer; background: url(/profiler?resource=Plus.gif&contenttype=image/gif) ' + (padding - 10) + 'px 7px no-repeat; padding-left:' + padding + 'px');
                     } else {
-                        currentRow.find('td:first').attr("style", 'cursor:pointer; background: url(/profiler?resource=Minus.gif&contenttype=image/gif) ' + (padding - 10) + ' 7 no-repeat; padding-left:' + padding + '"');
+                        currentRow.find('td:first').attr("style", 'cursor:pointer; background: url(/profiler?resource=Minus.gif&contenttype=image/gif) ' + (padding - 10) + 'px 7px no-repeat; padding-left:' + padding + 'px');
                     }
                 });
-                this.container.find("div.rh, div.rh-nested").click(function (e) {
+                this.container.find("div.rh, div.rh-nested, div.rh-nested-selected").click(function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     var css, cssSelected;
@@ -244,7 +244,7 @@ if (window.jQueryProfiler) {
                 currentHtml = '<form action="/profiler?handler=apr" method="post">' +
                 '<table class="w1000">' +
                 '<tr><th>Url to profile (Supports Regular Expressions)</th><th>Server</th><th>Profile Count</th><th>Threshold For Recording (ms)</th><th></th></tr>' +
-                '<tr><td><input id="Url" name="Url" style="width:625px" type="text" value="" /></td>' +
+                '<tr><td><input id="Url" name="Url" style="width:555px" type="text" value="" /></td>' +
                 '<td><input name="Server" style="width:200px" type="text" value="" /></td>' +
                 '<td><input name="ProfilingCount" maxlength="4" style="width:75px" type="text" value="" /></td>' +
                 '<td><input name="ThresholdForRecordingMs" maxlength="4" style="width:75px" type="text" value="" /></td>' +
@@ -383,7 +383,7 @@ if (window.jQueryProfiler) {
                 var hasData = method.Data && method.Data.length;
                 var enableToggle = hasLogMessages || hasExceptions || hasData;
                 var rowClass = enableToggle ? 'class="togglechild"' : '';
-                var css = enableToggle ? 'style="cursor:pointer; background: url(/profiler?resource=Plus.gif&contenttype=image/gif) ' + (padding - 10) + ' 7 no-repeat; padding-left:' + padding + '"' : 'style="padding-left:' + padding + 'px"';
+                var css = enableToggle ? 'style="cursor:pointer; background: url(/profiler?resource=Plus.gif&contenttype=image/gif) ' + (padding - 10) + 'px 7px no-repeat; padding-left:' + padding + 'px"' : 'style="padding-left:' + padding + 'px"';
 
                 currentHtml += '<tr ' + rowClass + ' data-padding="' + padding + '">' + $.viewengine.getMethodInfoHiddenFields(method) + '<td ' + css + '>&nbsp;' + $.viewengine.renderMethodSignature(method) + '</td><td>' + method.ElapsedMilliseconds + 'ms</td><td>' + method.StartedAtMilliseconds + 'ms</td><td>' + method.StoppedAtMilliseconds + 'ms</td><td>' + method.Exceptions.length + '</td><td>' + method.Messages.length + '</td></tr>';
 
@@ -391,20 +391,20 @@ if (window.jQueryProfiler) {
                     currentHtml += '<tr class="hidden"><td style="padding-left:' + (padding + 5) + 'px" colspan="6">';
 
                     if (hasLogMessages) {
-                        $.viewengine.renderTable(["Logged at", "Logger", "Level", "Error"], "Messages", method.Messages, "rh-nested", "nested hidden", function (message) {
+                        $.viewengine.renderTable(["Logged at", "Logger", "Level", "Error"], "Messages", method.Messages, "rh-nested-selected", "nested", function (message) {
                             currentHtml += '<tr><td style="width:80px">' + message.Milliseconds + 'ms</td><td style="width:80px">' + message.Logger + '</td><td style="width:100px">' + message.Level + '</td><td>' + message.Message + '</td></tr>';
                         });
                     }
 
                     if (hasExceptions) {
-                        $.viewengine.renderTable(["Logged at", "Exception Type", "Message"], "Exceptions", method.Exceptions, "rh-nested", "nested hidden", function (exception) {
+                    	$.viewengine.renderTable(["Logged at", "Exception Type", "Message"], "Exceptions", method.Exceptions, "rh-nested-selected", "nested", function (exception) {
                             currentHtml += '<tr><td style="width:80px">' + exception.Milliseconds + 'ms</td><td style="width:250px">' + exception.Type + '</td><td>' + exception.Message.replace(new RegExp('\n', 'g'), '<br />') + '</td></tr>';
                         });
                     }
 
                     if (hasData) {
                         $.each(method.Data, function (idx, itm) {
-                            $.viewengine.renderTable(["Name", "Value", "Type"], itm.Name, itm.Data, "rh-nested", "nested hidden", function (dataItem) {
+                        	$.viewengine.renderTable(["Name", "Value", "Type"], itm.Name, itm.Data, "rh-nested-selected", "nested", function (dataItem) {
                                 currentHtml += '<tr><td>' + dataItem.Name + '</td><td>' + $.viewengine.renderDataItem(dataItem) + '</td><td>' + dataItem.Type + '</td></tr>';
                             });
                         });

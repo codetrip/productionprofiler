@@ -28,7 +28,8 @@ namespace ProductionProfiler.Core.Configuration
         private bool _responseDataCollectorSet;
         private bool _cacheEngineSet;
         private bool _serializerSet;
-        private bool _loggerSet;
+		private bool _loggerSet;
+		private bool _auditingEnabled = false;
         private IEnumerable<Type> _typesToIntercept;
         private IEnumerable<Type> _typesToIgnore;
         private IContainer _container;
@@ -36,7 +37,7 @@ namespace ProductionProfiler.Core.Configuration
 
         public static IFluentExceptionConfiguration With(IContainer container)
         {
-            Configure config = new Configure
+            var config = new Configure
             {
                 _profilerConfiguration = new ProfilerConfiguration
                 {
@@ -56,7 +57,7 @@ namespace ProductionProfiler.Core.Configuration
             config._profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.SamplingPeriod] = new TimeSpan(0, 0, 10).ToString();
             config._profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.SamplingTriggerEnabled] = "false";
             config._profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.LongRequestThresholdMs] = "2000";
-            config._profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.TimeAllRequests] = "true";
+            config._profilerConfiguration.Settings[ProfilerConfiguration.SettingKeys.TimeAllRequests] = "false";
             return new ExceptionConfiguration(config);
         }
 
@@ -120,13 +121,13 @@ namespace ProductionProfiler.Core.Configuration
             return this;
         }
 
-        IFluentConfiguration IFluentConfiguration.Logger(ILogger logger)
-        {
-            logger.Initialise();
-            _loggerSet = true;
-            _container.RegisterTransient<ILogger>(logger.GetType());
-            return this;
-        }
+		IFluentConfiguration IFluentConfiguration.Logger(ILogger logger)
+		{
+			logger.Initialise();
+			_loggerSet = true;
+			_container.RegisterTransient<ILogger>(logger.GetType());
+			return this;
+		}
 
         IFluentConfiguration IFluentConfiguration.TimeAllRequests(int longRequestThresholdMs)
         {
@@ -141,7 +142,13 @@ namespace ProductionProfiler.Core.Configuration
             return this;
         }
 
-        #region Collectors
+	    public IFluentConfiguration EnableAuditing()
+	    {
+			_container.RegisterTransient<IComponentAuditor>(typeof(Log4NetComponentAuditor));
+			return this;
+	    }
+
+	    #region Collectors
 
         public IFluentConfiguration AuthoriseManagement(Func<HttpContext, bool> authorisedForManagement)
         {
@@ -234,7 +241,6 @@ namespace ProductionProfiler.Core.Configuration
             _container.RegisterTransient<IAddUrlToProfileRequestBinder>(typeof(AddUrlToProfileRequestBinder));
             _container.RegisterTransient<IUpdateUrlToProfileRequestBinder>(typeof(UpdateUrlToProfileRequestBinder));
             _container.RegisterTransient<IMethodDataCollector>(typeof(MethodDataCollector));
-            _container.RegisterTransient<IComponentAuditor>(typeof(Log4NetComponentAuditor));
             _container.RegisterSingleton<ICookieManager>(typeof(CookieManager));
 
             if (!_requestDataCollectorSet)
@@ -247,6 +253,8 @@ namespace ProductionProfiler.Core.Configuration
                 _container.RegisterTransient<ISerializer>(typeof(JsonSerializer));
             if (!_loggerSet)
                 _container.RegisterTransient<ILogger>(typeof(DefaultLogger));
+			if (!_auditingEnabled)
+				_container.RegisterTransient<IComponentAuditor>(typeof(NullComponentAuditor));
 
             _container.InitialiseForProxyInterception(_typesToIntercept,
                 new List<Type>(_typesToIgnore ?? new Type[0])

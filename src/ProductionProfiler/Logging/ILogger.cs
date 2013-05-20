@@ -20,7 +20,7 @@ namespace ProductionProfiler.Core.Logging
         /// <summary>
         /// Static initialisation of the logger if required, called once on application startup
         /// </summary>
-        void Initialise();
+		void Initialise();
         /// <summary>
         /// Sets the current MethodData on the logger, log messages should always be appended to this method when they are raised
         /// </summary>

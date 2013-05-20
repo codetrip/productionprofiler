@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="Auditing\AuditEvent.cs" />
     <Compile Include="Auditing\ComponentAuditorBase.cs" />
+    <Compile Include="Auditing\NullComponentAuditor.cs" />
     <Compile Include="Auditing\IComponentAuditor.cs" />
     <Compile Include="Auditing\Log4NetComponentAuditor.cs" />
     <Compile Include="Auditing\ExceptionUtility.cs" />

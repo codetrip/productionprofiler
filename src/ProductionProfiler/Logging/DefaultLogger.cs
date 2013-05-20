@@ -10,7 +10,7 @@ namespace ProductionProfiler.Core.Logging
         public void Stop()
         { }
 
-        public void Initialise()
+		public void Initialise()
         { }
 
         public MethodData CurrentMethod

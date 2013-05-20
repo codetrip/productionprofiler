@@ -50,11 +50,9 @@ namespace ProductionProfiler.IoC.Windsor
 
         private bool ShouldIntercept(IEnumerable<Type> serviceTypes)
         {
-            return _typesToIntercept == null 
-                || 
-                serviceTypes.Any(serviceType => 
-                _typesToIntercept.Any(t => t.IsAssignableFrom(serviceType)) 
-                && !_typesToIgnore.Any(t => t.IsAssignableFrom(serviceType)));
+	        return _typesToIntercept == null ? 
+				serviceTypes.Any(serviceType => !_typesToIgnore.Any(t => t.IsAssignableFrom(serviceType))) : 
+				serviceTypes.Any(serviceType => _typesToIntercept.Any(t => t.IsAssignableFrom(serviceType)) && !_typesToIgnore.Any(t => t.IsAssignableFrom(serviceType)));
         }
     }
 }

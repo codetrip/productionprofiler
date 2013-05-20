@@ -16,8 +16,17 @@ namespace ProductionProfiler.Core.Logging
         private MethodData _currentMethod;
         //we only want to know about logging that pertains to the thread of the web request
         private int _threadId;
+		private readonly bool _useRootLogger;
 
-        public void Start()
+		public Log4NetLogger()
+		{}
+
+	    public Log4NetLogger(bool useRootLogger)
+	    {
+		    _useRootLogger = useRootLogger;
+	    }
+
+	    public void Start()
         {
             _threadId = Thread.CurrentThread.ManagedThreadId;
             foreach (var appender in _profilingAppenders)
@@ -36,7 +45,7 @@ namespace ProductionProfiler.Core.Logging
             {
                 var logger = log.Logger as Logger;
 
-                if (logger != null)
+				if (logger != null)
                 {
                     var profilingAppender = new Log4NetProfilingAppender
                     {
@@ -49,14 +58,25 @@ namespace ProductionProfiler.Core.Logging
                 }
             }
 
-            var repository = LogManager.GetRepository() as Hierarchy;
+			var repository = LogManager.GetRepository() as Hierarchy;
 
-            if (repository != null)
-            {
-                System.Diagnostics.Trace.Write("LOG4NET CONFIGURATION CHANGED");
-                repository.Configured = true;
-                repository.RaiseConfigurationChanged(EventArgs.Empty);
-            }
+			if (repository == null)
+				return;
+
+			if (_useRootLogger && repository.Root != null)
+			{
+				var profilingAppender = new Log4NetProfilingAppender
+				{
+					Threshold = Level.Debug,
+					Name = "{0}-{1}".FormatWith(repository.Root.Name, Constants.ProfilingAppender)
+				};
+
+				repository.Root.AddAppender(profilingAppender);
+				_profilingAppenders.Add(profilingAppender);
+			}
+
+            repository.Configured = true;
+            repository.RaiseConfigurationChanged(EventArgs.Empty);
         }
 
         public MethodData CurrentMethod

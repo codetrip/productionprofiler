@@ -33,7 +33,7 @@ namespace ProductionProfiler.Core.Configuration
         /// <param name="requestFilter"></param>
         /// <returns></returns>
         IFluentConfiguration RequestFilter(Func<HttpRequest, bool> requestFilter);
-        IFluentConfiguration Logger(ILogger logger);
+		IFluentConfiguration Logger(ILogger logger);
         IFluentConfiguration DataProvider(IPersistenceProvider persistenceProvider);
         IFluentConfiguration CacheEngine<T>() where T : IProfilerCacheEngine;
         IFluentConfiguration Serializer<T>() where T : ISerializer;
@@ -43,7 +43,8 @@ namespace ProductionProfiler.Core.Configuration
         IFluentConfiguration AuthoriseSession(Func<string, bool> authoriseSession);
         IFluentConfiguration CollectMethodDataForTypes(IEnumerable<Type> typesToCollectMethodDataFor);
         IFluentConfiguration TimeAllRequests(int durationThresholdMs);
-        IFluentConfiguration DoNotTimeAllRequests();
+		IFluentConfiguration DoNotTimeAllRequests();
+		IFluentConfiguration EnableAuditing();
         IFluentProfilingTriggerConfiguration Trigger { get; }
         IFluentCollectorConfiguration AddMethodInvocationDataCollector<T>() where T : IMethodInvocationDataCollector;
         void Initialise();
