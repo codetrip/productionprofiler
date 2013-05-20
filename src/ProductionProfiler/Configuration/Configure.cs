@@ -144,6 +144,7 @@ namespace ProductionProfiler.Core.Configuration
 
 	    public IFluentConfiguration EnableAuditing()
 	    {
+		    _auditingEnabled = true;
 			_container.RegisterTransient<IComponentAuditor>(typeof(Log4NetComponentAuditor));
 			return this;
 	    }
